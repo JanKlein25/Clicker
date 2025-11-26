@@ -3,20 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker Legacy</title>
+  <title>KleinClicker Perfected</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-pattern: #1e1e24;
       --panel-left: #2b2b36;
       --panel-right: #26262e;
-      --header-bg: #15151a;
       --gold: #f1c40f;
       --text-main: #ecf0f1;
-      --text-dim: #95a5a6;
-      --border-color: #000;
       --highlight: #3498db;
+      --tooltip-bg: #1a1a1a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -31,52 +28,39 @@
       flex-direction: column;
     }
 
-    /* --- BACKGROUND PARTICLES --- */
-    #bgCanvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0.3;
-    }
-
     /* --- TOP BAR (NEWS TICKER) --- */
     #topBar {
-      height: 40px;
-      background: #000;
+      height: 45px;
+      background: #111;
       border-bottom: 2px solid #333;
       z-index: 100;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
       position: relative;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.5);
     }
     
-    .news-content {
-      white-space: nowrap;
-      position: absolute;
-      animation: ticker 15s linear infinite;
+    #newsTicker {
       font-family: 'Merriweather', serif;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: #bdc3c7;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      text-align: center;
+      padding: 0 20px;
     }
-    
-    @keyframes ticker {
-      0% { transform: translateX(100vw); }
-      100% { transform: translateX(-100%); }
-    }
+    #newsTicker.show { opacity: 1; }
 
     /* --- MAIN LAYOUT --- */
     #gameContainer {
       display: flex;
       flex: 1;
       z-index: 10;
-      height: calc(100vh - 40px);
+      height: calc(100vh - 45px);
     }
 
-    /* --- LEFT PANEL (CLICKING) --- */
+    /* --- LEFT PANEL --- */
     .left-panel {
       flex: 1;
       background: radial-gradient(circle at center, #353b48 0%, #1e1e24 100%);
@@ -87,6 +71,7 @@
       position: relative;
       border-right: 4px solid #000;
       box-shadow: inset -10px 0 20px rgba(0,0,0,0.5);
+      overflow: hidden; /* Für Partikel */
     }
 
     .bakery-name {
@@ -97,27 +82,29 @@
       font-family: 'Merriweather', serif;
       font-weight: 900;
       font-size: 1.8rem;
-      text-shadow: 0 2px 0 #000;
-      background: rgba(0,0,0,0.3);
-      padding: 5px 0;
+      text-shadow: 0 3px 0 #000;
+      color: var(--gold);
+      background: linear-gradient(to right, transparent, rgba(0,0,0,0.5), transparent);
+      padding: 10px 0;
     }
 
     .score-container {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       text-align: center;
       z-index: 20;
     }
 
     #score {
       font-family: 'Merriweather', serif;
-      font-size: 3rem;
+      font-size: 3.2rem;
       font-weight: bold;
-      text-shadow: 0 0 10px rgba(255,255,255,0.2);
+      text-shadow: 0 0 15px rgba(255,255,255,0.1);
     }
     
     #cps {
-      font-size: 1.1rem;
-      color: var(--text-dim);
+      font-size: 1.2rem;
+      color: #95a5a6;
+      margin-top: 5px;
     }
 
     #bigKlein {
@@ -126,86 +113,91 @@
       object-fit: contain;
       cursor: pointer;
       transition: transform 0.05s;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
       z-index: 20;
     }
-    #bigKlein:active { transform: scale(0.95); }
-    #bigKlein:hover { filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); }
+    #bigKlein:active { transform: scale(0.96); }
+    #bigKlein:hover { filter: drop-shadow(0 0 20px rgba(255,255,255,0.15)); }
 
     /* --- RIGHT PANEL (STORE) --- */
     .right-panel {
-      width: 350px;
+      width: 380px;
       background: var(--panel-right);
       display: flex;
       flex-direction: column;
       border-left: 1px solid #444;
     }
 
-    @media (max-width: 800px) {
-      /* Mobile Layout Switch */
-      #gameContainer { flex-direction: column; overflow-y: auto; }
-      .left-panel { min-height: 50vh; border-right: none; border-bottom: 4px solid #000; }
-      .right-panel { width: 100%; height: auto; }
-      #bgCanvas { display: none; } /* Performance on mobile */
-    }
-
-    /* Store Header */
     .store-header {
-      background: #000;
-      padding: 10px;
+      background: #1a1a1d;
+      padding: 12px;
       text-align: center;
       font-family: 'Merriweather', serif;
       font-weight: bold;
       color: var(--gold);
-      border-bottom: 1px solid #444;
+      border-bottom: 1px solid #333;
+      border-top: 1px solid #333;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
     }
 
     /* Upgrades Grid */
     .upgrades-container {
-      padding: 10px;
-      background: rgba(0,0,0,0.2);
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 5px;
+      padding: 8px;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
       min-height: 60px;
-      border-bottom: 2px solid #000;
+      max-height: 150px; /* Scrollbar falls zu viele Upgrades */
+      overflow-y: auto;
     }
     
     .upgrade-crate {
-      width: 48px;
-      height: 48px;
+      width: 54px;
+      height: 54px;
       background: #333;
-      border: 1px solid #555;
+      border: 2px solid #555;
       cursor: pointer;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       transition: all 0.1s;
+      border-radius: 4px;
     }
-    .upgrade-crate:hover { border-color: #fff; background: #444; }
-    .upgrade-crate:active { transform: scale(0.95); }
+    .upgrade-crate:hover { border-color: #fff; background: #444; z-index: 100; }
     
-    /* Tooltip */
+    /* TOOLTIP (Improved) */
     .upgrade-crate .tooltip {
       visibility: hidden;
-      width: 200px;
-      background-color: #111;
+      width: 280px;
+      background-color: var(--tooltip-bg);
       color: #fff;
-      text-align: left;
       border: 2px solid #fff;
-      padding: 10px;
-      border-radius: 4px;
+      padding: 12px;
+      border-radius: 6px;
       position: absolute;
-      z-index: 1000;
       top: 100%;
       right: 0;
       opacity: 0;
       transition: opacity 0.2s;
       pointer-events: none;
-      font-size: 0.8rem;
+      font-family: 'Roboto', sans-serif;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      z-index: 2000;
     }
+    
+    /* Tooltip content styling */
+    .tt-header { display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px solid #555; padding-bottom:5px; }
+    .tt-name { font-weight:bold; color:var(--text-main); font-size:1rem; }
+    .tt-cost { font-weight:bold; color:#e74c3c; } /* Red by default, green via JS */
+    .tt-desc { font-size:0.8rem; color:#bdc3c7; font-style: italic; margin-bottom: 8px;}
+    .tt-stats { font-size: 0.85rem; color: #fff; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 4px;}
+    .stat-old { color: #95a5a6; text-decoration: line-through; margin-right: 5px; }
+    .stat-new { color: #2ecc71; font-weight: bold; }
+
     .upgrade-crate:hover .tooltip { visibility: visible; opacity: 1; }
 
     /* Buildings List */
@@ -217,79 +209,79 @@
     }
 
     .building-row {
-      height: 64px;
-      background: linear-gradient(to bottom, #444, #333);
-      border-bottom: 1px solid #000;
+      height: 70px;
+      background: linear-gradient(to bottom, #3a3a42, #2c2c32);
+      border-bottom: 1px solid #111;
       display: flex;
       align-items: center;
-      padding: 0 10px;
+      padding: 0 15px;
       cursor: pointer;
       position: relative;
-      opacity: 0.7;
+      opacity: 0.6;
       transition: all 0.2s;
     }
-    .building-row:hover { opacity: 1; background: linear-gradient(to bottom, #555, #444); }
-    .building-row.locked { display: none; }
+    .building-row:hover { opacity: 1; background: linear-gradient(to bottom, #4a4a52, #3c3c42); }
     .building-row.can-afford { opacity: 1; }
-    .building-row.too-expensive { opacity: 0.6; filter: grayscale(0.5); }
+    
+    .b-icon { font-size: 2.2rem; width: 60px; text-align: center; margin-right: 15px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+    .b-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .b-name { font-weight: 900; font-family: 'Merriweather', serif; font-size: 1.2rem; text-shadow: 1px 1px 0 #000; color:#fff; }
+    .b-cost { color: #e74c3c; font-weight: bold; font-size: 0.95rem; }
+    .b-cost.affordable { color: #2ecc71; }
+    .b-count { font-size: 2.2rem; font-weight: bold; color: rgba(0,0,0,0.2); margin-left: auto; }
 
-    .b-icon { font-size: 2rem; width: 50px; text-align: center; margin-right: 10px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
-    .b-info { flex: 1; display: flex; flex-direction: column; }
-    .b-name { font-weight: bold; font-family: 'Merriweather', serif; font-size: 1.1rem; text-shadow: 1px 1px 0 #000; }
-    .b-cost { color: #2ecc71; font-weight: bold; font-size: 0.9rem; }
-    .b-cost.red { color: #e74c3c; }
-    .b-count { font-size: 2rem; font-weight: bold; color: rgba(0,0,0,0.3); padding-right: 10px; }
+    /* --- FALLING FACES (Particles) --- */
+    .falling-face {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      pointer-events: none;
+      z-index: 15;
+      animation: fallDown 1.5s cubic-bezier(0.5, 0, 1, 1) forwards;
+    }
+    @keyframes fallDown {
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translateY(600px) rotate(720deg) scale(0.5); opacity: 0; }
+    }
 
-    /* --- VISUAL EFFECTS --- */
-    .click-fx {
+    .click-text {
       position: absolute;
       color: #fff;
-      font-weight: bold;
+      font-weight: 900;
+      font-size: 1.5rem;
       pointer-events: none;
-      animation: floatUp 1s ease-out forwards;
+      animation: floatUp 0.8s ease-out forwards;
       z-index: 100;
-      text-shadow: 0 0 3px #000;
-      font-family: 'Merriweather', serif;
+      text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     }
-    
     @keyframes floatUp {
       0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-50px); }
+      100% { opacity: 0; transform: translateY(-80px); }
     }
 
-    /* --- BUFF BAR --- */
+    /* --- BUFFS --- */
     .buff-container {
       position: absolute;
-      top: 50%;
-      left: 10px;
+      bottom: 20px;
+      left: 20px;
       display: flex;
-      flex-direction: column;
-      gap: 5px;
+      gap: 10px;
       z-index: 50;
     }
     .buff-icon {
-      width: 40px;
-      height: 40px;
-      background: rgba(0,0,0,0.5);
+      width: 48px;
+      height: 48px;
+      background: rgba(0,0,0,0.8);
       border: 2px solid var(--gold);
-      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--gold);
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       position: relative;
-    }
-    .buff-timer {
-      position: absolute;
-      bottom: -15px;
-      font-size: 0.7rem;
-      background: #000;
-      padding: 1px 4px;
-      border-radius: 4px;
+      box-shadow: 0 0 10px var(--gold);
     }
 
-    /* --- GOLDEN COOKIE --- */
+    /* --- GOLDEN KLEIN --- */
     #goldenKlein {
       position: absolute;
       width: 90px;
@@ -301,30 +293,35 @@
       filter: drop-shadow(0 0 15px gold);
     }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+      #gameContainer { flex-direction: column; overflow-y: auto; }
+      .left-panel { min-height: 45vh; border-right: none; border-bottom: 4px solid #000; }
+      .right-panel { width: 100%; height: auto; }
+      #bigKlein { width: 180px; height: 180px; }
+      .upgrade-crate .tooltip { width: 220px; right: 100%; top: 0; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Background for falling heads -->
-  <canvas id="bgCanvas"></canvas>
-
   <div id="topBar">
-    <div class="news-content" id="newsTicker">Willkommen bei KleinClicker Legacy! Klick auf das Gesicht!</div>
+    <div id="newsTicker">Willkommen! Klicke auf das Gesicht, um dein Imperium zu starten.</div>
   </div>
 
   <div id="gameContainer">
     <!-- Left: Interaction -->
-    <div class="left-panel">
-      <div class="bakery-name">Dein Klein-Imperium</div>
+    <div class="left-panel" id="clickPanel">
+      <div class="bakery-name">KleinClicker Imperium</div>
       
       <div class="score-container">
         <div id="score">0</div>
-        <div id="cps">pro Sekunde: 0.0</div>
+        <div id="cps">pro Sekunde: 0,0</div>
       </div>
 
       <div class="buff-container" id="buffArea"></div>
       
-      <!-- Der "Cookie" -->
       <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein" alt="Klick mich!">
       
       <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="goldenKlein" alt="GOLD">
@@ -333,51 +330,50 @@
     <!-- Right: Shop -->
     <div class="right-panel">
       <div class="store-header">UPGRADES</div>
-      <div class="upgrades-container" id="upgradeGrid">
-        <!-- Gefüllt via JS -->
-      </div>
+      <div class="upgrades-container" id="upgradeGrid"></div>
 
       <div class="store-header">GEBÄUDE</div>
-      <div class="buildings-list" id="buildingList">
-        <!-- Gefüllt via JS -->
-      </div>
+      <div class="buildings-list" id="buildingList"></div>
     </div>
   </div>
 
   <script>
     /* --- CONFIG & DATA --- */
-    const GAME_VERSION = 1.0;
-    const SAVE_KEY = 'KleinClickerLegacySave';
+    const GAME_VERSION = 1.1;
+    const SAVE_KEY = 'KleinClickerPerfectSave';
 
-    // Buildings: Classic Curve
+    // Buildings
     const BUILDINGS = [
-      { id: 0, name: 'Maus',        baseCost: 15,      baseCps: 0.1,    icon: '👆', desc: 'Klickt automatisch für dich.' },
-      { id: 1, name: 'Oma',         baseCost: 100,     baseCps: 1,      icon: '👵', desc: 'Eine nette Oma backt Kleinis.' },
-      { id: 2, name: 'Plantage',    baseCost: 1100,    baseCps: 8,      icon: '🌳', desc: 'Baut Kleinis in der Erde an.' },
-      { id: 3, name: 'Mine',        baseCost: 12000,   baseCps: 47,     icon: '⛏️', desc: 'Schürft Kleinis aus dem Gestein.' },
-      { id: 4, name: 'Fabrik',      baseCost: 130000,  baseCps: 260,    icon: '🏭', desc: 'Massenproduktion!' },
-      { id: 5, name: 'Bank',        baseCost: 1400000, baseCps: 1400,   icon: '🏦', desc: 'Generiert Kleinis aus Zinsen.' },
-      { id: 6, name: 'Tempel',      baseCost: 20000000,baseCps: 7800,   icon: '🏛️', desc: 'Bete zu den Klein-Göttern.' }
+      { id: 0, name: 'Kaputte Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
+      { id: 1, name: 'Nette Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
+      { id: 2, name: 'Kleini Feld',  baseCost: 1100,    baseCps: 8,      icon: '🌾' },
+      { id: 3, name: 'Meme Mine',    baseCost: 12000,   baseCps: 47,     icon: '⛏️' },
+      { id: 4, name: 'Fabrik',       baseCost: 130000,  baseCps: 260,    icon: '🏭' },
+      { id: 5, name: 'Bank',         baseCost: 1400000, baseCps: 1400,   icon: '🏦' },
+      { id: 6, name: 'Tempel',       baseCost: 20000000,baseCps: 7800,   icon: '🏛️' }
     ];
 
-    // Upgrades: Unlock conditions
+    // Upgrades
+    // target: index in BUILDINGS. -1 means "Clicking".
     const UPGRADES = [
-      { id: 'u_click1', name: 'Plastik-Maus', cost: 500,    triggerType: 'clicks', triggerVal: 100,  icon: '🖱️', desc: 'Klicks sind doppelt so effektiv.', type: 'click', multi: 2 },
-      { id: 'u_click2', name: 'Eisen-Maus',   cost: 50000,  triggerType: 'clicks', triggerVal: 1000, icon: '⚒️', desc: 'Klicks sind doppelt so effektiv.', type: 'click', multi: 2 },
-      { id: 'u_b0_1',   name: 'Carpaltunnel', cost: 1000,   triggerType: 'build',  triggerId: 0, triggerVal: 10, icon: '👆', desc: 'Mäuse sind doppelt so effizient.', type: 'build', target: 0, multi: 2 },
-      { id: 'u_b1_1',   name: 'Nudelholz',    cost: 5000,   triggerType: 'build',  triggerId: 1, triggerVal: 10, icon: '👵', desc: 'Omas sind doppelt so effizient.', type: 'build', target: 1, multi: 2 },
-      { id: 'u_b1_2',   name: 'Bingo',        cost: 20000,  triggerType: 'build',  triggerId: 1, triggerVal: 50, icon: '🎱', desc: 'Omas x2.', type: 'build', target: 1, multi: 2 },
-      { id: 'u_b2_1',   name: 'Dünger',       cost: 55000,  triggerType: 'build',  triggerId: 2, triggerVal: 10, icon: '💩', desc: 'Plantagen x2.', type: 'build', target: 2, multi: 2 },
-      { id: 'u_b3_1',   name: 'Sicherheitslicht', cost: 600000, triggerType: 'build', triggerId: 3, triggerVal: 10, icon: '🔦', desc: 'Minen x2.', type: 'build', target: 3, multi: 2 }
+      { id: 'u_click_1', name: 'Plastik Maus', cost: 500,    trigger: {type:'clicks', val:100}, icon:'🖱️', desc:'Klicks sind doppelt so effektiv.', type:'click', multi:2 },
+      { id: 'u_click_2', name: 'Gamer Maus',   cost: 50000,  trigger: {type:'clicks', val:1000},icon:'🎮', desc:'Klicks sind doppelt so effektiv.', type:'click', multi:2 },
+      
+      { id: 'u_b0_1',    name: 'Carpaltunnel', cost: 1000,   trigger: {type:'build', id:0, val:10}, icon:'🩹', desc:'Mäuse sind doppelt so effizient.', type:'build', target:0, multi:2 },
+      { id: 'u_b1_1',    name: 'Nudelholz',    cost: 5000,   trigger: {type:'build', id:1, val:10}, icon:'🥖', desc:'Omas arbeiten doppelt so hart.', type:'build', target:1, multi:2 },
+      { id: 'u_b1_2',    name: 'Brille',       cost: 20000,  trigger: {type:'build', id:1, val:50}, icon:'👓', desc:'Omas sehen besser (x2 Prod).', type:'build', target:1, multi:2 },
+      
+      { id: 'u_b2_1',    name: 'Dünger',       cost: 55000,  trigger: {type:'build', id:2, val:10}, icon:'💩', desc:'Felder wachsen schneller (x2).', type:'build', target:2, multi:2 },
+      { id: 'u_b3_1',    name: 'Dynamit',      cost: 600000, trigger: {type:'build', id:3, val:10}, icon:'🧨', desc:'Minen sprengen mehr weg (x2).', type:'build', target:3, multi:2 }
     ];
 
-    const NEWS_TICKER_MSGS = [
-      "Klein wird in den Nachrichten erwähnt!",
-      "Omas beschweren sich über Klick-Finger.",
-      "Wissenschaftler entdecken neues Klein-Partikel.",
-      "Börse stürzt ab, investiere in Kleinis!",
-      "Janklein25 approved this game.",
-      "Cookie Clicker ruft an, sie wollen ihre Mechanik zurück."
+    const NEWS = [
+      "Klein wurde im Fernsehen gesehen!",
+      "Omas streiken für mehr Bingo-Abende.",
+      "Der Kurs für Kleinis steigt ins Unermessliche!",
+      "Wissenschaftler sind verwirrt: Wo kommen all die Kleinis her?",
+      "Jemand hat gerade auf ein Gesicht geklickt.",
+      "Ein goldenes Gesicht wurde gesichtet!"
     ];
 
     /* --- GAME STATE --- */
@@ -386,61 +382,54 @@
       totalScore: 0,
       clicks: 0,
       buildings: new Array(BUILDINGS.length).fill(0),
-      upgrades: [], // IDs of bought upgrades
+      upgrades: [],
       startTime: Date.now()
     };
 
     let buffs = {
-      frenzy: { active: false, time: 0, multi: 7 }, // x7 CPS
-      clickFrenzy: { active: false, time: 0, multi: 777 } // x777 Click Power
+      frenzy: { active: false, time: 0 },
+      lucky: { active: false, time: 0 }
     };
 
-    /* --- ENGINE VARS --- */
     let lastTime = performance.now();
-    let goldenTimer = 0;
     
-    // DOM Cache
+    /* --- ELEMENTS --- */
     const elScore = document.getElementById('score');
     const elCps = document.getElementById('cps');
     const elTicker = document.getElementById('newsTicker');
-    const elUpgradeGrid = document.getElementById('upgradeGrid');
-    const elBuildList = document.getElementById('buildingList');
-    const elBuffArea = document.getElementById('buffArea');
+    const elGrid = document.getElementById('upgradeGrid');
+    const elList = document.getElementById('buildingList');
 
-    /* --- INITIALIZATION --- */
+    /* --- INIT --- */
     function init() {
       loadGame();
-      buildUI();
-      scheduleGolden();
+      createBuildingUI();
+      renderUpgrades();
       requestAnimationFrame(gameLoop);
-      setInterval(slowLoop, 1000); // Save & Ticker
-      initBackground();
+      setInterval(slowLoop, 1000); // 1s Loop für Save & News
+      scheduleGolden();
+      updateNews(); // First news
     }
 
-    /* --- MAIN LOOP --- */
+    /* --- LOOPS --- */
     function gameLoop(now) {
       let dt = (now - lastTime) / 1000;
-      if (dt > 1) dt = 1;
+      if(dt > 1) dt = 1;
       lastTime = now;
 
-      // Handle Buffs
+      // Logic
       updateBuffs(dt);
-
-      // Calc CPS
-      const rawCps = calculateCPS();
-      const buffMult = getBuffMult();
-      const finalCps = rawCps * buffMult;
-
-      if (finalCps > 0) {
-        addScore(finalCps * dt);
+      const cps = calculateCPS();
+      if(cps > 0) {
+        game.score += cps * dt;
+        game.totalScore += cps * dt;
       }
 
       // Render
       elScore.textContent = formatNum(Math.floor(game.score));
-      elCps.textContent = "pro Sekunde: " + formatNum(finalCps, 1);
-      document.title = formatNum(Math.floor(game.score)) + " Kleinis";
+      elCps.textContent = "pro Sekunde: " + formatNum(cps, 1);
+      document.title = formatNum(Math.floor(game.score)) + " KleinClicker";
 
-      // Update Building buttons (Enable/Disable visuals)
       updateBuildingButtons();
 
       requestAnimationFrame(gameLoop);
@@ -448,377 +437,301 @@
 
     function slowLoop() {
       saveGame();
-      
-      // Rotate News
-      if(Math.random() > 0.7) {
-        const msg = NEWS_TICKER_MSGS[Math.floor(Math.random() * NEWS_TICKER_MSGS.length)];
-        elTicker.textContent = msg;
-      }
-      
-      // Update Upgrades (Check Unlocks)
-      renderUpgrades();
+      updateNews();
+      renderUpgrades(); // Refresh tooltips/unlocks
     }
 
-    /* --- LOGIC --- */
+    /* --- CALCULATIONS --- */
+    function getBuildingMultiplier(bIndex) {
+      let m = 1;
+      UPGRADES.forEach(u => {
+        if(u.type === 'build' && u.target === bIndex && game.upgrades.includes(u.id)) {
+          m *= u.multi;
+        }
+      });
+      // Frenzy buff affects production
+      if(buffs.frenzy.active) m *= 7;
+      return m;
+    }
+
+    function getSingleBuildingCPS(bIndex) {
+      return BUILDINGS[bIndex].baseCps * getBuildingMultiplier(bIndex);
+    }
+
     function calculateCPS() {
       let cps = 0;
       BUILDINGS.forEach((b, i) => {
-        let bCps = b.baseCps;
-        const count = game.buildings[i];
-        
-        // Apply Building Upgrades
-        UPGRADES.forEach(u => {
-          if (game.upgrades.includes(u.id) && u.type === 'build' && u.target === i) {
-            bCps *= u.multi;
-          }
-        });
-        
-        cps += bCps * count;
+        cps += game.buildings[i] * getSingleBuildingCPS(i);
       });
       return cps;
     }
 
-    function calculateClickPower() {
-      let power = 1;
-      // Base: 1 + 1% of CPS
-      const rawCps = calculateCPS();
-      power += rawCps * 0.01;
+    function getClickPower() {
+      // Basis = 1 + 1% von CPS
+      let base = 1 + (calculateCPS() * 0.01);
       
       // Click Upgrades
       UPGRADES.forEach(u => {
-        if (game.upgrades.includes(u.id) && u.type === 'click') {
-          power *= u.multi;
-        }
+        if(u.type === 'click' && game.upgrades.includes(u.id)) base *= u.multi;
       });
-      
-      // Buffs
-      if (buffs.clickFrenzy.active) power *= 777;
-      if (buffs.frenzy.active) power *= 7; // Frenzy affects clicks too in some versions, lets say yes
 
-      return power;
-    }
+      // Frenzy wirkt auch auf Klicks
+      if(buffs.frenzy.active) base *= 7;
 
-    function getBuffMult() {
-      let m = 1;
-      if (buffs.frenzy.active) m *= 7;
-      return m;
-    }
-
-    function updateBuffs(dt) {
-      // Frenzy
-      if(buffs.frenzy.active) {
-        buffs.frenzy.time -= dt;
-        if(buffs.frenzy.time <= 0) {
-          buffs.frenzy.active = false;
-          renderBuffs();
-        } else {
-            // Update Timer Text
-            const el = document.getElementById('buff-timer-frenzy');
-            if(el) el.textContent = Math.ceil(buffs.frenzy.time) + "s";
-        }
-      }
-      // Click Frenzy
-      if(buffs.clickFrenzy.active) {
-        buffs.clickFrenzy.time -= dt;
-        if(buffs.clickFrenzy.time <= 0) {
-          buffs.clickFrenzy.active = false;
-          renderBuffs();
-        } else {
-             const el = document.getElementById('buff-timer-click');
-             if(el) el.textContent = Math.ceil(buffs.clickFrenzy.time) + "s";
-        }
-      }
-    }
-
-    function addScore(amt) {
-      game.score += amt;
-      game.totalScore += amt;
+      return base;
     }
 
     /* --- INTERACTION --- */
-    document.getElementById('bigKlein').addEventListener('mousedown', (e) => {
-      const power = calculateClickPower();
-      addScore(power);
+    const bigKlein = document.getElementById('bigKlein');
+    const clickPanel = document.getElementById('clickPanel');
+
+    bigKlein.addEventListener('mousedown', (e) => {
+      const power = getClickPower();
+      game.score += power;
+      game.totalScore += power;
       game.clicks++;
+
+      // Floating Text
+      spawnText(e.clientX, e.clientY, `+${formatNum(power)}`);
       
-      createParticles(e.clientX, e.clientY, `+${formatNum(power)}`);
-      
-      // Tiny chance for manual update of upgrades on click
-      if(game.clicks % 10 === 0) renderUpgrades();
+      // FALLING FACES (The visual effect)
+      spawnFallingFace(e.clientX, e.clientY);
     });
 
-    /* --- STORE SYSTEM --- */
-    function getCost(bIndex) {
-      const b = BUILDINGS[bIndex];
-      return Math.floor(b.baseCost * Math.pow(1.15, game.buildings[bIndex]));
+    function spawnFallingFace(x, y) {
+      const img = document.createElement('img');
+      img.src = bigKlein.src;
+      img.className = 'falling-face';
+      // Zufällige Position leicht variieren
+      const offsetX = (Math.random() - 0.5) * 60; 
+      img.style.left = (x - 15 + offsetX) + 'px';
+      img.style.top = (y - 15) + 'px';
+      
+      clickPanel.appendChild(img);
+      setTimeout(() => img.remove(), 1500);
     }
 
-    function buyBuilding(index) {
-      const cost = getCost(index);
-      if (game.score >= cost) {
+    function spawnText(x, y, txt) {
+      const el = document.createElement('div');
+      el.className = 'click-text';
+      el.textContent = txt;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 800);
+    }
+
+    /* --- FORMATTING (The "No K" Rule) --- */
+    function formatNum(num, decimals=0) {
+      if(num < 1000000) {
+        // Unter 1 Million: 1.250 (Deutsche Schreibweise)
+        return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
+      } else {
+        // Über 1 Million: 1,5 Millionen
+        if(num >= 1000000000) return (num/1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Milliarden";
+        return (num/1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Millionen";
+      }
+    }
+
+    /* --- SHOP SYSTEM --- */
+    function getCost(bIndex) {
+      return Math.floor(BUILDINGS[bIndex].baseCost * Math.pow(1.15, game.buildings[bIndex]));
+    }
+
+    function buyBuilding(i) {
+      const cost = getCost(i);
+      if(game.score >= cost) {
         game.score -= cost;
-        game.buildings[index]++;
-        
-        // Update DOM
-        const row = document.getElementById(`row-${index}`);
-        row.querySelector('.b-count').textContent = game.buildings[index];
-        row.querySelector('.b-cost').textContent = formatNum(getCost(index));
-        
-        // Trigger Upgrade Check
+        game.buildings[i]++;
+        updateBuildingRow(i);
         renderUpgrades();
       }
     }
 
-    function buyUpgrade(uId) {
-      const u = UPGRADES.find(x => x.id === uId);
-      if (game.score >= u.cost) {
-        game.score -= u.cost;
-        game.upgrades.push(uId);
-        renderUpgrades(); // Remove from grid
-      }
-    }
-
-    /* --- UI BUILDING --- */
-    function buildUI() {
-      // Build Building List
-      elBuildList.innerHTML = '';
+    function createBuildingUI() {
+      elList.innerHTML = '';
       BUILDINGS.forEach((b, i) => {
         const div = document.createElement('div');
         div.className = 'building-row';
-        div.id = `row-${i}`;
+        div.id = `b-row-${i}`;
+        div.onclick = () => buyBuilding(i);
         div.innerHTML = `
           <div class="b-icon">${b.icon}</div>
           <div class="b-info">
             <div class="b-name">${b.name}</div>
-            <div class="b-cost">🍪 ${formatNum(getCost(i))}</div>
+            <div class="b-cost" id="b-cost-${i}">0</div>
           </div>
-          <div class="b-count">${game.buildings[i]}</div>
+          <div class="b-count" id="b-count-${i}">0</div>
         `;
-        div.onclick = () => buyBuilding(i);
-        elBuildList.appendChild(div);
+        elList.appendChild(div);
+        updateBuildingRow(i);
       });
-      renderUpgrades();
+    }
+
+    function updateBuildingRow(i) {
+      const countEl = document.getElementById(`b-count-${i}`);
+      const costEl = document.getElementById(`b-cost-${i}`);
+      countEl.textContent = game.buildings[i];
+      costEl.textContent = formatNum(getCost(i));
     }
 
     function updateBuildingButtons() {
       BUILDINGS.forEach((b, i) => {
-        const row = document.getElementById(`row-${i}`);
+        const row = document.getElementById(`b-row-${i}`);
+        const costEl = document.getElementById(`b-cost-${i}`);
         const cost = getCost(i);
-        
-        // Unlocking logic (like cookie clicker: only show if you have ~50% of cost of previous)
-        // Simple version: Always show, just dim
         if(game.score >= cost) {
           row.classList.add('can-afford');
-          row.classList.remove('too-expensive');
-          row.querySelector('.b-cost').classList.remove('red');
+          costEl.classList.add('affordable');
         } else {
           row.classList.remove('can-afford');
-          row.classList.add('too-expensive');
-          row.querySelector('.b-cost').classList.add('red');
+          costEl.classList.remove('affordable');
         }
       });
     }
 
+    /* --- UPGRADES & TOOLTIPS --- */
+    function buyUpgrade(uId) {
+      const u = UPGRADES.find(x => x.id === uId);
+      if(game.score >= u.cost) {
+        game.score -= u.cost;
+        game.upgrades.push(uId);
+        renderUpgrades();
+      }
+    }
+
     function renderUpgrades() {
-      elUpgradeGrid.innerHTML = '';
-      
+      elGrid.innerHTML = '';
       const available = UPGRADES.filter(u => {
-        if (game.upgrades.includes(u.id)) return false; // Already bought
-        
-        // Check Unlock Condition
-        if (u.triggerType === 'clicks' && game.clicks >= u.triggerVal) return true;
-        if (u.triggerType === 'build' && game.buildings[u.triggerId] >= u.triggerVal) return true;
-        
+        if(game.upgrades.includes(u.id)) return false;
+        if(u.trigger.type === 'clicks' && game.clicks >= u.trigger.val) return true;
+        if(u.trigger.type === 'build' && game.buildings[u.trigger.id] >= u.trigger.val) return true;
         return false;
       });
 
       available.forEach(u => {
         const div = document.createElement('div');
         div.className = 'upgrade-crate';
-        div.innerHTML = `
-          ${u.icon}
-          <div class="tooltip">
-            <strong>${u.name}</strong><br>
-            <span style="font-size:0.7rem; color:#aaa">${u.desc}</span><br>
-            <span style="color:${game.score >= u.cost ? '#2ecc71' : '#e74c3c'}">
-              ${formatNum(u.cost)}
-            </span>
-          </div>
-        `;
-        div.onclick = () => buyUpgrade(u.id);
+        div.innerHTML = u.icon;
         
-        if (game.score < u.cost) {
-            div.style.opacity = "0.5";
-            div.style.filter = "grayscale(1)";
+        // Dynamic Tooltip Content
+        let statsHtml = '';
+        if(u.type === 'build') {
+            const bIndex = u.target;
+            const bName = BUILDINGS[bIndex].name;
+            const currentCps = getSingleBuildingCPS(bIndex);
+            const newCps = currentCps * u.multi;
+            const totalGain = (newCps - currentCps) * game.buildings[bIndex];
+            
+            statsHtml = `
+              <div class="tt-stats">
+                Gebäude: ${bName}<br>
+                Prod: <span class="stat-old">${formatNum(currentCps, 1)}</span> 
+                ➜ <span class="stat-new">${formatNum(newCps, 1)}</span><br>
+                Total Bonus: +${formatNum(totalGain, 1)} CPS
+              </div>
+            `;
+        } else {
+            statsHtml = `<div class="tt-stats">Klickstärke x${u.multi}</div>`;
         }
 
-        elUpgradeGrid.appendChild(div);
+        const canBuy = game.score >= u.cost;
+        const color = canBuy ? '#2ecc71' : '#e74c3c';
+        
+        div.innerHTML += `
+          <div class="tooltip">
+            <div class="tt-header">
+              <span class="tt-name">${u.name}</span>
+              <span class="tt-cost" style="color:${color}">${formatNum(u.cost)}</span>
+            </div>
+            <div class="tt-desc">${u.desc}</div>
+            ${statsHtml}
+          </div>
+        `;
+        
+        div.onclick = () => buyUpgrade(u.id);
+        if(!canBuy) div.style.opacity = '0.5';
+        
+        elGrid.appendChild(div);
       });
     }
 
-    function renderBuffs() {
-      elBuffArea.innerHTML = '';
+    /* --- NEWS TICKER (Fixed Fade) --- */
+    function updateNews() {
+      elTicker.classList.remove('show');
+      
+      setTimeout(() => {
+        const msg = NEWS[Math.floor(Math.random() * NEWS.length)];
+        elTicker.textContent = msg;
+        elTicker.classList.add('show');
+      }, 500); // Warten bis ausgeblendet
+    }
+
+    /* --- BUFFS & GOLDEN KLEIN --- */
+    function updateBuffs(dt) {
       if(buffs.frenzy.active) {
-        elBuffArea.innerHTML += `
-          <div class="buff-icon" style="border-color:#f1c40f">
-            🔥 <div class="buff-timer" id="buff-timer-frenzy"></div>
-          </div>`;
-      }
-      if(buffs.clickFrenzy.active) {
-        elBuffArea.innerHTML += `
-          <div class="buff-icon" style="border-color:#3498db">
-            👆 <div class="buff-timer" id="buff-timer-click"></div>
-          </div>`;
+        buffs.frenzy.time -= dt;
+        if(buffs.frenzy.time <= 0) {
+          buffs.frenzy.active = false;
+          renderBuffIcons();
+        }
       }
     }
 
-    /* --- GOLDEN COOKIE MECHANIC --- */
+    function renderBuffIcons() {
+      const area = document.getElementById('buffArea');
+      area.innerHTML = '';
+      if(buffs.frenzy.active) {
+        area.innerHTML += `<div class="buff-icon">🔥</div>`;
+      }
+    }
+
     function scheduleGolden() {
-      // Random time between 2 and 5 minutes (simplified for demo: 30s - 90s)
-      const time = (Math.random() * 60000) + 30000;
-      goldenTimer = setTimeout(spawnGolden, time);
+      const delay = (Math.random() * 60000) + 30000; 
+      setTimeout(spawnGolden, delay);
     }
 
     function spawnGolden() {
       const g = document.getElementById('goldenKlein');
-      const x = Math.random() * (window.innerWidth - 100);
-      const y = Math.random() * (window.innerHeight - 100);
-      g.style.left = x + 'px';
-      g.style.top = y + 'px';
+      g.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+      g.style.top = Math.random() * (window.innerHeight - 100) + 'px';
       g.style.display = 'block';
-      
-      // Auto disappear
-      setTimeout(() => {
-        if(g.style.display === 'block') {
-          g.style.display = 'none';
-          scheduleGolden();
-        }
-      }, 10000);
+      setTimeout(() => { g.style.display = 'none'; scheduleGolden(); }, 10000);
     }
 
     document.getElementById('goldenKlein').onmousedown = function() {
       this.style.display = 'none';
-      clearTimeout(goldenTimer);
       
-      // Effect: 50% Lucky (Points), 50% Frenzy (x7)
-      const r = Math.random();
-      if(r > 0.5) {
-        // Frenzy
-        buffs.frenzy.active = true;
-        buffs.frenzy.time = 30; // 30s
-        renderBuffs();
-        showNews("FRENZY! x7 Produktion für 30 Sekunden!");
-      } else {
-        // Lucky (15 mins of production)
-        const bonus = Math.max(100, calculateCPS() * 60 * 15);
-        addScore(bonus);
-        createParticles(parseInt(this.style.left), parseInt(this.style.top), "LUCKY!");
-        showNews("LUCKY! Ein riesiger Haufen Kleinis gefunden.");
-      }
-
+      // Frenzy Effect
+      buffs.frenzy.active = true;
+      buffs.frenzy.time = 30;
+      renderBuffIcons();
+      spawnText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7)");
+      
       scheduleGolden();
     };
 
-    function showNews(txt) {
-      elTicker.textContent = txt;
-    }
-
-    /* --- HELPERS --- */
-    function formatNum(n, d=0) {
-      if(n >= 1e6) return (n/1e6).toFixed(3) + " Millionen";
-      if(n >= 1e3) return (n/1e3).toFixed(d) + "k"; // 1.234 statt 1,234 (eng)
-      return n.toLocaleString();
-    }
-
-    function createParticles(x, y, text) {
-      const el = document.createElement('div');
-      el.className = 'click-fx';
-      el.textContent = text;
-      el.style.left = x + 'px';
-      el.style.top = y + 'px';
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1000);
-    }
-
-    /* --- BACKGROUND ANIMATION --- */
-    function initBackground() {
-      const cvs = document.getElementById('bgCanvas');
-      const ctx = cvs.getContext('2d');
-      let heads = [];
-      const img = new Image();
-      img.src = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
-
-      function resize() {
-        cvs.width = window.innerWidth;
-        cvs.height = window.innerHeight;
-      }
-      window.onresize = resize;
-      resize();
-
-      class Head {
-        constructor() {
-          this.x = Math.random() * cvs.width;
-          this.y = -50;
-          this.size = 20 + Math.random() * 30;
-          this.speed = 1 + Math.random() * 2;
-          this.rot = Math.random() * 360;
-          this.rotSpd = (Math.random()-0.5) * 2;
-        }
-        update() {
-          this.y += this.speed;
-          this.rot += this.rotSpd;
-        }
-        draw() {
-          ctx.save();
-          ctx.translate(this.x, this.y);
-          ctx.rotate(this.rot * Math.PI/180);
-          if(img.complete) ctx.drawImage(img, -this.size/2, -this.size/2, this.size, this.size);
-          ctx.restore();
-        }
-      }
-
-      function loop() {
-        ctx.clearRect(0, 0, cvs.width, cvs.height);
-        
-        // Spawn rate based on CPS (max limit)
-        const cps = calculateCPS();
-        const chance = Math.min(0.5, 0.01 + (cps / 1000)); 
-        if(Math.random() < chance) heads.push(new Head());
-
-        for(let i=0; i<heads.length; i++) {
-          heads[i].update();
-          heads[i].draw();
-          if(heads[i].y > cvs.height + 50) {
-            heads.splice(i, 1);
-            i--;
-          }
-        }
-        requestAnimationFrame(loop);
-      }
-      loop();
-    }
-
-    /* --- SAVE SYSTEM --- */
+    /* --- SAVE --- */
     function saveGame() {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(game));
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        score: game.score,
+        buildings: game.buildings,
+        upgrades: game.upgrades,
+        totalScore: game.totalScore,
+        clicks: game.clicks
+      }));
     }
     function loadGame() {
-      const d = localStorage.getItem(SAVE_KEY);
+      const d = JSON.parse(localStorage.getItem(SAVE_KEY));
       if(d) {
-        try {
-            const parsed = JSON.parse(d);
-            // Deep merge logic simplified
-            game.score = parsed.score || 0;
-            game.totalScore = parsed.totalScore || 0;
-            game.clicks = parsed.clicks || 0;
-            game.upgrades = parsed.upgrades || [];
-            if(parsed.buildings) {
-                parsed.buildings.forEach((c, i) => { if(i < game.buildings.length) game.buildings[i] = c; });
-            }
-        } catch(e) {}
+        game.score = d.score || 0;
+        game.totalScore = d.totalScore || 0;
+        game.clicks = d.clicks || 0;
+        if(d.buildings) d.buildings.forEach((n,i) => game.buildings[i] = n);
+        game.upgrades = d.upgrades || [];
       }
     }
-    
+
     init();
   </script>
 </body>
