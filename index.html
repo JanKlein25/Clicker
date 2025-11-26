@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker Universe</title>
+  <title>KleinClicker Alive</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
@@ -29,6 +29,8 @@
       height: 100vh;
       overflow: hidden;
       display: flex;
+      /* Zurück zum Standard-Layout (Links/Rechts) ohne Ticker */
+      flex-direction: row; 
     }
 
     /* --- GLOBAL TOOLTIP --- */
@@ -50,24 +52,44 @@
 
     /* --- LAYOUT --- */
     .left-panel {
-      flex: 1; background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+      flex: 1; 
+      /* Dynamic Background Logic handled in JS */
+      background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+      transition: background 2s ease;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       position: relative; border-right: 2px solid rgba(255,255,255,0.05);
-      box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+      box-shadow: inset 0 0 100px rgba(0,0,0,0.8); overflow: hidden;
     }
     .right-panel {
       width: 420px; background: var(--panel-right); display: flex; flex-direction: column;
       border-left: 1px solid #222; box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 50;
     }
 
-    /* --- ELEMENTS --- */
+    /* --- VISUAL ELEMENTS (Background Icons) --- */
+    #visual-canvas {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: 1; overflow: hidden;
+    }
+    .bg-icon {
+        position: absolute; font-size: 1.5rem; opacity: 0.3;
+        animation: floatAround linear infinite;
+        text-shadow: 0 0 5px rgba(255,255,255,0.2);
+    }
+    @keyframes floatAround {
+        0% { transform: translate(0,0) rotate(0deg); }
+        25% { transform: translate(20px, -20px) rotate(10deg); }
+        50% { transform: translate(0, -40px) rotate(0deg); }
+        75% { transform: translate(-20px, -20px) rotate(-10deg); }
+        100% { transform: translate(0,0) rotate(0deg); }
+    }
+
     .bakery-name { 
       position: absolute; top: 30px; 
       font-family: 'Merriweather', serif; font-weight: 900; font-size: 2.2rem; 
       text-transform: uppercase; letter-spacing: 2px;
       background: linear-gradient(to bottom, #f1c40f, #d35400); 
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 4px 0px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 4px 0px rgba(0,0,0,0.5)); z-index: 20;
     }
     
     .score-container { margin-bottom: 50px; text-align: center; z-index: 20; }
@@ -332,6 +354,9 @@
   </div>
 
   <div class="left-panel" id="clickPanel">
+    <!-- VISUAL BACKGROUND AREA -->
+    <div id="visual-canvas"></div>
+
     <div class="bakery-name">KleinClicker</div>
     <div class="score-container">
       <div id="score">0</div>
@@ -353,7 +378,7 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Universe_V1';
+    const SAVE_KEY = 'KleinClicker_Precision_V6'; // Use your saved key
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
     
     // NEW BUILDINGS ADDED
@@ -388,7 +413,6 @@
       { id: 'u_b4_1',    name: 'Roboterarm',   cost: 15000000, trigger: {type:'build', id:4, val:10}, icon:'🤖', desc:'Ersetzt menschliche Fehler.', type:'build', target:4, multi:2, text:'Fabrik Produktion x2' },
       { id: 'u_b5_1',    name: 'Goldtresor',   cost: 200000000, trigger: {type:'build', id:5, val:10}, icon:'🔐', desc:'Noch sicherer als Fort Knox.', type:'build', target:5, multi:2, text:'Bank Produktion x2' },
       
-      // New Upgrades for Endgame
       { id: 'u_b7_1',    name: 'Reagenzglas',  cost: 5000000000, trigger: {type:'build', id:7, val:10}, icon:'🧪', desc:'Klonflüssigkeit mit Geschmack.', type:'build', target:7, multi:2, text:'Labor Produktion x2' },
       { id: 'u_b8_1',    name: 'Mars Ticket',  cost: 75000000000, trigger: {type:'build', id:8, val:10}, icon:'🎟️', desc:'One-Way Ticket für Kleinis.', type:'build', target:8, multi:2, text:'Raketen Produktion x2' },
       { id: 'u_b9_1',    name: 'Rick\'s Gun',  cost: 1500000000000, trigger: {type:'build', id:9, val:10}, icon:'🔫', desc:'Wubba Lubba Dub Dub!', type:'build', target:9, multi:2, text:'Portal Produktion x2' },
@@ -403,6 +427,10 @@
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
     let lastTime = performance.now();
     let casinoUnlocked = false;
+
+    // Visual State
+    let visualElements = [];
+    const MAX_VISUALS = 30; // Max floating icons to prevent lag
 
     /* --- UI --- */
     const tooltipEl = document.getElementById('global-tooltip');
@@ -426,6 +454,7 @@
       buildBuildingUI();
       renderUpgrades();
       renderHistory();
+      initVisuals();
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000); 
       scheduleGolden();
@@ -451,6 +480,8 @@
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
       document.getElementById('cps').textContent = formatNum(cps, 1) + " Kleinis / Sekunde";
       
+      updateDynamicBackground();
+      
       if(!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
       else if(casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
 
@@ -458,6 +489,58 @@
       requestAnimationFrame(gameLoop);
     }
     function slowLoop() { saveGame(); renderUpgrades(); }
+
+    /* --- VISUALS & BACKGROUND --- */
+    function initVisuals() {
+        const container = document.getElementById('visual-canvas');
+        container.innerHTML = '';
+        visualElements = [];
+        
+        // Spawn existing buildings
+        let totalCreated = 0;
+        // Prioritize expensive buildings visually
+        for(let i=BUILDINGS.length-1; i>=0; i--) {
+            if(game.buildings[i] > 0) {
+                // Determine how many icons to show (logarithmic scaling)
+                let count = Math.min(Math.ceil(Math.log2(game.buildings[i] + 1)), 5);
+                for(let k=0; k<count; k++) {
+                    if(totalCreated < MAX_VISUALS) {
+                        spawnVisualIcon(BUILDINGS[i].icon);
+                        totalCreated++;
+                    }
+                }
+            }
+        }
+    }
+
+    function spawnVisualIcon(iconChar) {
+        const container = document.getElementById('visual-canvas');
+        const el = document.createElement('div');
+        el.className = 'bg-icon';
+        el.textContent = iconChar;
+        
+        // Random Position
+        el.style.left = Math.random() * 90 + '%';
+        el.style.top = Math.random() * 90 + '%';
+        // Random Size variation
+        el.style.fontSize = (1 + Math.random()) + 'rem';
+        // Random Animation Duration
+        el.style.animationDuration = (10 + Math.random() * 20) + 's';
+        
+        container.appendChild(el);
+        visualElements.push(el);
+    }
+
+    function updateDynamicBackground() {
+        const panel = document.getElementById('clickPanel');
+        let s = game.totalScore;
+        // Simple milestones for colors
+        if(s < 10000) { /* Default Blue/Black */ }
+        else if(s < 1000000) { panel.style.background = `radial-gradient(circle at center, #8e44ad 0%, #000000 100%)`; } // Purple
+        else if(s < 1000000000) { panel.style.background = `radial-gradient(circle at center, #d35400 0%, #2d3436 100%)`; } // Orange/Dark
+        else if(s < 1000000000000) { panel.style.background = `radial-gradient(circle at center, #f1c40f 0%, #2c3e50 100%)`; } // Gold
+        else { panel.style.background = `radial-gradient(circle at center, #16a085 0%, #000 100%)`; } // Matrix Green/Space
+    }
 
     /* --- MATH --- */
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
@@ -706,6 +789,7 @@
     function handleInteraction(x, y) {
       const power = getClickPower(); addScore(power); game.clicks++;
       spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power!=1?'s':''}`); spawnFallingFace(x, y);
+      
       bigKlein.style.transform = "scale(0.94)"; setTimeout(()=> bigKlein.style.transform = "scale(1)", 50);
     }
     function spawnFloatingText(x, y, text) {
@@ -731,7 +815,14 @@
     function getBuildingCost(i) { return Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15, game.buildings[i])); }
     function buyBuilding(i) {
       const cost = getBuildingCost(i);
-      if(game.score >= cost) { game.score -= cost; game.buildings[i]++; updateSingleBuildingUI(i); renderUpgrades(); }
+      if(game.score >= cost) { 
+          game.score -= cost; 
+          game.buildings[i]++; 
+          updateSingleBuildingUI(i); 
+          renderUpgrades();
+          // Visual feedback
+          if(visualElements.length < MAX_VISUALS) spawnVisualIcon(BUILDINGS[i].icon);
+      }
     }
     function buildBuildingUI() {
       const list = document.getElementById('buildingList'); list.innerHTML = '';
