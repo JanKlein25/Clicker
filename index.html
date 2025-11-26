@@ -3,239 +3,247 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker Live</title>
+  <title>KleinClicker Casino Royale</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
     :root {
       --bg-dark: #0f0f12;
-      --panel-bg: #121216;
-      --border: rgba(255,255,255,0.08);
+      --panel-left: #1a1a20;
+      --panel-right: #121216;
       --gold: #f1c40f;
       --green: #2ecc71;
       --red: #e74c3c;
       --text-main: #ecf0f1;
       --tooltip-bg: rgba(10, 10, 15, 0.98);
+      --card-width: 70px;
+      --card-gap: 4px;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     
-    body { 
-      font-family: 'Roboto', sans-serif; 
-      background-color: var(--bg-dark); 
-      color: var(--text-main); 
-      height: 100vh; 
-      overflow: hidden; 
-      display: flex; 
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
     }
+
+    /* --- GLOBAL TOOLTIP --- */
+    #global-tooltip {
+      position: fixed; top: 0; left: 0; width: 320px;
+      background: var(--tooltip-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      pointer-events: none; z-index: 10000; padding: 0; display: none;
+      box-shadow: 0 10px 50px rgba(0,0,0,1);
+    }
+    .tt-header { background: rgba(255,255,255,0.03); padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .tt-title { font-family: 'Merriweather', serif; font-weight: 900; font-size: 1.1rem; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
+    .tt-price { font-size: 0.9rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; background: #000; }
+    .tt-price.affordable { color: var(--green); border: 1px solid rgba(46, 204, 113, 0.3); } 
+    .tt-price.expensive { color: var(--red); opacity: 0.8; }
+    .tt-body { padding: 12px; font-size: 0.85rem; color: #ccc; line-height: 1.4; }
+    .tt-effect { color: #fff; font-weight: bold; margin-bottom: 8px; display: block; font-size: 0.95rem; border-left: 3px solid var(--gold); padding-left: 10px; }
+    .tt-stats { background: rgba(0,0,0,0.4); padding: 10px; margin-top: 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.05); }
+    .stat-highlight { color: var(--green); font-weight: bold; font-size: 0.95rem; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); }
 
     /* --- LAYOUT --- */
-    .leaderboard-panel {
-      width: 300px;
-      background: var(--panel-bg);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      z-index: 40;
-      box-shadow: 5px 0 20px rgba(0,0,0,0.3);
-    }
-    .lb-header-fixed {
-      padding: 20px;
-      background: #0a0a0d;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    .lb-title { font-family: 'Merriweather', serif; color: var(--gold); font-weight: 900; letter-spacing: 1px; font-size: 1.2rem; }
-    .lb-subtitle { font-size: 0.7rem; color: #666; margin-top: 5px; }
-    
-    .lb-content { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #333 #0a0a0d; }
-    
-    .lb-item { 
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 15px; 
-      border-bottom: 1px solid rgba(255,255,255,0.03); 
-      font-size: 0.9rem; 
-      transition: background 0.2s;
-    }
-    .lb-item:hover { background: rgba(255,255,255,0.05); }
-    .lb-item.is-me { background: rgba(52, 152, 219, 0.15); border-left: 3px solid #3498db; }
-    
-    .lb-rank { width: 25px; color: #666; font-weight: bold; font-size: 0.8rem; }
-    .lb-name { flex: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 5px; }
-    .lb-score { color: var(--gold); font-family: monospace; font-weight: bold; }
-    
-    .lb-item:nth-child(1) .lb-rank { color: #f1c40f; text-shadow: 0 0 5px #f1c40f; }
-    .lb-item:nth-child(2) .lb-rank { color: #bdc3c7; }
-    .lb-item:nth-child(3) .lb-rank { color: #e67e22; }
-
-    .game-panel {
-      flex: 1; 
-      background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+    .left-panel {
+      flex: 1; background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; border-right: 2px solid rgba(255,255,255,0.05);
       box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
     }
-
     .right-panel {
-      width: 380px;
-      background: var(--panel-bg);
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid var(--border);
-      box-shadow: -5px 0 20px rgba(0,0,0,0.5);
-      z-index: 50;
+      width: 420px; background: var(--panel-right); display: flex; flex-direction: column;
+      border-left: 1px solid #222; box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 50;
     }
 
-    /* --- UI ELEMENTS --- */
+    /* --- ELEMENTS --- */
     .bakery-name { 
       position: absolute; top: 30px; 
-      font-family: 'Merriweather', serif; font-weight: 900; font-size: 2.5rem; 
+      font-family: 'Merriweather', serif; font-weight: 900; font-size: 2.2rem; 
       text-transform: uppercase; letter-spacing: 2px;
       background: linear-gradient(to bottom, #f1c40f, #d35400); 
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       filter: drop-shadow(0 4px 0px rgba(0,0,0,0.5));
     }
     
-    .score-container { margin-bottom: 40px; text-align: center; z-index: 20; }
-    #score { font-family: 'Roboto', sans-serif; font-size: 4rem; font-weight: 900; text-shadow: 0 0 30px rgba(255,255,255,0.1); line-height: 1; }
-    #cps { font-size: 1.3rem; color: #7f8c8d; margin-top: 10px; font-weight: 500; background: rgba(0,0,0,0.4); padding: 5px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); }
+    .score-container { margin-bottom: 50px; text-align: center; z-index: 20; }
+    #score { font-family: 'Roboto', sans-serif; font-size: 3.8rem; font-weight: 900; text-shadow: 0 0 30px rgba(255,255,255,0.1); line-height: 1; }
+    #cps { font-size: 1.2rem; color: #7f8c8d; margin-top: 10px; font-weight: 500; background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); }
 
     #bigKlein {
-      width: 320px; height: 320px; object-fit: contain; cursor: pointer;
+      width: 300px; height: 300px; object-fit: contain; cursor: pointer;
       transition: transform 0.05s, filter 0.1s; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.5)); z-index: 20;
     }
     #bigKlein:active { transform: scale(0.96); filter: brightness(0.9); }
     #bigKlein:hover { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(255,255,255,0.1)); }
 
+    /* --- CASINO BUTTON --- */
     #casinoBtn {
       margin-top: 30px;
       background: linear-gradient(45deg, #e67e22, #f39c12);
       border: 2px solid rgba(255,255,255,0.2); color: #fff;
-      padding: 12px 40px; border-radius: 50px;
+      padding: 12px 30px; border-radius: 50px;
       font-weight: 900; font-size: 1.2rem; cursor: pointer;
       box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
-      display: none; z-index: 25; transition: all 0.2s; letter-spacing: 1px;
+      display: none; z-index: 25; transition: all 0.2s;
+      letter-spacing: 1px;
     }
     #casinoBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(243, 156, 18, 0.8); }
 
-    /* SHOP STYLES */
-    .store-header { background: #0a0a0d; padding: 15px; text-align: center; font-family: 'Merriweather', serif; font-weight: 900; color: #57606f; border-bottom: 1px solid #222; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; }
-    .upgrades-container { padding: 10px; background: rgba(0,0,0,0.2); display: flex; flex-wrap: wrap; gap: 6px; min-height: 80px; max-height: 200px; overflow-y: auto; border-bottom: 2px solid #000; }
-    .upgrade-crate { width: 56px; height: 56px; background: linear-gradient(135deg, #2d3436, #1e272e); border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; border-radius: 6px; transition: all 0.2s; }
-    .upgrade-crate:hover { border-color: var(--text-main); background: #333; z-index: 5; }
+    /* --- SHOP --- */
+    .store-header { 
+      background: #0a0a0d; padding: 18px; text-align: center; 
+      font-family: 'Merriweather', serif; font-weight: 900; color: #57606f; 
+      border-bottom: 1px solid #222; font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; 
+    }
     
+    .upgrades-container { padding: 12px; background: rgba(0,0,0,0.2); display: flex; flex-wrap: wrap; gap: 8px; min-height: 80px; max-height: 220px; overflow-y: auto; border-bottom: 2px solid #000; }
+    .upgrade-crate { 
+      width: 60px; height: 60px; background: linear-gradient(135deg, #2d3436, #1e272e); 
+      border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; 
+      font-size: 1.8rem; border-radius: 8px; transition: all 0.2s; position: relative;
+    }
+    .upgrade-crate:hover { border-color: var(--text-main); background: #333; z-index: 5; }
+
     .buildings-list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #444 #0a0a0d; }
-    .building-row { height: 75px; background: linear-gradient(to right, #1a1a20, #141418); border-bottom: 1px solid #000; display: flex; align-items: center; padding: 0 15px; cursor: pointer; position: relative; opacity: 0.5; transition: all 0.2s; }
+    .building-row { 
+      height: 80px; background: linear-gradient(to right, #1a1a20, #141418); 
+      border-bottom: 1px solid #000; display: flex; align-items: center; padding: 0 20px; 
+      cursor: pointer; position: relative; opacity: 0.5; transition: all 0.2s; 
+    }
     .building-row:hover { opacity: 1; background: #222; }
     .building-row.can-afford { opacity: 1; }
-    .b-icon { font-size: 2.2rem; width: 50px; text-align: center; margin-right: 10px; }
+    .b-icon { font-size: 2.5rem; width: 60px; text-align: center; margin-right: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
     .b-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-    .b-name { font-weight: 700; font-family: 'Merriweather', serif; font-size: 1rem; color: #fff; margin-bottom: 2px; }
-    .b-cps { font-size: 0.7rem; color: #636e72; }
-    .b-cost { color: var(--red); font-weight: bold; font-size: 0.85rem; }
+    .b-name { font-weight: 700; font-family: 'Merriweather', serif; font-size: 1.1rem; color: #fff; margin-bottom: 3px; }
+    .b-cps { font-size: 0.8rem; color: #636e72; }
+    .b-cost { color: var(--red); font-weight: bold; font-size: 0.95rem; }
     .b-cost.affordable { color: var(--green); }
-    .b-count { font-size: 2rem; font-weight: 900; color: rgba(255,255,255,0.05); margin-left: auto; }
+    .b-count { font-size: 2.2rem; font-weight: 900; color: rgba(255,255,255,0.05); margin-left: auto; }
 
-    /* TOOLTIP */
-    #global-tooltip { position: fixed; top: 0; left: 0; width: 300px; background: var(--tooltip-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; pointer-events: none; z-index: 10000; padding: 0; display: none; box-shadow: 0 10px 50px rgba(0,0,0,1); }
-    .tt-header { background: rgba(255,255,255,0.03); padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .tt-title { font-family: 'Merriweather', serif; font-weight: 900; font-size: 1rem; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
-    .tt-price { font-size: 0.8rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: #000; }
-    .tt-price.affordable { color: var(--green); border: 1px solid rgba(46, 204, 113, 0.3); } 
-    .tt-price.expensive { color: var(--red); opacity: 0.8; }
-    .tt-body { padding: 10px; font-size: 0.8rem; color: #ccc; line-height: 1.4; }
-    .tt-stats { background: rgba(0,0,0,0.4); padding: 8px; margin-top: 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.05); }
-    .stat-highlight { color: var(--green); font-weight: bold; font-size: 0.9rem; margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); }
+    /* --- CASINO MODAL --- */
+    #casinoModal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.92); z-index: 12000;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    
+    .casino-window {
+      background: #18181b; width: 95%; max-width: 600px;
+      border: 1px solid #333; border-radius: 16px;
+      padding: 0; text-align: center;
+      box-shadow: 0 0 80px rgba(0,0,0,0.8);
+      position: relative; overflow: hidden;
+      animation: zoomIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    @keyframes zoomIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
 
-    /* LOGIN MODAL */
-    #loginModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 20000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-    .login-box { text-align: center; max-width: 400px; padding: 40px; background: #111; border-radius: 20px; border: 1px solid #333; }
-    .login-title { font-family: 'Merriweather', serif; font-size: 2rem; color: var(--gold); margin-bottom: 20px; }
-    .login-input { background: #222; border: 2px solid #444; color: #fff; padding: 15px; font-size: 1.2rem; border-radius: 8px; width: 100%; margin-bottom: 20px; text-align: center; }
-    .start-btn { background: var(--green); color: #000; border: none; padding: 15px 40px; font-size: 1.5rem; font-weight: bold; border-radius: 50px; cursor: pointer; transition: transform 0.1s; }
-    .start-btn:active { transform: scale(0.95); }
-
-    /* CASINO MODAL */
-    #casinoModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 12000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-    .casino-window { background: #18181b; width: 95%; max-width: 600px; border: 1px solid #333; border-radius: 16px; padding: 0; text-align: center; box-shadow: 0 0 80px rgba(0,0,0,0.8); position: relative; overflow: hidden; }
-    .cw-header { background: linear-gradient(to bottom, #2d3436, #1e272e); padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-    .cw-title { font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--gold); font-weight: 900; }
+    .cw-header {
+      background: linear-gradient(to bottom, #2d3436, #1e272e);
+      padding: 20px; border-bottom: 1px solid #333;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .cw-title { font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--gold); font-weight: 900; letter-spacing: 1px; }
     .cw-balance { font-size: 1.1rem; color: #fff; font-weight: bold; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; border: 1px solid #444; }
+
     .cw-body { padding: 30px; position: relative; }
-    .roulette-container { width: 100%; height: 100px; background: #000; border-radius: 8px; border: 4px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 30px #000; }
-    .roulette-marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: var(--gold); transform: translateX(-50%); z-index: 10; box-shadow: 0 0 10px var(--gold); }
-    .roulette-strip { display: flex; height: 100%; align-items: center; position: absolute; left: 50%; }
-    .r-card { width: 70px; height: 70px; margin-right: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: rgba(255,255,255,0.4); font-size: 1.2rem; flex-shrink: 0; border-bottom: 4px solid rgba(0,0,0,0.3); position: relative; }
+
+    /* ROULETTE TICKER */
+    .roulette-container {
+      width: 100%; height: 100px; background: #000; border-radius: 8px; border: 4px solid #333;
+      position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 30px #000;
+    }
+    .roulette-marker {
+      position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: var(--gold);
+      transform: translateX(-50%); z-index: 10; box-shadow: 0 0 10px var(--gold);
+    }
+    .roulette-strip {
+      display: flex; height: 100%; align-items: center; position: absolute; left: 50%;
+    }
+    .r-card {
+      width: 70px; height: 70px; margin-right: 4px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; color: rgba(255,255,255,0.4); font-size: 1.2rem;
+      flex-shrink: 0; border-bottom: 4px solid rgba(0,0,0,0.3); position: relative;
+    }
     .rc-red { background: linear-gradient(to bottom, #e74c3c, #c0392b); }
     .rc-black { background: linear-gradient(to bottom, #34495e, #2c3e50); }
     .rc-green { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #000; box-shadow: 0 0 15px var(--gold); z-index: 2; }
+    .rc-logo { width: 40px; height: 40px; object-fit: contain; }
+
+    /* CONTROLS */
     .bet-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
     .bet-input { background: #111; border: 1px solid #444; color: #fff; font-size: 1.2rem; padding: 10px; width: 150px; text-align: center; font-weight: bold; border-radius: 6px; }
     .control-btn { background: #333; border: 1px solid #555; color: #ccc; padding: 0 15px; cursor: pointer; font-weight: bold; border-radius: 6px; }
+    .control-btn:hover { background: #444; color: #fff; }
+
     .action-row { display: flex; gap: 15px; justify-content: center; }
-    .bet-btn { flex: 1; padding: 20px 10px; border: none; border-radius: 10px; font-weight: 900; font-size: 1.1rem; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; border: 2px solid rgba(255,255,255,0.05); transition: transform 0.1s; }
+    .bet-btn {
+      flex: 1; padding: 20px 10px; border: none; border-radius: 10px;
+      font-weight: 900; font-size: 1.1rem; color: #fff; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      border: 2px solid rgba(255,255,255,0.05); transition: transform 0.1s;
+    }
     .bet-btn:active { transform: scale(0.95); }
+    .bet-btn:disabled { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
     .btn-red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
     .btn-black { background: linear-gradient(135deg, #34495e, #2c3e50); }
     .btn-green { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000; }
     .sub-text { font-size: 0.7rem; opacity: 0.8; font-weight: normal; }
+
     .history-bar { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; display: flex; justify-content: center; gap: 8px; }
     .hist-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.3); }
     .hist-red { background: var(--red); }
     .hist-black { background: #34495e; }
     .hist-green { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+    
     .close-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #666; font-size: 1.5rem; cursor: pointer; }
 
-    /* FX */
+    /* Particles & FX */
     .win-particle { position: absolute; width: 10px; height: 10px; pointer-events: none; animation: confetti 1s ease-out forwards; z-index: 1000; }
     @keyframes confetti { 0% {transform: translate(0,0) rotate(0deg); opacity: 1;} 100% {transform: translate(var(--tx), var(--ty)) rotate(720deg); opacity: 0;} }
     .win-pulse { animation: screenFlash 0.5s; }
     @keyframes screenFlash { 0% {background-color: rgba(255,255,255,0.2);} 100% {background-color: transparent;} }
-    .click-text { position: absolute; color: #fff; font-weight: 900; font-size: 1.4rem; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 100; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-    @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1); } }
     .falling-face { position: absolute; width: 35px; height: 35px; pointer-events: none; z-index: 15; animation: physicsFall 1.2s cubic-bezier(0.5, 0, 0.8, 0.8) forwards; }
     @keyframes physicsFall { 0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; } 100% { transform: translateY(800px) rotate(360deg) scale(0.8); opacity: 0; } }
+    .click-text { position: absolute; color: #fff; font-weight: 900; font-size: 1.4rem; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 100; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1); } }
+    
+    /* Golden Klein */
     #goldenKlein { position: absolute; width: 80px; height: 80px; z-index: 9999; cursor: pointer; display: none; filter: drop-shadow(0 0 20px gold); animation: wobble 2s infinite; }
     @keyframes wobble { 0%,100% {transform:rotate(0deg);} 25% {transform:rotate(-5deg);} 75% {transform:rotate(5deg);} }
     .buff-container { position: absolute; bottom: 20px; left: 20px; display: flex; gap: 8px; z-index: 100; }
     .buff-icon { width: 50px; height: 50px; background: rgba(0,0,0,0.8); border: 2px solid var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); animation: pulse 1s infinite alternate; }
 
-    @media (max-width: 900px) {
+    @media (max-width: 850px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
-      .leaderboard-panel { width: 100%; height: 200px; order: 3; }
-      .game-panel { min-height: 60vh; border-right: none; border-bottom: 2px solid #333; order: 1; }
-      .right-panel { width: 100%; min-height: 50vh; order: 2; }
+      .left-panel { min-height: 50vh; border-right: none; border-bottom: 2px solid #333; }
+      .right-panel { width: 100%; min-height: 50vh; }
       #global-tooltip { display: none !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- GLOBAL TOOLTIP -->
   <div id="global-tooltip">
     <div class="tt-header">
-      <div class="tt-title"><span id="tt-name-display">Name</span><span id="tt-price-display" class="tt-price">100</span></div>
+      <div class="tt-title">
+        <span id="tt-name-display">Name</span>
+        <span id="tt-price-display" class="tt-price">100</span>
+      </div>
     </div>
     <div class="tt-body">
-      <span id="tt-effect-display" class="tt-effect">Effekt</span>
-      <div id="tt-desc-display">Beschr.</div>
+      <span id="tt-effect-display" class="tt-effect">Verdoppelt Produktion</span>
+      <div id="tt-desc-display">Beschreibung...</div>
       <div id="tt-stats-container" class="tt-stats"></div>
     </div>
   </div>
 
-  <!-- LOGIN MODAL -->
-  <div id="loginModal">
-    <div class="login-box">
-      <div class="login-title">👋 Willkommen!</div>
-      <p style="color:#aaa; margin-bottom:15px;">Dein Name für die Rangliste:</p>
-      <input type="text" id="usernameInput" class="login-input" placeholder="Name eingeben..." maxlength="12">
-      <button class="start-btn" onclick="registerUser()">LOS GEHT'S</button>
-    </div>
-  </div>
-
-  <!-- CASINO MODAL -->
   <div id="casinoModal">
     <div class="casino-window" id="casinoWindow">
       <button class="close-btn" onclick="closeCasino()">×</button>
@@ -267,33 +275,18 @@
     </div>
   </div>
 
-  <!-- 1. LEFT: LEADERBOARD -->
-  <div class="leaderboard-panel">
-    <div class="lb-header-fixed">
-      <div class="lb-title">🏆 LIVE RANGLISTE</div>
-      <div class="lb-subtitle">Aktualisiert automatisch</div>
-    </div>
-    <div class="lb-content" id="lb-list-content">
-      <div style="padding:20px; text-align:center; color:#666;">Lade Daten...</div>
-    </div>
-  </div>
-
-  <!-- 2. MIDDLE: GAME -->
-  <div class="game-panel" id="clickPanel">
+  <div class="left-panel" id="clickPanel">
     <div class="bakery-name">KleinClicker</div>
     <div class="score-container">
       <div id="score">0</div>
       <div id="cps">pro Sekunde: 0,0</div>
     </div>
-    
-    <button id="casinoBtn" onclick="openCasino()">🎰 CASINO</button>
-
+    <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
     <div class="buff-container" id="buffArea"></div>
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein" alt="Klick mich!">
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="goldenKlein" alt="GOLD">
   </div>
 
-  <!-- 3. RIGHT: SHOP -->
   <div class="right-panel">
     <div class="store-header">Upgrades</div>
     <div class="upgrades-container" id="upgradeGrid"></div>
@@ -302,13 +295,12 @@
   </div>
 
   <script>
-    /* --- CONFIGURATION --- */
-    const DREAMLO_PRIVATE = "J_9nhvHp40akfBloaOBYng4kUhadyKq0aF6oD1cOn6vQ"; 
-    const DREAMLO_PUBLIC = "69277c3d8f40bb18647b2486"; 
-
-    const SAVE_KEY = 'KleinClicker_Live_Final_V3';
+    /* --- CONFIG & ASSETS --- */
+    const SAVE_KEY = 'KleinClicker_Precision_V6';
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
-    
+    const CARD_WIDTH = 70;
+    const CARD_GAP = 4;
+
     const BUILDINGS = [
       { id: 0, name: 'Kaputte Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
       { id: 1, name: 'Nette Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
@@ -332,7 +324,6 @@
 
     /* --- GAME STATE --- */
     let game = {
-      username: null,
       score: 0, totalScore: 0, clicks: 0, 
       buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
       casinoHistory: []
@@ -341,7 +332,7 @@
     let lastTime = performance.now();
     let casinoUnlocked = false;
 
-    /* --- UI REFS --- */
+    /* --- UI --- */
     const tooltipEl = document.getElementById('global-tooltip');
     const ttName = document.getElementById('tt-name-display');
     const ttPrice = document.getElementById('tt-price-display');
@@ -354,99 +345,22 @@
       try {
         loadGame();
       } catch(e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
-
-      if(!game.username) {
-        document.getElementById('loginModal').style.display = 'flex';
-      } else {
-        document.getElementById('loginModal').style.display = 'none';
-        submitScore();
-        fetchLeaderboard();
-      }
       
       buildBuildingUI();
       renderUpgrades();
       renderHistory();
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000); 
-      setInterval(submitScore, 30000); 
-      setInterval(fetchLeaderboard, 10000); 
       scheduleGolden();
       
       document.addEventListener('mousemove', (e) => {
         if (tooltipEl.style.display === 'block') {
-          let top = e.clientY + 10; let left = e.clientX - 310;
+          let top = e.clientY + 10; let left = e.clientX - 330;
           if(left < 10) left = e.clientX + 10;
           if(top + tooltipEl.offsetHeight > window.innerHeight) top = window.innerHeight - tooltipEl.offsetHeight - 10;
           tooltipEl.style.top = top + 'px'; tooltipEl.style.left = left + 'px';
         }
       });
-    }
-
-    function registerUser() {
-      const input = document.getElementById('usernameInput');
-      const name = input.value.trim().replace(/[^a-zA-Z0-9äöüÄÖÜß ]/g, '');
-      if(name.length > 0) {
-        game.username = name;
-        document.getElementById('loginModal').style.display = 'none';
-        submitScore(); 
-        setTimeout(fetchLeaderboard, 1000); 
-        saveGame();
-      } else {
-        alert("Bitte gültigen Namen eingeben!");
-      }
-    }
-
-    /* --- LEADERBOARD NETWORKING (FIXED PROXY) --- */
-    function submitScore() {
-      if(!game.username || DREAMLO_PRIVATE.includes("HIER")) return;
-      const scoreToSend = Math.floor(game.totalScore);
-      const url = `https://www.dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${game.username}/${scoreToSend}`;
-      fetch(url, { mode: 'no-cors' }).catch(e => {}); 
-    }
-
-    function fetchLeaderboard() {
-      // NEUER PROXY: corsproxy.io (Deutlich stabiler)
-      const dreamloUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json`;
-      const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(dreamloUrl);
-      
-      fetch(proxyUrl)
-        .then(response => response.json())
-        .then(data => {
-          const list = document.getElementById('lb-list-content');
-          list.innerHTML = ''; 
-          
-          if(!data || !data.dreamlo) {
-             list.innerHTML = "<div style='padding:20px;text-align:center;color:#666'>Ladefehler...</div>";
-             return;
-          }
-
-          if(data.dreamlo.leaderboard === null) {
-            list.innerHTML = "<div style='padding:20px;text-align:center;color:#666'>Noch keine Spieler.<br>Sei der Erste!</div>";
-            return;
-          }
-          
-          let entries = data.dreamlo.leaderboard.entry;
-          if(!Array.isArray(entries)) entries = [entries];
-
-          // Sortieren (Sicherheitshalber, falls Dreamlo es nicht tut)
-          entries.sort((a, b) => parseInt(b.score) - parseInt(a.score));
-
-          entries.forEach((e, index) => {
-            const isMe = e.name === game.username ? 'is-me' : '';
-            const div = document.createElement('div');
-            div.className = `lb-item ${isMe}`;
-            div.innerHTML = `
-              <div class="lb-rank">#${index+1}</div>
-              <div class="lb-name">${e.name}</div>
-              <div class="lb-score">${formatNum(parseInt(e.score))}</div>
-            `;
-            list.appendChild(div);
-          });
-        })
-        .catch(err => {
-          console.log(err);
-          document.getElementById('lb-list-content').innerHTML = "<div style='padding:20px;text-align:center;color:#e74c3c;font-size:0.8rem'>Verbindung fehlgeschlagen.<br>Prüfe Internet.</div>";
-        });
     }
 
     function gameLoop(now) {
@@ -460,12 +374,8 @@
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
       document.getElementById('cps').textContent = "pro Sekunde: " + formatNum(cps, 1);
       
-      if(!casinoUnlocked && game.totalScore >= 1000) { 
-        casinoUnlocked = true; 
-        document.getElementById('casinoBtn').style.display = 'block'; 
-      } else if(casinoUnlocked) {
-        document.getElementById('casinoBtn').style.display = 'block';
-      }
+      if(!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
+      else if(casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
 
       updateBuildingStates();
       requestAnimationFrame(gameLoop);
@@ -489,71 +399,133 @@
       return power;
     }
 
-    /* --- CASINO LOGIC --- */
+    /* --- CASINO LOGIC (PRECISION FIX) --- */
     let isSpinning = false;
+
     function openCasino() {
       document.getElementById('casinoModal').style.display = 'flex';
-      updateCasinoUI(); generateStrip(50, null);
-      const s = document.getElementById('rouletteStrip'); s.style.transition = 'none'; s.style.transform = 'translateX(0px)';
+      updateCasinoUI();
+      generateStrip(50, null);
+      const s = document.getElementById('rouletteStrip');
+      s.style.transition = 'none'; s.style.transform = 'translateX(0px)';
     }
     function closeCasino() { document.getElementById('casinoModal').style.display = 'none'; }
     function updateCasinoUI() { document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score)); }
+
     function setBetMultiplier(multi) {
       const input = document.getElementById('betAmount');
       if(multi === 'max') input.value = Math.floor(game.score);
-      else { let val = parseInt(input.value) || 0; if(val === 0) val = 100; input.value = Math.floor(val * multi); }
+      else {
+        let val = parseInt(input.value) || 0;
+        if(val === 0) val = 100;
+        input.value = Math.floor(val * multi);
+      }
     }
+
     function generateStrip(count, winningColor) {
-      const strip = document.getElementById('rouletteStrip'); strip.innerHTML = '';
+      const strip = document.getElementById('rouletteStrip');
+      strip.innerHTML = '';
       for(let i=0; i<count; i++) {
-        let type = 'black'; const r = Math.random();
+        let type = 'black';
+        const r = Math.random();
+        // Index 60 is strictly forced to be winning color
         if(winningColor && i === 60) type = winningColor;
-        else { if(r < 0.06) type = 'green'; else if(r < 0.53) type = 'red'; else type = 'black'; }
-        const el = document.createElement('div'); el.className = `r-card rc-${type}`;
-        if(type === 'green') el.innerHTML = `<img src="${IMG_URL}" class="rc-logo">`; else el.textContent = Math.floor(Math.random() * 7) + (type==='black'?8:1);
+        else {
+          if(r < 0.06) type = 'green';
+          else if(r < 0.53) type = 'red';
+          else type = 'black';
+        }
+        const el = document.createElement('div');
+        el.className = `r-card rc-${type}`;
+        if(type === 'green') el.innerHTML = `<img src="${IMG_URL}" class="rc-logo">`;
+        else el.textContent = Math.floor(Math.random() * 7) + (type==='black'?8:1);
         strip.appendChild(el);
       }
     }
+
     function spin(choice) {
       if(isSpinning) return;
-      const betInput = document.getElementById('betAmount'); let bet = parseInt(betInput.value);
+      const betInput = document.getElementById('betAmount');
+      let bet = parseInt(betInput.value);
       if(isNaN(bet) || bet <= 0) { alert("Bitte Einsatz eingeben!"); return; }
       if(bet > game.score) { bet = Math.floor(game.score); betInput.value = bet; }
       if(bet <= 0) return;
 
-      game.score -= bet; updateCasinoUI(); isSpinning = true; 
-      document.querySelectorAll('.bet-btn, .control-btn, .close-btn').forEach(b => b.disabled = true);
+      game.score -= bet;
+      updateCasinoUI();
+      isSpinning = true;
+      disableButtons(true);
 
-      const r = Math.random(); let result = 'black';
-      if(r < 0.05) result = 'green'; else if(r < 0.525) result = 'red';
+      const r = Math.random();
+      let result = 'black';
+      if(r < 0.05) result = 'green';
+      else if(r < 0.525) result = 'red';
 
       generateStrip(80, result);
-      const strip = document.getElementById('rouletteStrip');
-      strip.style.transition = 'none'; strip.style.transform = 'translateX(0px)'; strip.offsetHeight; 
       
-      const cardSize = 74; const targetIndex = 60; const centerOfTarget = (targetIndex * cardSize) + 35;
-      const jitter = Math.floor(Math.random() * 50) - 25; const totalTranslate = centerOfTarget + jitter;
+      const strip = document.getElementById('rouletteStrip');
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateX(0px)';
+      strip.offsetHeight; 
+      
+      /* --- PRECISION MATH FIX --- */
+      // Card is 70px wide + 4px gap = 74px total.
+      // We want to center Card index 60.
+      // Offset = 60 * 74px.
+      // To center it: add half a card width (35px).
+      // Center of card 60 is at: (60 * 74) + 35 pixels from start.
+      const cardSize = 74;
+      const targetIndex = 60;
+      const centerOfTarget = (targetIndex * cardSize) + 35;
+      
+      // Random Jitter: strictly limited to +/- 25px
+      // This ensures we NEVER cross the border (which is 35px away)
+      const jitter = Math.floor(Math.random() * 50) - 25; 
+      const totalTranslate = centerOfTarget + jitter;
 
       strip.style.transition = 'transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1)'; 
       strip.style.transform = `translateX(-${totalTranslate}px)`;
-      const marker = document.querySelector('.roulette-marker'); marker.style.animation = "shake 0.1s infinite"; setTimeout(() => marker.style.animation = "none", 4500);
+      
+      const marker = document.querySelector('.roulette-marker');
+      marker.style.animation = "shake 0.1s infinite";
+      setTimeout(() => marker.style.animation = "none", 4500);
+
       setTimeout(() => { finishSpin(choice, result, bet); }, 4500);
     }
+
     function finishSpin(choice, result, bet) {
-      isSpinning = false; 
-      document.querySelectorAll('.bet-btn, .control-btn, .close-btn').forEach(b => b.disabled = false);
-      
-      game.casinoHistory.unshift(result); if(game.casinoHistory.length > 10) game.casinoHistory.pop(); renderHistory();
-      let multiplier = 0; if(choice === result) { if(result === 'green') multiplier = 14; else multiplier = 2; }
-      if(multiplier > 0) {
-        const win = bet * multiplier; addScore(win); spawnConfetti();
-        document.getElementById('casinoWindow').classList.add('win-pulse'); setTimeout(()=>document.getElementById('casinoWindow').classList.remove('win-pulse'), 500);
+      isSpinning = false;
+      disableButtons(false);
+      game.casinoHistory.unshift(result);
+      if(game.casinoHistory.length > 10) game.casinoHistory.pop();
+      renderHistory();
+
+      let multiplier = 0;
+      if(choice === result) {
+        if(result === 'green') multiplier = 14;
+        else multiplier = 2;
       }
-      updateCasinoUI(); saveGame();
+
+      if(multiplier > 0) {
+        const win = bet * multiplier;
+        addScore(win);
+        spawnConfetti();
+        document.getElementById('casinoWindow').classList.add('win-pulse');
+        setTimeout(()=>document.getElementById('casinoWindow').classList.remove('win-pulse'), 500);
+      }
+      updateCasinoUI();
+      saveGame();
     }
+
     function renderHistory() {
       const con = document.getElementById('history-container'); con.innerHTML = '';
-      game.casinoHistory.forEach(h => { const d = document.createElement('div'); d.className = `hist-dot hist-${h}`; con.appendChild(d); });
+      game.casinoHistory.forEach(h => {
+        const d = document.createElement('div'); d.className = `hist-dot hist-${h}`; con.appendChild(d);
+      });
+    }
+
+    function disableButtons(disable) {
+      document.querySelectorAll('.bet-btn, .control-btn, .close-btn').forEach(b => b.disabled = disable);
     }
     function spawnConfetti() {
       const win = document.getElementById('casinoWindow');
@@ -561,14 +533,14 @@
         const p = document.createElement('div'); p.className = 'win-particle';
         p.style.backgroundColor = ['#f1c40f', '#e74c3c', '#2ecc71', '#3498db'][Math.floor(Math.random()*4)];
         p.style.left = '50%'; p.style.top = '50%';
-        p.style.setProperty('--tx', (Math.random()*400 - 200) + 'px'); p.style.setProperty('--ty', (Math.random()*400 - 200) + 'px');
+        p.style.setProperty('--tx', (Math.random()*400 - 200) + 'px');
+        p.style.setProperty('--ty', (Math.random()*400 - 200) + 'px');
         win.appendChild(p); setTimeout(()=>p.remove(), 1000);
       }
     }
 
     /* --- INTERACTIONS --- */
     const bigKlein = document.getElementById('bigKlein');
-    const clickPanel = document.getElementById('clickPanel');
     bigKlein.addEventListener('mousedown', (e) => handleInteraction(e.clientX, e.clientY));
     bigKlein.addEventListener('touchstart', (e) => { e.preventDefault(); for(let i=0; i<e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY); });
     function handleInteraction(x, y) {
@@ -578,15 +550,11 @@
     }
     function spawnFloatingText(x, y, text) {
       const el = document.createElement('div'); el.className = 'click-text'; el.textContent = text;
-      const rect = clickPanel.getBoundingClientRect();
-      el.style.left = (x - 20 + Math.random()*40) + 'px'; el.style.top = y + 'px'; 
-      document.body.appendChild(el); setTimeout(()=>el.remove(), 800);
+      el.style.left = (x-20+Math.random()*40)+'px'; el.style.top = y+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(), 800);
     }
     function spawnFallingFace(x, y) {
       const img = document.createElement('img'); img.src = IMG_URL; img.className = 'falling-face';
-      const rect = clickPanel.getBoundingClientRect();
-      img.style.left = (x - rect.left - 17) + 'px'; img.style.top = (y - rect.top - 17) + 'px'; 
-      clickPanel.appendChild(img); setTimeout(()=>img.remove(), 1200);
+      img.style.left = (x-17)+'px'; img.style.top = (y-17)+'px'; document.getElementById('clickPanel').appendChild(img); setTimeout(()=>img.remove(), 1200);
     }
     function formatNum(num, decimals=0) {
       if(num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
@@ -659,14 +627,13 @@
       });
     }
 
-    /* --- GOLDEN (10-20m) --- */
+    /* --- GOLDEN --- */
     function updateBuffs(dt) { if(buffs.frenzy.active) { buffs.frenzy.time -= dt; if(buffs.frenzy.time <= 0) { buffs.frenzy.active = false; renderBuffs(); } } }
     function renderBuffs() { document.getElementById('buffArea').innerHTML = buffs.frenzy.active ? `<div class="buff-icon">🔥</div>` : ''; }
     function scheduleGolden() { const delay = (Math.random() * 600000) + 600000; setTimeout(spawnGolden, delay); }
     function spawnGolden() {
       const g = document.getElementById('goldenKlein');
-      const panel = document.getElementById('clickPanel');
-      const maxX = panel.offsetWidth - 80; const maxY = panel.offsetHeight - 80;
+      const maxX = document.getElementById('clickPanel').offsetWidth - 80; const maxY = document.getElementById('clickPanel').offsetHeight - 80;
       g.style.left = Math.random() * maxX + 'px'; g.style.top = Math.random() * maxY + 'px'; g.style.display = 'block';
       setTimeout(() => { if(g.style.display === 'block') { g.style.display = 'none'; scheduleGolden(); } }, 10000);
     }
@@ -677,13 +644,12 @@
 
     /* --- SAVE --- */
     function saveGame() {
-      const data = { username: game.username, score: game.score, totalScore: game.totalScore, clicks: game.clicks, buildings: game.buildings, upgrades: game.upgrades, casinoHistory: game.casinoHistory };
+      const data = { score: game.score, totalScore: game.totalScore, clicks: game.clicks, buildings: game.buildings, upgrades: game.upgrades, casinoHistory: game.casinoHistory };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
     function loadGame() {
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
       if(saved) {
-        game.username = saved.username || null;
         game.score = saved.score || 0; game.totalScore = saved.totalScore || 0; game.clicks = saved.clicks || 0;
         if(saved.buildings) game.buildings = saved.buildings;
         game.upgrades = saved.upgrades || []; game.casinoHistory = saved.casinoHistory || [];
