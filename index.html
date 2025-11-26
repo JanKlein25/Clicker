@@ -24,7 +24,7 @@
       background: var(--bg-gradient);
       color: var(--text-color);
       height: 100vh;
-      overflow: hidden; /* Wichtig für Partikel */
+      overflow: hidden; 
       display: grid;
       grid-template-rows: auto 1fr auto;
       position: relative;
@@ -41,30 +41,10 @@
       100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
     }
 
-    @keyframes popIn {
-      0% { transform: scale(0); }
-      80% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
     @keyframes shine {
       0% { filter: brightness(100%) drop-shadow(0 0 0px gold); transform: scale(1); }
       50% { filter: brightness(130%) drop-shadow(0 0 20px gold); transform: scale(1.1); }
       100% { filter: brightness(100%) drop-shadow(0 0 0px gold); transform: scale(1); }
-    }
-
-    @keyframes shake {
-      0% { transform: translate(1px, 1px) rotate(0deg); }
-      10% { transform: translate(-1px, -2px) rotate(-1deg); }
-      20% { transform: translate(-3px, 0px) rotate(1deg); }
-      30% { transform: translate(3px, 2px) rotate(0deg); }
-      40% { transform: translate(1px, -1px) rotate(1deg); }
-      50% { transform: translate(-1px, 2px) rotate(-1deg); }
-      60% { transform: translate(-3px, 1px) rotate(0deg); }
-      70% { transform: translate(3px, 1px) rotate(-1deg); }
-      80% { transform: translate(-1px, -1px) rotate(1deg); }
-      90% { transform: translate(1px, 2px) rotate(0deg); }
-      100% { transform: translate(1px, -2px) rotate(-1deg); }
     }
 
     /* --- UI Elements --- */
@@ -156,7 +136,7 @@
       width: 80px;
       height: 80px;
       cursor: pointer;
-      display: none; /* JS toggles this */
+      display: none; 
       z-index: 999;
       animation: shine 1.5s infinite;
     }
@@ -430,7 +410,7 @@
     }
 
     function calculateClickPower() {
-      // Klickstärke = 1 + 2% der aktuellen CPS. Macht Klicken auch im Lategame wichtig!
+      // Klickstärke = 1 + 2% der aktuellen CPS.
       return 1 + (calculateCPS() * 0.02); 
     }
 
@@ -439,14 +419,13 @@
     }
 
     function getLevel() {
-      // Einfache Formel: Wurzel aus TotalScore geteilt durch Faktor
       return Math.floor(Math.sqrt(state.totalScore) / 10) + 1;
     }
 
     /* --- Interaction --- */
     els.clickArea.addEventListener('mousedown', (e) => handleUserClick(e.clientX, e.clientY));
     els.clickArea.addEventListener('touchstart', (e) => {
-      e.preventDefault(); // Kein Zoom
+      e.preventDefault(); 
       for (let i = 0; i < e.touches.length; i++) {
         handleUserClick(e.touches[i].clientX, e.touches[i].clientY);
       }
@@ -462,19 +441,15 @@
       spawnFloatingText(x, y, `+${Math.floor(power)}`);
       spawnFallingHead(x, y);
       
-      // Animation Reset Hack
+      // Animation Reset für das Bild (nur das Bild wackelt/pulsiert leicht)
       els.klein.style.transform = 'scale(0.9)';
       setTimeout(() => els.klein.style.transform = '', 50);
-
-      // Kleines Wackeln bei schnellem Klicken
-      document.body.style.animation = 'none';
-      document.body.offsetHeight; /* trigger reflow */
-      document.body.style.animation = 'shake 0.2s';
+      
+      // Screen Shake wurde hier ENTFERNT
     }
 
     /* --- Golden Klein Event --- */
     function scheduleGoldenKlein() {
-      // Zufällig zwischen 30 und 90 Sekunden
       const delay = (Math.random() * 60000) + 30000;
       setTimeout(showGoldenKlein, delay);
     }
@@ -488,7 +463,6 @@
       g.style.top = y + 'px';
       g.style.display = 'block';
 
-      // Verschwindet nach 10 Sekunden
       goldenTimer = setTimeout(() => {
         g.style.display = 'none';
         scheduleGoldenKlein();
@@ -499,7 +473,6 @@
       clearTimeout(goldenTimer);
       els.golden.style.display = 'none';
       
-      // BONUS: 300x aktueller CPS oder mind. 500 Punkte
       const bonus = Math.max(500, calculateCPS() * 300);
       state.score += bonus;
       state.totalScore += bonus;
@@ -516,9 +489,8 @@
       if (state.score >= cost) {
         state.score -= cost;
         u.count++;
-        renderShop(); // Refresh Preise
+        renderShop(); 
         
-        // Soundeffekt (Simuliert durch visuelles Feedback)
         const btn = document.getElementById(`btn-${index}`);
         if(btn) btn.style.transform = "scale(0.9)";
         setTimeout(() => btn ? btn.style.transform = "" : null, 100);
@@ -600,7 +572,6 @@
       img.style.left = (x - 20) + 'px';
       img.style.top = (y - 20) + 'px';
       
-      // Random Rotation direction
       const rot = Math.random() > 0.5 ? 1 : -1;
       img.style.transform = `rotate(${Math.random() * 360}deg)`;
       
@@ -619,20 +590,17 @@
       }, 3000);
     }
 
-    /* --- UI Updates (60fps optimized) --- */
+    /* --- UI Updates --- */
     function updateUI() {
-      // Score smooth update
       els.score.textContent = Math.floor(state.score).toLocaleString();
       els.cps.textContent = calculateCPS().toLocaleString(undefined, {maximumFractionDigits: 1}) + " / Sek";
       
-      // Update Buttons enabled state
       state.upgrades.forEach((u, index) => {
         const btn = document.getElementById(`btn-${index}`);
         if (btn) {
           const cost = getCost(u);
           if (state.score >= cost && btn.disabled) {
             btn.disabled = false;
-            // Highlight update
             const costLabel = btn.previousElementSibling.previousElementSibling.querySelector('.item-cost');
             if(costLabel) costLabel.style.color = '#ffeaa7';
           } else if (state.score < cost && !btn.disabled) {
@@ -643,11 +611,8 @@
         }
       });
 
-      // Level Logic
       const lvl = getLevel();
       els.levelDisplay.textContent = lvl;
-      // Fortschritt zum nächsten Level berechnen
-      // (Sehr simple visuelle Annäherung)
       const currentBase = Math.pow((lvl-1)*10, 2);
       const nextBase = Math.pow(lvl*10, 2);
       const progress = (state.totalScore - currentBase) / (nextBase - currentBase);
@@ -662,7 +627,6 @@
       if(tabName === 'shop') document.getElementById('panelShop').style.display = 'block';
       if(tabName === 'achievements') document.getElementById('panelAchievements').style.display = 'block';
       
-      // Update Buttons
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       event.target.classList.add('active');
     };
@@ -685,7 +649,7 @@
         try {
           const parsed = JSON.parse(saved);
           state.score = parsed.score || 0;
-          state.totalScore = parsed.totalScore || parsed.score; // Kompatibilität
+          state.totalScore = parsed.totalScore || parsed.score;
           state.clickCount = parsed.clickCount || 0;
           
           if (parsed.upgrades) {
