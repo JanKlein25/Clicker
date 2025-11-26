@@ -304,16 +304,15 @@
     <div class="buildings-list" id="buildingList"></div>
   </div>
 
-  <script>
+ <script>
     /* --- CONFIGURATION --- */
     const DREAMLO_PRIVATE = "J_9nhvHp40akfBloaOBYng4kUhadyKq0aF6oD1cOn6vQ"; 
     const DREAMLO_PUBLIC = "69277c3d8f40bb18647b2486"; 
 
-    const SAVE_KEY = 'KleinClicker_Live_V1';
+    const SAVE_KEY = 'KleinClicker_Live_Final';
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
-    const CARD_WIDTH = 70;
-    const CARD_GAP = 4;
-
+    
+    /* BALANCING DATEN */
     const BUILDINGS = [
       { id: 0, name: 'Kaputte Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
       { id: 1, name: 'Nette Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
@@ -374,8 +373,8 @@
       renderHistory();
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000); 
-      setInterval(submitScore, 30000); // Score alle 30s
-      setInterval(fetchLeaderboard, 10000); // Liste alle 10s
+      setInterval(submitScore, 30000); // Score alle 30s hochladen
+      setInterval(fetchLeaderboard, 10000); // Liste alle 10s aktualisieren
       scheduleGolden();
       
       // Tooltip Follow
@@ -391,42 +390,62 @@
 
     function registerUser() {
       const input = document.getElementById('usernameInput');
-      const name = input.value.trim().replace(/[^a-zA-Z0-9]/g, ''); // Clean input
+      // Entferne Leerzeichen und Sonderzeichen für Sicherheit
+      const name = input.value.trim().replace(/[^a-zA-Z0-9äöüÄÖÜß ]/g, '');
+      
       if(name.length > 0) {
         game.username = name;
         document.getElementById('loginModal').style.display = 'none';
-        submitScore();
-        fetchLeaderboard();
+        submitScore(); // Sofort senden
+        setTimeout(fetchLeaderboard, 1000); // Kurz warten, dann laden
         saveGame();
       } else {
-        alert("Bitte gültigen Namen eingeben!");
+        alert("Bitte Namen eingeben (nur Buchstaben/Zahlen)!");
       }
     }
 
-    /* --- LEADERBOARD NETWORKING --- */
+    /* --- LEADERBOARD NETWORKING (OPTIMIERT) --- */
     function submitScore() {
       if(!game.username || DREAMLO_PRIVATE.includes("HIER")) return;
-      const url = `https://www.dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${game.username}/${Math.floor(game.totalScore)}`;
-      fetch(url).catch(e => console.log("Upload error")); // Silent fail
+      
+      // URL zusammenbauen
+      const scoreToSend = Math.floor(game.totalScore);
+      const url = `https://www.dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${game.username}/${scoreToSend}`;
+      
+      // Silent Fetch (kein Fehler, wenn es mal nicht klappt)
+      fetch(url).catch(e => console.warn("Score Upload failed"));
     }
 
     function fetchLeaderboard() {
-      const url = `https://www.dreamlo.com/lb/${DREAMLO_PUBLIC}/json`;
+      // Timestamp anhängen (?nocache=...), damit der Browser nicht die alte Liste lädt
+      const url = `https://www.dreamlo.com/lb/${DREAMLO_PUBLIC}/json?nocache=${new Date().getTime()}`;
+      
       fetch(url)
         .then(response => response.json())
         .then(data => {
           const list = document.getElementById('lb-list-content');
-          list.innerHTML = '';
-          let entries = [];
+          list.innerHTML = ''; // Liste leeren
           
+          // Sicherheitscheck 1: Sind überhaupt Daten da?
+          if(!data || !data.dreamlo) {
+             list.innerHTML = "<div style='padding:20px;text-align:center;color:#666'>Ladefehler...</div>";
+             return;
+          }
+
+          // Sicherheitscheck 2: Ist die Liste leer? (Dreamlo sendet null)
           if(data.dreamlo.leaderboard === null) {
-            list.innerHTML = "<div style='padding:20px;text-align:center;color:#666'>Noch keine Scores</div>";
+            list.innerHTML = "<div style='padding:20px;text-align:center;color:#666'>Noch keine Spieler.<br>Sei der Erste!</div>";
             return;
           }
           
-          const entryData = data.dreamlo.leaderboard.entry;
-          if(Array.isArray(entryData)) entries = entryData; else entries = [entryData];
+          let entries = data.dreamlo.leaderboard.entry;
+          
+          // Sicherheitscheck 3: Einzelner Eintrag ist Objekt, mehrere sind Array
+          if(!Array.isArray(entries)) {
+            entries = [entries]; // In Array umwandeln
+          }
 
+          // Rendern
           entries.forEach((e, index) => {
             const isMe = e.name === game.username ? 'is-me' : '';
             const div = document.createElement('div');
@@ -439,7 +458,10 @@
             list.appendChild(div);
           });
         })
-        .catch(err => {});
+        .catch(err => {
+          console.error(err);
+          document.getElementById('lb-list-content').innerHTML = "<div style='padding:20px;text-align:center;color:#e74c3c;font-size:0.8rem'>Verbindung fehlgeschlagen.<br>Prüfe Internet.</div>";
+        });
     }
 
     function gameLoop(now) {
@@ -453,8 +475,13 @@
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
       document.getElementById('cps').textContent = "pro Sekunde: " + formatNum(cps, 1);
       
-      if(!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
-      else if(casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
+      // Casino unlock bei 1000 Punkten
+      if(!casinoUnlocked && game.totalScore >= 1000) { 
+        casinoUnlocked = true; 
+        document.getElementById('casinoBtn').style.display = 'block'; 
+      } else if(casinoUnlocked) {
+        document.getElementById('casinoBtn').style.display = 'block';
+      }
 
       updateBuildingStates();
       requestAnimationFrame(gameLoop);
@@ -478,7 +505,7 @@
       return power;
     }
 
-    /* --- CASINO --- */
+    /* --- CASINO LOGIC --- */
     let isSpinning = false;
     function openCasino() {
       document.getElementById('casinoModal').style.display = 'flex';
@@ -510,7 +537,9 @@
       if(bet > game.score) { bet = Math.floor(game.score); betInput.value = bet; }
       if(bet <= 0) return;
 
-      game.score -= bet; updateCasinoUI(); isSpinning = true; disableButtons(true);
+      game.score -= bet; updateCasinoUI(); isSpinning = true; 
+      document.querySelectorAll('.bet-btn, .control-btn, .close-btn').forEach(b => b.disabled = true);
+
       const r = Math.random(); let result = 'black';
       if(r < 0.05) result = 'green'; else if(r < 0.525) result = 'red';
 
@@ -527,7 +556,9 @@
       setTimeout(() => { finishSpin(choice, result, bet); }, 4500);
     }
     function finishSpin(choice, result, bet) {
-      isSpinning = false; disableButtons(false);
+      isSpinning = false; 
+      document.querySelectorAll('.bet-btn, .control-btn, .close-btn').forEach(b => b.disabled = false);
+      
       game.casinoHistory.unshift(result); if(game.casinoHistory.length > 10) game.casinoHistory.pop(); renderHistory();
       let multiplier = 0; if(choice === result) { if(result === 'green') multiplier = 14; else multiplier = 2; }
       if(multiplier > 0) {
@@ -540,7 +571,6 @@
       const con = document.getElementById('history-container'); con.innerHTML = '';
       game.casinoHistory.forEach(h => { const d = document.createElement('div'); d.className = `hist-dot hist-${h}`; con.appendChild(d); });
     }
-    function disableButtons(disable) { document.querySelectorAll('.bet-btn, .control-btn, .close-btn').forEach(b => b.disabled = disable); }
     function spawnConfetti() {
       const win = document.getElementById('casinoWindow');
       for(let i=0; i<30; i++) {
@@ -564,15 +594,15 @@
     }
     function spawnFloatingText(x, y, text) {
       const el = document.createElement('div'); el.className = 'click-text'; el.textContent = text;
-      // Fix position relative to panel
+      // Position korrigieren
       const rect = clickPanel.getBoundingClientRect();
       el.style.left = (x - 20 + Math.random()*40) + 'px'; el.style.top = y + 'px'; 
       document.body.appendChild(el); setTimeout(()=>el.remove(), 800);
     }
     function spawnFallingFace(x, y) {
       const img = document.createElement('img'); img.src = IMG_URL; img.className = 'falling-face';
-      // Calculate relative position inside the middle panel
       const rect = clickPanel.getBoundingClientRect();
+      // Position relativ zum Panel, damit es nicht rausfliegt
       img.style.left = (x - rect.left - 17) + 'px'; img.style.top = (y - rect.top - 17) + 'px'; 
       clickPanel.appendChild(img); setTimeout(()=>img.remove(), 1200);
     }
@@ -641,7 +671,8 @@
       available.forEach(u => {
         const div = document.createElement('div'); div.className = 'upgrade-crate'; div.innerHTML = u.icon;
         div.onmouseenter = () => showTooltip(u); div.onmouseleave = () => hideTooltip();
-        if(game.score >= u.cost) { div.onclick = () => buyUpgrade(u.id); } else { div.style.opacity = 0.5; div.style.filter = "grayscale(1)"; }
+        if(game.score >= u.cost) { div.onclick = () => buyUpgrade(u.id); } 
+        else { div.style.opacity = 0.5; div.style.filter = "grayscale(1)"; }
         container.appendChild(div);
       });
     }
