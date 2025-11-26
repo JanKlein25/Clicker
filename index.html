@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker Ultimate</title>
+  <title>KleinClicker Casino</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   
   <style>
@@ -13,6 +13,7 @@
       --gold: #f1c40f;
       --green: #2ecc71;
       --red: #e74c3c;
+      --black: #2d3436;
       --text-main: #ecf0f1;
       --tooltip-bg: rgba(15, 15, 20, 0.98);
       --border-color: rgba(255, 255, 255, 0.15);
@@ -29,149 +30,73 @@
       display: flex;
     }
 
-    /* --- GLOBAL TOOLTIP (The Fix) --- */
+    /* --- GLOBAL TOOLTIP --- */
     #global-tooltip {
-      position: fixed;
-      top: 0; left: 0;
-      width: 300px;
-      background: var(--tooltip-bg);
-      border: 1px solid var(--gold);
-      border-radius: 8px;
-      pointer-events: none; /* Maus ignoriert das Element */
-      z-index: 10000; /* Immer ganz oben */
-      padding: 0;
-      display: none; /* Standardmäßig unsichtbar */
+      position: fixed; top: 0; left: 0; width: 300px;
+      background: var(--tooltip-bg); border: 1px solid var(--gold); border-radius: 8px;
+      pointer-events: none; z-index: 10000; padding: 0; display: none;
       box-shadow: 0 10px 40px rgba(0,0,0,1);
-      font-family: 'Roboto', sans-serif;
     }
-
-    .tt-header { 
-      background: rgba(255,255,255,0.05); 
-      padding: 12px; 
-      border-bottom: 1px solid var(--border-color);
-    }
+    .tt-header { background: rgba(255,255,255,0.05); padding: 12px; border-bottom: 1px solid var(--border-color); }
     .tt-title { font-family: 'Merriweather', serif; font-weight: 900; font-size: 1.1rem; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
     .tt-price { font-size: 0.9rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: #000; }
-    .tt-price.affordable { color: var(--green); }
-    .tt-price.expensive { color: var(--red); }
-    
+    .tt-price.affordable { color: var(--green); } .tt-price.expensive { color: var(--red); }
     .tt-body { padding: 12px; font-size: 0.85rem; color: #ccc; line-height: 1.4; }
     .tt-effect { color: #fff; font-weight: bold; margin-bottom: 8px; display: block; font-size: 0.95rem; border-left: 3px solid var(--gold); padding-left: 8px; }
-    
-    .tt-stats { 
-      background: rgba(0,0,0,0.5); 
-      padding: 10px; 
-      margin-top: 8px; 
-      border-radius: 4px; 
-      font-size: 0.8rem;
-    }
+    .tt-stats { background: rgba(0,0,0,0.5); padding: 10px; margin-top: 8px; border-radius: 4px; font-size: 0.8rem; }
     .stat-line { display: flex; justify-content: space-between; margin-bottom: 4px; }
     .stat-highlight { color: var(--green); font-weight: bold; font-size: 0.9rem; margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); }
 
-
-    /* --- LEFT PANEL --- */
+    /* --- LAYOUT --- */
     .left-panel {
-      flex: 1;
-      background: radial-gradient(circle at center, #353b48 0%, #15151a 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      border-right: 2px solid #000;
-      box-shadow: inset -10px 0 30px rgba(0,0,0,0.5);
-      overflow: hidden;
+      flex: 1; background: radial-gradient(circle at center, #353b48 0%, #15151a 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; border-right: 2px solid #000; box-shadow: inset -10px 0 30px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .right-panel {
+      width: 400px; background: var(--panel-right); display: flex; flex-direction: column;
+      border-left: 1px solid #333; box-shadow: -5px 0 15px rgba(0,0,0,0.5); z-index: 50;
     }
 
-    .bakery-name {
-      position: absolute;
-      top: 30px;
-      font-family: 'Merriweather', serif;
-      font-weight: 900;
-      font-size: 2rem;
-      text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      color: var(--gold);
-      opacity: 0.9;
-      letter-spacing: 1px;
-    }
-
+    /* --- LEFT ELEMENTS --- */
+    .bakery-name { position: absolute; top: 30px; font-family: 'Merriweather', serif; font-weight: 900; font-size: 2rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5); color: var(--gold); opacity: 0.9; }
     .score-container { margin-bottom: 40px; text-align: center; z-index: 20; }
     #score { font-family: 'Merriweather', serif; font-size: 3.5rem; font-weight: 700; text-shadow: 0 0 20px rgba(255,255,255,0.15); line-height: 1.1; }
     #cps { font-size: 1.3rem; color: #bdc3c7; margin-top: 8px; font-weight: 500; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px; }
 
     #bigKlein {
-      width: 300px; height: 300px;
-      object-fit: contain;
-      cursor: pointer;
-      transition: transform 0.05s, filter 0.2s;
-      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
-      z-index: 20;
+      width: 300px; height: 300px; object-fit: contain; cursor: pointer;
+      transition: transform 0.05s, filter 0.2s; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6)); z-index: 20;
     }
     #bigKlein:active { transform: scale(0.94); }
     #bigKlein:hover { filter: drop-shadow(0 0 25px rgba(255,255,255,0.1)); }
 
-    /* --- RIGHT PANEL (SHOP) --- */
-    .right-panel {
-      width: 400px;
-      background: var(--panel-right);
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid #333;
-      box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-      z-index: 50;
+    /* --- CASINO BUTTON --- */
+    #casinoBtn {
+      margin-top: 20px;
+      background: linear-gradient(135deg, #d35400, #e67e22);
+      border: 2px solid #fff; color: #fff;
+      padding: 10px 25px; border-radius: 30px;
+      font-weight: bold; font-size: 1.1rem; cursor: pointer;
+      box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+      display: none; /* Hidden until unlocked */
+      z-index: 25; transition: transform 0.1s;
+      animation: pulseBtn 2s infinite;
     }
+    #casinoBtn:active { transform: scale(0.95); }
+    @keyframes pulseBtn { 0% {box-shadow: 0 0 0 0 rgba(230,126,34, 0.7);} 70% {box-shadow: 0 0 0 10px rgba(230,126,34, 0);} 100% {box-shadow: 0 0 0 0 rgba(230,126,34, 0);} }
 
-    .store-header {
-      background: #111;
-      padding: 15px;
-      text-align: center;
-      font-family: 'Merriweather', serif;
-      font-weight: bold;
-      color: #95a5a6;
-      border-bottom: 1px solid #333;
-      font-size: 0.85rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    /* Upgrades Container - No overflow:hidden to mess with tooltips, but handled via JS now anyway */
-    .upgrades-container {
-      padding: 10px;
-      background: rgba(0,0,0,0.2);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      min-height: 70px;
-      max-height: 200px;
-      overflow-y: auto;
-      border-bottom: 2px solid #000;
-    }
+    /* --- SHOP ELEMENTS --- */
+    .store-header { background: #111; padding: 15px; text-align: center; font-family: 'Merriweather', serif; font-weight: bold; color: #95a5a6; border-bottom: 1px solid #333; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; }
     
-    .upgrade-crate {
-      width: 58px; height: 58px;
-      background: linear-gradient(135deg, #333, #222);
-      border: 1px solid #555;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      border-radius: 6px;
-      transition: all 0.2s;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    }
+    .upgrades-container { padding: 10px; background: rgba(0,0,0,0.2); display: flex; flex-wrap: wrap; gap: 8px; min-height: 70px; max-height: 200px; overflow-y: auto; border-bottom: 2px solid #000; }
+    .upgrade-crate { width: 58px; height: 58px; background: linear-gradient(135deg, #333, #222); border: 1px solid #555; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border-radius: 6px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
     .upgrade-crate:hover { border-color: #fff; transform: translateY(-2px); background: #444; }
 
-    /* Buildings */
     .buildings-list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #555 #111; }
-    .building-row {
-      height: 75px; background: linear-gradient(to right, #333, #25252b);
-      border-bottom: 1px solid #111; display: flex; align-items: center;
-      padding: 0 15px; cursor: pointer; position: relative; opacity: 0.6; transition: all 0.2s;
-    }
+    .building-row { height: 75px; background: linear-gradient(to right, #333, #25252b); border-bottom: 1px solid #111; display: flex; align-items: center; padding: 0 15px; cursor: pointer; position: relative; opacity: 0.6; transition: all 0.2s; }
     .building-row:hover { opacity: 1; background: #3a3a42; }
     .building-row.can-afford { opacity: 1; }
-    
     .b-icon { font-size: 2.4rem; width: 64px; text-align: center; margin-right: 15px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
     .b-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
     .b-name { font-weight: 700; font-family: 'Merriweather', serif; font-size: 1.1rem; color: #fff; margin-bottom: 2px; }
@@ -181,45 +106,71 @@
     .b-count { font-size: 2.5rem; font-weight: 900; color: rgba(0,0,0,0.15); margin-left: auto; }
 
     /* Particles & FX */
-    .falling-face {
-      position: absolute; width: 35px; height: 35px; pointer-events: none; z-index: 15;
-      animation: physicsFall 1.2s cubic-bezier(0.5, 0, 0.8, 0.8) forwards;
-    }
+    .falling-face { position: absolute; width: 35px; height: 35px; pointer-events: none; z-index: 15; animation: physicsFall 1.2s cubic-bezier(0.5, 0, 0.8, 0.8) forwards; }
     @keyframes physicsFall { 0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; } 100% { transform: translateY(800px) rotate(360deg) scale(0.8); opacity: 0; } }
-
-    .click-text {
-      position: absolute; color: #fff; font-weight: 900; font-size: 1.4rem; pointer-events: none;
-      animation: floatUp 0.8s ease-out forwards; z-index: 100; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    }
+    .click-text { position: absolute; color: #fff; font-weight: 900; font-size: 1.4rem; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 100; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
     @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1); } }
 
     /* Golden Klein */
-    #goldenKlein {
-      position: absolute; width: 80px; height: 80px; z-index: 9999; cursor: pointer; display: none;
-      filter: drop-shadow(0 0 20px gold); animation: wobble 2s infinite;
-    }
+    #goldenKlein { position: absolute; width: 80px; height: 80px; z-index: 9999; cursor: pointer; display: none; filter: drop-shadow(0 0 20px gold); animation: wobble 2s infinite; }
     @keyframes wobble { 0%,100% {transform:rotate(0deg);} 25% {transform:rotate(-5deg);} 75% {transform:rotate(5deg);} }
 
     /* Buffs */
     .buff-container { position: absolute; bottom: 20px; left: 20px; display: flex; gap: 8px; z-index: 100; }
-    .buff-icon { 
-      width: 50px; height: 50px; background: rgba(0,0,0,0.8); border: 2px solid var(--gold); border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; 
-      box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); animation: pulse 1s infinite alternate;
-    }
+    .buff-icon { width: 50px; height: 50px; background: rgba(0,0,0,0.8); border: 2px solid var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); animation: pulse 1s infinite alternate; }
     @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+    /* --- CASINO MODAL --- */
+    #casinoModal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85); z-index: 12000;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+    .casino-window {
+      background: #1e272e; width: 90%; max-width: 450px;
+      border: 4px solid var(--gold); border-radius: 12px;
+      padding: 20px; text-align: center;
+      box-shadow: 0 0 50px rgba(241, 196, 15, 0.2);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn { 0%{transform:scale(0.5);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+
+    .casino-title { font-family:'Merriweather', serif; font-size:2rem; color: var(--gold); margin-bottom: 20px; text-shadow: 2px 2px 0 #000; }
+    
+    .roulette-display {
+      width: 100%; height: 80px; background: #000; border: 2px solid #555;
+      margin: 20px 0; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      position: relative; overflow: hidden;
+    }
+    .roulette-display::before { content: '▼'; position: absolute; top: -5px; color: var(--gold); font-size: 1rem; z-index: 10; }
+    
+    .bet-controls { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+    .bet-input { background: #333; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 4px; width: 120px; text-align: center; font-weight: bold; }
+    .bet-btn { background: #444; border: none; color: #ccc; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .bet-btn:hover { background: #555; color: #fff; }
+
+    .color-buttons { display: flex; gap: 10px; justify-content: center; }
+    .c-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: 900; font-size: 1.2rem; cursor: pointer; color: white; transition: transform 0.1s; border: 2px solid rgba(255,255,255,0.1); }
+    .c-btn:active { transform: scale(0.95); }
+    .c-red { background: var(--red); }
+    .c-black { background: var(--black); }
+    .c-green { background: var(--green); }
+
+    .close-casino { margin-top: 15px; background: transparent; border: none; color: #666; cursor: pointer; text-decoration: underline; }
 
     @media (max-width: 850px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
       .left-panel { min-height: 50vh; border-right: none; border-bottom: 2px solid #333; }
       .right-panel { width: 100%; min-height: 50vh; }
-      #global-tooltip { display: none !important; } /* Tooltips on mobile are hard, hiding for simplicity or could be modal */
+      #global-tooltip { display: none !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- GLOBAL TOOLTIP ELEMENT -->
+  <!-- GLOBAL TOOLTIP -->
   <div id="global-tooltip">
     <div class="tt-header">
       <div class="tt-title">
@@ -229,8 +180,35 @@
     </div>
     <div class="tt-body">
       <span id="tt-effect-display" class="tt-effect">Verdoppelt Produktion</span>
-      <div id="tt-desc-display">Beschreibungstext...</div>
+      <div id="tt-desc-display">Beschreibung...</div>
       <div id="tt-stats-container" class="tt-stats"></div>
+    </div>
+  </div>
+
+  <!-- CASINO MODAL -->
+  <div id="casinoModal">
+    <div class="casino-window">
+      <div class="casino-title">🎰 KLEIN CASINO</div>
+      
+      <div style="font-size:0.9rem; color:#aaa; margin-bottom:5px;">Dein Guthaben: <span id="casino-balance" style="color:#fff; font-weight:bold;">0</span></div>
+      
+      <div class="bet-controls">
+        <input type="number" id="betAmount" class="bet-input" placeholder="Einsatz">
+        <button class="bet-btn" onclick="setBet('half')">1/2</button>
+        <button class="bet-btn" onclick="setBet('all')">ALL IN</button>
+      </div>
+
+      <div class="roulette-display" id="rouletteWheel">
+        BEREIT?
+      </div>
+
+      <div class="color-buttons">
+        <button class="c-btn c-red" onclick="spinRoulette('red')">ROT<br><span style="font-size:0.7rem">x2</span></button>
+        <button class="c-btn c-green" onclick="spinRoulette('green')">KLEIN<br><span style="font-size:0.7rem">x14</span></button>
+        <button class="c-btn c-black" onclick="spinRoulette('black')">SCHWARZ<br><span style="font-size:0.7rem">x2</span></button>
+      </div>
+
+      <button class="close-casino" onclick="closeCasino()">Zurück zur Arbeit</button>
     </div>
   </div>
 
@@ -240,6 +218,10 @@
       <div id="score">0</div>
       <div id="cps">pro Sekunde: 0,0</div>
     </div>
+    
+    <!-- CASINO BUTTON -->
+    <button id="casinoBtn" onclick="openCasino()">🎰 CASINO</button>
+
     <div class="buff-container" id="buffArea"></div>
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein" alt="Klick mich!">
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="goldenKlein" alt="GOLD">
@@ -254,9 +236,8 @@
 
   <script>
     /* --- CONFIGURATION --- */
-    const SAVE_KEY = 'KleinClicker_FixedTooltip_V3';
+    const SAVE_KEY = 'KleinClicker_Casino_V4';
     
-    // Buildings
     const BUILDINGS = [
       { id: 0, name: 'Kaputte Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
       { id: 1, name: 'Nette Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
@@ -267,33 +248,26 @@
       { id: 6, name: 'Tempel',       baseCost: 20000000,baseCps: 7800,   icon: '🏛️' }
     ];
 
-    // Upgrades
     const UPGRADES = [
       { id: 'u_click_1', name: 'Plastik Maus', cost: 500,    trigger: {type:'clicks', val:100}, icon:'🖱️', desc:'Die billigste Maus auf dem Markt.', type:'click', multi:2, text:'Klickstärke x2' },
       { id: 'u_click_2', name: 'Gamer Maus',   cost: 50000,  trigger: {type:'clicks', val:1000},icon:'🎮', desc:'Mit RGB Beleuchtung für mehr FPS.', type:'click', multi:2, text:'Klickstärke x2' },
-      
       { id: 'u_b0_1',    name: 'Carpaltunnel', cost: 1000,   trigger: {type:'build', id:0, val:10}, icon:'🩹', desc:'Mäuse arbeiten trotz Schmerzen weiter.', type:'build', target:0, multi:2, text:'Maus Produktion x2' },
       { id: 'u_b0_2',    name: 'Makro',        cost: 10000,  trigger: {type:'build', id:0, val:50}, icon:'⌨️', desc:'Automatisierte Klick-Skripte.', type:'build', target:0, multi:2, text:'Maus Produktion x2' },
-
       { id: 'u_b1_1',    name: 'Nudelholz',    cost: 5000,   trigger: {type:'build', id:1, val:10}, icon:'🥖', desc:'Die Omas werden aggressiver.', type:'build', target:1, multi:2, text:'Oma Produktion x2' },
       { id: 'u_b1_2',    name: 'Lesebrille',   cost: 50000,  trigger: {type:'build', id:1, val:50}, icon:'👓', desc:'Sie sehen die Kleinis jetzt besser.', type:'build', target:1, multi:2, text:'Oma Produktion x2' },
-      
       { id: 'u_b2_1',    name: 'Dünger',       cost: 150000, trigger: {type:'build', id:2, val:10}, icon:'💩', desc:'100% biologisch abbaubar.', type:'build', target:2, multi:2, text:'Feld Produktion x2' },
       { id: 'u_b3_1',    name: 'Dynamit',      cost: 1200000, trigger: {type:'build', id:3, val:10}, icon:'🧨', desc:'Sicherheit ist zweitrangig.', type:'build', target:3, multi:2, text:'Mine Produktion x2' }
     ];
 
     /* --- GAME STATE --- */
     let game = {
-      score: 0,
-      totalScore: 0,
-      clicks: 0,
-      buildings: new Array(BUILDINGS.length).fill(0),
-      upgrades: []
+      score: 0, totalScore: 0, clicks: 0, buildings: new Array(BUILDINGS.length).fill(0), upgrades: []
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
     let lastTime = performance.now();
+    let casinoUnlocked = false;
 
-    /* --- UI REFERENCES --- */
+    /* --- UI REFS --- */
     const tooltipEl = document.getElementById('global-tooltip');
     const ttName = document.getElementById('tt-name-display');
     const ttPrice = document.getElementById('tt-price-display');
@@ -310,19 +284,12 @@
       setInterval(slowLoop, 500); 
       scheduleGolden();
       
-      // Global Mouse Tracking for Tooltip
       document.addEventListener('mousemove', (e) => {
         if (tooltipEl.style.display === 'block') {
-          // Position tooltip to the left of the mouse to avoid going off screen right
-          let top = e.clientY + 10;
-          let left = e.clientX - 310; // 300px width + 10px padding
-          
-          // Safety checks
-          if(left < 10) left = e.clientX + 10; // Flip to right if too close to left edge
+          let top = e.clientY + 10; let left = e.clientX - 310;
+          if(left < 10) left = e.clientX + 10;
           if(top + tooltipEl.offsetHeight > window.innerHeight) top = window.innerHeight - tooltipEl.offsetHeight - 10;
-          
-          tooltipEl.style.top = top + 'px';
-          tooltipEl.style.left = left + 'px';
+          tooltipEl.style.top = top + 'px'; tooltipEl.style.left = left + 'px';
         }
       });
     }
@@ -330,8 +297,7 @@
     /* --- LOOPS --- */
     function gameLoop(now) {
       let dt = (now - lastTime) / 1000;
-      if(dt > 1) dt = 1; 
-      lastTime = now;
+      if(dt > 1) dt = 1; lastTime = now;
       updateBuffs(dt);
       
       const cps = calculateTotalCPS();
@@ -340,23 +306,26 @@
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
       document.getElementById('cps').textContent = "pro Sekunde: " + formatNum(cps, 1);
       
+      // Casino Unlock Check
+      if(!casinoUnlocked && game.totalScore >= 1000) {
+        casinoUnlocked = true;
+        document.getElementById('casinoBtn').style.display = 'block';
+      } else if(casinoUnlocked) {
+        document.getElementById('casinoBtn').style.display = 'block';
+      }
+
       updateBuildingStates();
       requestAnimationFrame(gameLoop);
     }
 
-    function slowLoop() {
-      saveGame();
-      renderUpgrades(); 
-    }
+    function slowLoop() { saveGame(); renderUpgrades(); }
 
     /* --- MATH --- */
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
     
     function getBuildingMultiplier(index) {
       let m = 1;
-      UPGRADES.forEach(u => {
-        if(u.type === 'build' && u.target === index && game.upgrades.includes(u.id)) m *= u.multi;
-      });
+      UPGRADES.forEach(u => { if(u.type === 'build' && u.target === index && game.upgrades.includes(u.id)) m *= u.multi; });
       if(buffs.frenzy.active) m *= buffs.frenzy.multi;
       return m;
     }
@@ -364,9 +333,7 @@
     function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
     
     function calculateTotalCPS() {
-      let cps = 0;
-      game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i));
-      return cps;
+      let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps;
     }
 
     function getClickPower() {
@@ -374,6 +341,80 @@
       UPGRADES.forEach(u => { if(u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
       if(buffs.frenzy.active) power *= buffs.frenzy.multi;
       return power;
+    }
+
+    /* --- CASINO LOGIC --- */
+    function openCasino() {
+      document.getElementById('casinoModal').style.display = 'flex';
+      document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score));
+    }
+    function closeCasino() { document.getElementById('casinoModal').style.display = 'none'; }
+    
+    function setBet(type) {
+      if(type === 'half') document.getElementById('betAmount').value = Math.floor(game.score / 2);
+      if(type === 'all') document.getElementById('betAmount').value = Math.floor(game.score);
+    }
+
+    let spinning = false;
+    function spinRoulette(choice) {
+      if(spinning) return;
+      
+      const bet = parseInt(document.getElementById('betAmount').value);
+      if(isNaN(bet) || bet <= 0) { alert("Ungültiger Einsatz!"); return; }
+      if(bet > game.score) { alert("Nicht genug Punkte!"); return; }
+      
+      // Abziehen
+      game.score -= bet;
+      document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score));
+      
+      spinning = true;
+      const wheel = document.getElementById('rouletteWheel');
+      let steps = 0;
+      const totalSteps = 30 + Math.floor(Math.random() * 10); // Zufällige Dauer
+      
+      const interval = setInterval(() => {
+        // Animation visuals
+        steps++;
+        const r = Math.random();
+        let color, text;
+        
+        if(r < 0.475) { color = 'var(--red)'; text = "ROT"; }
+        else if(r < 0.95) { color = '#333'; text = "SCHWARZ"; }
+        else { color = 'var(--green)'; text = "KLEIN"; }
+        
+        wheel.style.background = color;
+        wheel.innerText = text;
+
+        if(steps >= totalSteps) {
+          clearInterval(interval);
+          finishSpin(choice, bet, text);
+        }
+      }, 80); // Speed
+    }
+
+    function finishSpin(choice, bet, resultText) {
+      spinning = false;
+      let won = false;
+      let multiplier = 0;
+      
+      // Logic Check
+      // resultText is what the wheel stopped on
+      if(choice === 'red' && resultText === 'ROT') { won = true; multiplier = 2; }
+      else if(choice === 'black' && resultText === 'SCHWARZ') { won = true; multiplier = 2; }
+      else if(choice === 'green' && resultText === 'KLEIN') { won = true; multiplier = 14; }
+      
+      if(won) {
+        const winAmount = bet * multiplier;
+        game.score += winAmount;
+        game.totalScore += winAmount; // Gewinne zählen zum Lifetime Score? Ja.
+        document.getElementById('rouletteWheel').innerText = `GEWONNEN! (+${formatNum(winAmount)})`;
+        document.getElementById('rouletteWheel').style.background = "var(--gold)";
+      } else {
+        document.getElementById('rouletteWheel').innerText = "VERLOREN";
+        document.getElementById('rouletteWheel').style.background = "#555";
+      }
+      
+      document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score));
     }
 
     /* --- INTERACTION --- */
@@ -388,8 +429,7 @@
 
     function handleInteraction(x, y) {
       const power = getClickPower();
-      addScore(power);
-      game.clicks++;
+      addScore(power); game.clicks++;
       spawnFloatingText(x, y, `+${formatNum(power)}`);
       spawnFallingFace(x, y);
       bigKlein.style.transform = "scale(0.94)";
@@ -398,23 +438,14 @@
 
     /* --- VISUALS --- */
     function spawnFloatingText(x, y, text) {
-      const el = document.createElement('div');
-      el.className = 'click-text';
-      el.textContent = text;
-      el.style.left = (x - 20 + Math.random()*40) + 'px';
-      el.style.top = y + 'px';
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 800);
+      const el = document.createElement('div'); el.className = 'click-text'; el.textContent = text;
+      el.style.left = (x - 20 + Math.random()*40) + 'px'; el.style.top = y + 'px';
+      document.body.appendChild(el); setTimeout(() => el.remove(), 800);
     }
-
     function spawnFallingFace(x, y) {
-      const img = document.createElement('img');
-      img.src = bigKlein.src;
-      img.className = 'falling-face';
-      img.style.left = (x - 17) + 'px';
-      img.style.top = (y - 17) + 'px';
-      clickPanel.appendChild(img);
-      setTimeout(() => img.remove(), 1200);
+      const img = document.createElement('img'); img.src = bigKlein.src; img.className = 'falling-face';
+      img.style.left = (x - 17) + 'px'; img.style.top = (y - 17) + 'px';
+      clickPanel.appendChild(img); setTimeout(() => img.remove(), 1200);
     }
 
     function formatNum(num, decimals=0) {
@@ -425,173 +456,109 @@
 
     /* --- SHOP --- */
     function getBuildingCost(i) { return Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15, game.buildings[i])); }
-    
     function buyBuilding(i) {
       const cost = getBuildingCost(i);
       if(game.score >= cost) {
-        game.score -= cost;
-        game.buildings[i]++;
-        updateSingleBuildingUI(i);
-        renderUpgrades();
+        game.score -= cost; game.buildings[i]++;
+        updateSingleBuildingUI(i); renderUpgrades();
       }
     }
-
     function buildBuildingUI() {
-      const list = document.getElementById('buildingList');
-      list.innerHTML = '';
+      const list = document.getElementById('buildingList'); list.innerHTML = '';
       BUILDINGS.forEach((b, i) => {
-        const el = document.createElement('div');
-        el.className = 'building-row';
-        el.id = `build-row-${i}`;
-        el.onclick = () => buyBuilding(i);
+        const el = document.createElement('div'); el.className = 'building-row'; el.id = `build-row-${i}`; el.onclick = () => buyBuilding(i);
         el.innerHTML = `
           <div class="b-icon">${b.icon}</div>
-          <div class="b-info">
-            <div class="b-name">${b.name}</div>
-            <div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div>
-            <div class="b-cost" id="cost-${i}">0</div>
-          </div>
+          <div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div><div class="b-cost" id="cost-${i}">0</div></div>
           <div class="b-count" id="count-${i}">0</div>
         `;
-        list.appendChild(el);
-        updateSingleBuildingUI(i);
+        list.appendChild(el); updateSingleBuildingUI(i);
       });
     }
-
     function updateSingleBuildingUI(i) {
       document.getElementById(`count-${i}`).textContent = game.buildings[i];
       document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i));
     }
-
     function updateBuildingStates() {
       BUILDINGS.forEach((b, i) => {
-        const row = document.getElementById(`build-row-${i}`);
-        const costEl = document.getElementById(`cost-${i}`);
-        if(game.score >= getBuildingCost(i)) {
-          row.classList.add('can-afford'); costEl.classList.add('affordable');
-        } else {
-          row.classList.remove('can-afford'); costEl.classList.remove('affordable');
-        }
+        const row = document.getElementById(`build-row-${i}`); const costEl = document.getElementById(`cost-${i}`);
+        if(game.score >= getBuildingCost(i)) { row.classList.add('can-afford'); costEl.classList.add('affordable'); }
+        else { row.classList.remove('can-afford'); costEl.classList.remove('affordable'); }
       });
     }
 
-    /* --- UPGRADES & NEW TOOLTIP LOGIC --- */
+    /* --- UPGRADES --- */
     function buyUpgrade(uId) {
       const u = UPGRADES.find(x => x.id === uId);
       if(game.score >= u.cost) {
-        game.score -= u.cost;
-        game.upgrades.push(uId);
-        renderUpgrades();
-        hideTooltip(); // Hide immediately after buying
+        game.score -= u.cost; game.upgrades.push(uId);
+        renderUpgrades(); hideTooltip();
       }
     }
-
     function showTooltip(u) {
       ttName.textContent = u.name;
       ttPrice.textContent = formatNum(u.cost);
       ttPrice.className = game.score >= u.cost ? 'tt-price affordable' : 'tt-price expensive';
-      ttEffect.textContent = "Effekt: " + u.text; // Explicit text
+      ttEffect.textContent = "Effekt: " + u.text;
       ttDesc.textContent = u.desc;
       
       let statsHTML = '';
       if(u.type === 'build') {
-          const bIdx = u.target;
-          const count = game.buildings[bIdx];
+          const bIdx = u.target; const count = game.buildings[bIdx];
           const currentMulti = getBuildingMultiplier(bIdx);
           const base = BUILDINGS[bIdx].baseCps;
           const currentSingleCPS = base * currentMulti;
           const newSingleCPS = currentSingleCPS * u.multi;
           const totalGain = (newSingleCPS - currentSingleCPS) * count;
 
-          statsHTML = `
-            <div class="stat-line">
-              <span>Einzelproduktion:</span>
-              <span>${formatNum(currentSingleCPS, 1)} ➜ <span style="color:#2ecc71">${formatNum(newSingleCPS, 1)}</span></span>
-            </div>
-            <div class="stat-highlight">
-               +${formatNum(totalGain, 1)} CPS Gesamt
-            </div>
-          `;
+          statsHTML = `<div class="stat-line"><span>Einzeln:</span><span>${formatNum(currentSingleCPS, 1)} ➜ <span style="color:#2ecc71">${formatNum(newSingleCPS, 1)}</span></span></div><div class="stat-highlight">+${formatNum(totalGain, 1)} CPS Gesamt</div>`;
       } else {
           statsHTML = `<div class="stat-highlight">Klickstärke wird verdoppelt!</div>`;
       }
-      ttStats.innerHTML = statsHTML;
-      tooltipEl.style.display = 'block';
+      ttStats.innerHTML = statsHTML; tooltipEl.style.display = 'block';
     }
-
-    function hideTooltip() {
-      tooltipEl.style.display = 'none';
-    }
-
+    function hideTooltip() { tooltipEl.style.display = 'none'; }
     function renderUpgrades() {
-      const container = document.getElementById('upgradeGrid');
-      container.innerHTML = '';
+      const container = document.getElementById('upgradeGrid'); container.innerHTML = '';
       const available = UPGRADES.filter(u => {
         if(game.upgrades.includes(u.id)) return false;
         if(u.trigger.type === 'clicks' && game.clicks >= u.trigger.val) return true;
         if(u.trigger.type === 'build' && game.buildings[u.trigger.id] >= u.trigger.val) return true;
         return false;
       });
-
       available.forEach(u => {
-        const div = document.createElement('div');
-        div.className = 'upgrade-crate';
-        div.innerHTML = u.icon;
-        
-        // Mouse Events for Global Tooltip
-        div.onmouseenter = () => showTooltip(u);
-        div.onmouseleave = () => hideTooltip();
-
-        if(game.score >= u.cost) {
-          div.onclick = () => buyUpgrade(u.id);
-        } else {
-          div.style.opacity = 0.5;
-          div.style.filter = "grayscale(1)";
-        }
+        const div = document.createElement('div'); div.className = 'upgrade-crate'; div.innerHTML = u.icon;
+        div.onmouseenter = () => showTooltip(u); div.onmouseleave = () => hideTooltip();
+        if(game.score >= u.cost) { div.onclick = () => buyUpgrade(u.id); } 
+        else { div.style.opacity = 0.5; div.style.filter = "grayscale(1)"; }
         container.appendChild(div);
       });
     }
 
-    /* --- BUFFS & GOLDEN KLEIN (10-20 mins) --- */
+    /* --- BUFFS & GOLDEN (10-20 min) --- */
     function updateBuffs(dt) {
       if(buffs.frenzy.active) {
         buffs.frenzy.time -= dt;
         if(buffs.frenzy.time <= 0) { buffs.frenzy.active = false; renderBuffs(); }
       }
     }
-    function renderBuffs() {
-      const area = document.getElementById('buffArea');
-      area.innerHTML = buffs.frenzy.active ? `<div class="buff-icon">🔥</div>` : '';
-    }
-
-    function scheduleGolden() {
-      const delay = (Math.random() * 600000) + 600000; // 10-20 min
-      setTimeout(spawnGolden, delay);
-    }
-
+    function renderBuffs() { document.getElementById('buffArea').innerHTML = buffs.frenzy.active ? `<div class="buff-icon">🔥</div>` : ''; }
+    function scheduleGolden() { const delay = (Math.random() * 600000) + 600000; setTimeout(spawnGolden, delay); }
     function spawnGolden() {
       const g = document.getElementById('goldenKlein');
       const maxX = document.getElementById('clickPanel').offsetWidth - 80;
       const maxY = document.getElementById('clickPanel').offsetHeight - 80;
-      g.style.left = Math.random() * maxX + 'px';
-      g.style.top = Math.random() * maxY + 'px';
-      g.style.display = 'block';
-      setTimeout(() => { 
-        if(g.style.display === 'block') { g.style.display = 'none'; scheduleGolden(); }
-      }, 10000);
+      g.style.left = Math.random() * maxX + 'px'; g.style.top = Math.random() * maxY + 'px'; g.style.display = 'block';
+      setTimeout(() => { if(g.style.display === 'block') { g.style.display = 'none'; scheduleGolden(); } }, 10000);
     }
-
     document.getElementById('goldenKlein').onmousedown = function(e) {
-      e.stopPropagation();
-      this.style.display = 'none';
-      buffs.frenzy.active = true;
-      buffs.frenzy.time = 30;
-      renderBuffs();
+      e.stopPropagation(); this.style.display = 'none';
+      buffs.frenzy.active = true; buffs.frenzy.time = 30; renderBuffs();
       spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7 CPS)");
       scheduleGolden();
     };
 
-    /* --- SAVE SYSTEM --- */
+    /* --- SAVE --- */
     function saveGame() {
       const data = { score: game.score, totalScore: game.totalScore, clicks: game.clicks, buildings: game.buildings, upgrades: game.upgrades };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
@@ -599,10 +566,8 @@
     function loadGame() {
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
       if(saved) {
-        game.score = saved.score || 0;
-        game.totalScore = saved.totalScore || 0;
-        game.clicks = saved.clicks || 0;
-        if(saved.buildings) game.buildings = saved.buildings;
+        game.score = saved.score || 0; game.totalScore = saved.totalScore || 0;
+        game.clicks = saved.clicks || 0; if(saved.buildings) game.buildings = saved.buildings;
         game.upgrades = saved.upgrades || [];
       }
     }
