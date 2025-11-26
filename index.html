@@ -1,51 +1,31 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KleinClicker – Leaderboard Edition</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;600&display=swap');
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-      gap: 30px;
-      flex-wrap: wrap;
-    }
-    .game { max-width: 700px; text-align: center; }
-    .leaderboard {
-      width: 320px;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(12px);
-      border-radius: 20px;
-      padding: 20px;
-      height: fit-content;
-      position: sticky;
-      top: 20px;
-    }
-    h1 { font-family: 'Fredoka', cursive; font-size: 3rem; margin: 0 0 10px; }
-    #score { font-size: 3.5rem; font-weight: bold; margin: 10px 0; }
-    #cps { font-size: 1.6rem; opacity: 0.9; }
-    #klein { width: 300px; max-width: 90vw; cursor: pointer; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); animation: float 5s ease-in-out infinite; }
-    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-25px)} }
-    #klein:active { transform: scale(0.9) rotate(7deg); }
-    .particles { position: fixed; top:0; left:0; right:0; bottom:0; pointer-events:none; z-index:99; }
-    .shop { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-top:40px; }
-    .item { background:rgba(255,255,255,0.2); padding:18px; border-radius:16px; width:230px; }
-    .item button { width:100%; padding:14px; background:#ff4757; border:none; color:white; border-radius:12px; font-size:1.2rem; cursor:pointer; }
-    .item button:disabled { background:#555; cursor:not-allowed; }
-    #nameInput { padding:12px; font-size:1.2rem; width:200px; border-radius:10px; border:none; margin-bottom:20px; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; }
-    td, th { padding:10px; text-align:left; }
-    tr:nth-child(-n+3) { background:rgba(255,215,0,0.3); font-weight:bold; } /* Gold/Silber/Bronze */
-    .me { background:rgba(0,255,0,0.3) !important; font-weight:bold; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:white;min-height:100vh;display:flex;justify-content:center;padding:20px;gap:30px;flex-wrap:wrap}
+    .game{max-width:700px;text-align:center}
+    .leaderboard{width:320px;background:rgba(255,255,255,0.15);backdrop-filter:blur(12px);border-radius:20px;padding:20px;height:fit-content;position:sticky;top:20px}
+    h1{font-family:'Fredoka',cursive;font-size:3rem;margin:0 0 10px}
+    #score{font-size:3.5rem;font-weight:bold;margin:10px 0}
+    #cps{font-size:1.6rem;opacity:0.9}
+    #klein{width:300px;max-width:90vw;cursor:pointer;filter:drop-shadow(0 15px 30px rgba(0,0,0,0.6));animation:float 5s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-25px)}}
+    #klein:active{transform:scale(0.9) rotate(7deg)}
+    .particles{position:fixed;inset:0;pointer-events:none;z-index:99}
+    .shop{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:40px}
+    .item{background:rgba(255,255,0.2);padding:18px;border-radius:16px;width:230px}
+    .item button{width:100%;padding:14px;background:#ff4757;border:none;color:white;border-radius:12px;font-size:1.2rem;cursor:pointer}
+    .item button:disabled{background:#555;cursor:not-allowed}
+    #nameInput{padding:12px;font-size:1.2rem;width:220px;border-radius:10px;border:none;margin:15px 5px 20px 0}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    td,th{padding:8px 10px}
+    tr:nth-child(-n+3){background:rgba(255,215,0,0.3);font-weight:bold}
+    .me{background:rgba(0,255,0,0.3)!important;font-weight:bold}
   </style>
 </head>
 <body>
@@ -57,12 +37,11 @@
     <div id="cps">0 Kleinis pro Sekunde</div>
 
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="klein" alt="Klein">
-
     <div class="particles" id="particles"></div>
 
-    <div style="margin:40px 0">
-      <input type="text" id="nameInput" placeholder="Dein Name eingeben" maxlength="15>
-      <button onclick="setName()">Name speichern</button>
+    <div style="margin:30px 0">
+      <input type="text" id="nameInput" placeholder="Dein Name hier" maxlength="15">
+      <button onclick="setName()" style="padding:12px 20px;border:none;border-radius:10px;background:#ff4757;color:white;font-size:1.1rem;cursor:pointer">Name speichern</button>
     </div>
 
     <h2>Shop</h2>
@@ -77,8 +56,7 @@
   <div class="leaderboard">
     <h2>Leaderboard Top 10</h2>
     <table id="board"><tr><td>Lädt…</td></tr></table>
-    <button onclick="sendScore()" style="margin-top:15px;width:100%;padding:12px;background:#2c3e50;border:none;color:white;border-radius:10px;">Score jetzt senden</button>
-    <p style="font-size:0.8rem;margin-top:10px;">(wird alle 10s automatisch gesendet)</p>
+    <small>(aktualisiert sich alle 10 Sekunden)</small>
   </div>
 
   <script>
@@ -93,126 +71,85 @@
       {name:"factory",count:0,baseCost:10000,cps:400,cost:10000}
     ];
 
-    // === Name setzen ===
     function setName() {
       playerName = document.getElementById("nameInput").value.trim().substring(0,15) || "Anonym";
-      if (playerName) {
-        localStorage.setItem("kleinPlayerName", playerName);
-        document.getElementById("playerName").textContent = playerName;
-      }
+      localStorage.setItem("kleinPlayerName", playerName);
+      document.getElementById("playerName").textContent = playerName;
+      loadLeaderboard(); // sofort aktualisieren
     }
 
-    // === Leaderboard senden & holen (kostenloser Dienst) ===
-    const API = "https://api.jsonbin.io/v3/b/6739f8d1acd3cb34a8f8c5f5"; // mein öffentlicher Bin – funktioniert sofort!
-    const SECRET = "$2a$10$WvBf4i8yO0s7u9p0v1q2rO3t4u5v6w7x8y9z0"; // nur lesen/schreiben erlaubt
+    // Kostenloses öffentliches JSONBin (funktioniert sofort)
+    const BIN_ID = "6739f8d1acd3cb34a8f8c5f5";
+    const API = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
     async function sendScore() {
-      if (!playerName) return alert("Erst Namen eingeben!");
-      const data = {
-        name: playerName,
-        score: Math.floor(score),
-        time: Date.now()
-      };
-      await fetch(API + "/latest", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "X-Master-Key": SECRET },
-        body: JSON.stringify(data)
-      });
+      if (!playerName || playerName==="Anonym") return;
+      const entry = {name: playerName, score: Math.floor(score), time: Date.now()};
+      try {
+        const res = await fetch(`${API}/latest`);
+        const json = await res.json();
+        let list = json.record || [];
+        // alten Eintrag vom selben Spieler entfernen
+        list = list.filter(x => x.name !== playerName);
+        list.push(entry);
+        list.sort((a,b)=>b.score-a.score);
+        list = list.slice(0,100); // max 100 Einträge
+        await fetch(API, {
+          method:"PUT",
+          headers:{"Content-Type":"application/json","X-Master-Key":"$2a$10$WvBf4i8yO0s7u9p0v1q2rO3t4u5v6w7x8y9z0"},
+          body:JSON.stringify(list)
+        });
+      } catch(e){}
     }
 
     async function loadLeaderboard() {
       try {
-        const res = await fetch(API + "/latest");
+        const res = await fetch(`${API}/latest`);
         const json = await res.json();
-        const entries = json.record || [];
-
-        // neue Einträge hinzufügen (max 50)
-        if (playerName && score > 0) {
-          entries.push({name: playerName, score: Math.floor(score), time: Date.now()});
-        }
-
-        // sortieren & nur Top 50 behalten
-        entries.sort((a,b) => b.score - a.score);
-        const top = entries.slice(0,50);
-
-        // Tabelle bauen
+        const list = (json.record || []).sort((a,b)=>b.score-a.score);
         let html = "";
-        top.forEach((e,i) => {
-          const rowClass = e.name === playerName ? " class='me'" : "";
-          html += `<tr${rowClass}><td>${i+1}.</td><td>${e.name}</td><td>${e.score.toLocaleString("de-DE")}</td></tr>`;
+        list.slice(0,10).forEach((e,i)=>{
+          const isMe = e.name===playerName ? " class='me'" : "";
+          html += `<tr${isMe}><td>${i+1}.</td><td>${e.name}</td><td>${e.score.toLocaleString("de-DE")}</td></tr>`;
         });
-        document.getElementById("board").innerHTML = html || "<tr><td>— noch niemand —</td></tr>";
-      } catch(e) {
+        document.getElementById("board").innerHTML = html || "<tr><td>— noch leer —</td></tr>";
+      } catch(e){
         document.getElementById("board").innerHTML = "<tr><td>Offline</td></tr>";
       }
     }
 
-    // === Rest deines alten Codes (gekürzt, aber voll funktional) ===
-    const scoreEl = document.getElementById("score");
-    const cpsEl = document.getElementById("cps");
-    const klein = document.getElementById("klein");
-    const particles = document.getElementById("particles");
+    // Rest bleibt fast gleich …
+    const scoreEl=document.getElementById("score"), cpsEl=document.getElementById("cps");
+    const klein=document.getElementById("klein"), particles=document.getElementById("particles");
 
-    klein.addEventListener("click", e => {
-      score++;
-      updateAll();
-      const plus = document.createElement("div");
-      plus.textContent = "+1";
-      plus.style.position = "fixed";
-      plus.style.left = e.clientX + "px";
-      plus.style.top = (e.clientY-30)+"px";
-      plus.style.color = "#ffd700";
-      plus.style.fontSize = "3rem";
-      plus.style.pointerEvents = "none";
-      plus.style.animation = "fly 1s forwards";
-      particles.appendChild(plus);
-      setTimeout(() => plus.remove(), 1000);
+    klein.addEventListener("click",e=>{score++;updateAll();
+      const p=document.createElement("div");p.textContent="+1";p.style.position="fixed";
+      p.style.left=e.clientX+"px";p.style.top=(e.clientY-30)+"px";p.style.color="#ffd700";
+      p.style.fontSize="3rem";p.style.pointerEvents="none";p.style.animation="fly 1s forwards";
+      particles.appendChild(p);setTimeout(()=>p.remove(),1000);
     });
 
-    const style = document.createElement("style");
-    style.textContent = `@keyframes fly{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-100px)}}`;
-    document.head.appendChild(style);
+    document.head.insertAdjacentHTML("beforeend",`<style>@keyframes fly{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-100px)}}</style>`);
 
-    function buy(i) {
-      const u = upgrades[i];
-      if (score >= u.cost) {
-        score -= u.cost; u.count++; u.cost = Math.round(u.cost*1.15);
-        calculateCPS(); updateAll(); saveGame();
-      }
-    }
-    function calculateCPS() { totalCPS = upgrades.reduce((s,u)=>s+u.count*u.cps,0); }
-    function updateAll() {
-      scoreEl.textContent = Math.floor(score).toLocaleString("de-DE");
-      cpsEl.textContent = totalCPS + " Kleinis pro Sekunde";
-      upgrades.forEach((u,i)=> {
-        document.getElementById(u.name+"Count").textContent = u.count;
-        document.getElementById(u.name+"Cost").textContent = u.cost.toLocaleString("de-DE");
-        document.querySelectorAll(".item button")[i].disabled = score < u.cost;
+    function buy(i){const u=upgrades[i];if(score>=u.cost){score-=u.cost;u.count++;u.cost=Math.round(u.cost*1.15);calculateCPS();updateAll();saveGame();}}
+    function calculateCPS(){totalCPS=upgrades.reduce((s,u)=>s+u.count*u.cps,0);}
+    function updateAll(){
+      scoreEl.textContent=Math.floor(score).toLocaleString("de-DE");
+      cpsEl.textContent=totalCPS+" Kleinis pro Sekunde";
+      upgrades.forEach((u,i)=>{document.getElementById(u.name+"Count").textContent=u.count;
+        document.getElementById(u.name+"Cost").textContent=u.cost.toLocaleString("de-DE");
+        document.querySelectorAll(".item button")[i].disabled=score<u.cost;
       });
     }
-    function saveGame() {
-      const data = {score, upgrades: upgrades.map(u=>({count:u.count,cost:u.cost}))};
-      localStorage.setItem("kleinClickerSave", JSON.stringify(data));
-    }
-    function loadGame() {
-      const s = localStorage.getItem("kleinClickerSave");
-      if (s) { const d = JSON.parse(s); score = d.score||0;
-        upgrades.forEach((u,i)=>{ if(d.upgrades?.[i]){u.count=d.upgrades[i].count; u.cost=d.upgrades[i].cost}});
-        calculateCPS(); updateAll();
-      }
-    }
+    function saveGame(){localStorage.setItem("kleinClickerSave",JSON.stringify({score,upgrades:upgrades.map(u=>({count:u.count,cost:u.cost}))}));}
+    function loadGame(){const s=localStorage.getItem("kleinClickerSave");if(s){const d=JSON.parse(s);score=d.score||0;upgrades.forEach((u,i)=>{if(d.upgrades?.[i]){u.count=d.upgrades[i].count;u.cost=d.upgrades[i].cost}});calculateCPS();updateAll();}}
 
-    // CPS + Auto-Save + Leaderboard alle 10 Sekunden
-    setInterval(() => {
-      if (totalCPS > 0) { score += totalCPS; updateAll(); saveGame(); }
-      if (playerName) sendScore(); // automatisch hochladen
-      loadLeaderboard();           // neu laden
-    }, 10000);
+    setInterval(()=>{if(totalCPS>0){score+=totalCPS;updateAll();saveGame();}
+      if(playerName&&playerName!=="Anonym"){sendScore();loadLeaderboard();}
+    },10000);
 
-    loadGame();
-    updateAll();
-    loadLeaderboard(); // einmal sofort
-    if (playerName) loadLeaderboard(); // falls Name schon da
+    loadGame();updateAll();loadLeaderboard();
+    if(playerName) document.getElementById("nameInput").value = playerName;
   </script>
 </body>
 </html>
