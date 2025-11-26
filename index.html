@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker Casino Royale</title>
+  <title>KleinClicker Universe</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
@@ -18,8 +18,6 @@
       --red: #e74c3c;
       --text-main: #ecf0f1;
       --tooltip-bg: rgba(10, 10, 15, 0.98);
-      --card-width: 70px;
-      --card-gap: 4px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
@@ -73,7 +71,7 @@
     }
     
     .score-container { margin-bottom: 50px; text-align: center; z-index: 20; }
-    #score { font-family: 'Roboto', sans-serif; font-size: 3.8rem; font-weight: 900; text-shadow: 0 0 30px rgba(255,255,255,0.1); line-height: 1; }
+    #score { font-family: 'Roboto', sans-serif; font-size: 3.2rem; font-weight: 900; text-shadow: 0 0 30px rgba(255,255,255,0.1); line-height: 1; }
     .currency-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--gold); font-weight: 700; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
     #cps { font-size: 1.1rem; color: #7f8c8d; margin-top: 10px; font-weight: 500; background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); }
 
@@ -120,13 +118,13 @@
     }
     .building-row:hover { opacity: 1; background: #222; }
     .building-row.can-afford { opacity: 1; }
-    .b-icon { font-size: 2.5rem; width: 60px; text-align: center; margin-right: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+    .b-icon { font-size: 2.2rem; width: 50px; text-align: center; margin-right: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
     .b-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-    .b-name { font-weight: 700; font-family: 'Merriweather', serif; font-size: 1.1rem; color: #fff; margin-bottom: 3px; }
-    .b-cps { font-size: 0.8rem; color: #636e72; }
-    .b-cost { color: var(--red); font-weight: bold; font-size: 0.95rem; }
+    .b-name { font-weight: 700; font-family: 'Merriweather', serif; font-size: 1rem; color: #fff; margin-bottom: 3px; }
+    .b-cps { font-size: 0.75rem; color: #636e72; }
+    .b-cost { color: var(--red); font-weight: bold; font-size: 0.85rem; }
     .b-cost.affordable { color: var(--green); }
-    .b-count { font-size: 2.2rem; font-weight: 900; color: rgba(255,255,255,0.05); margin-left: auto; }
+    .b-count { font-size: 1.8rem; font-weight: 900; color: rgba(255,255,255,0.05); margin-left: auto; }
 
     /* --- CASINO MODAL --- */
     #casinoModal {
@@ -355,30 +353,45 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V6';
+    const SAVE_KEY = 'KleinClicker_Universe_V1';
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
-    const CARD_WIDTH = 70;
-    const CARD_GAP = 4;
-
+    
+    // NEW BUILDINGS ADDED
     const BUILDINGS = [
-      { id: 0, name: 'Kaputte Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
-      { id: 1, name: 'Nette Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
-      { id: 2, name: 'Kleini Feld',  baseCost: 1100,    baseCps: 8,      icon: '🌾' },
-      { id: 3, name: 'Meme Mine',    baseCost: 12000,   baseCps: 47,     icon: '⛏️' },
-      { id: 4, name: 'Fabrik',       baseCost: 130000,  baseCps: 260,    icon: '🏭' },
-      { id: 5, name: 'Bank',         baseCost: 1400000, baseCps: 1400,   icon: '🏦' },
-      { id: 6, name: 'Tempel',       baseCost: 20000000,baseCps: 7800,   icon: '🏛️' }
+      { id: 0, name: 'Kaputte Maus', baseCost: 15,            baseCps: 0.1,         icon: '👆' },
+      { id: 1, name: 'Nette Oma',    baseCost: 100,           baseCps: 1,           icon: '👵' },
+      { id: 2, name: 'Kleini Feld',  baseCost: 1100,          baseCps: 8,           icon: '🌾' },
+      { id: 3, name: 'Meme Mine',    baseCost: 12000,         baseCps: 47,          icon: '⛏️' },
+      { id: 4, name: 'Fabrik',       baseCost: 130000,        baseCps: 260,         icon: '🏭' },
+      { id: 5, name: 'Bank',         baseCost: 1400000,       baseCps: 1400,        icon: '🏦' },
+      { id: 6, name: 'Tempel',       baseCost: 20000000,      baseCps: 7800,        icon: '🏛️' },
+      { id: 7, name: 'Klon-Labor',   baseCost: 330000000,     baseCps: 45000,       icon: '🧬' }, // 330 Mio
+      { id: 8, name: 'Klein-Rakete', baseCost: 5100000000,    baseCps: 280000,      icon: '🚀' }, // 5.1 Mrd
+      { id: 9, name: 'Portal',       baseCost: 75000000000,   baseCps: 1600000,     icon: '🌀' }, // 75 Mrd
+      { id: 10, name: 'Zeitmaschine',baseCost: 900000000000,  baseCps: 12000000,    icon: '⏳' }, // 900 Mrd
+      { id: 11, name: 'Klein-Versum',baseCost: 15000000000000,baseCps: 150000000,   icon: '🌌' }  // 15 Bio
     ];
 
+    // UPDATED UPGRADES
     const UPGRADES = [
       { id: 'u_click_1', name: 'Plastik Maus', cost: 500,    trigger: {type:'clicks', val:100}, icon:'🖱️', desc:'Die billigste Maus auf dem Markt.', type:'click', multi:2, text:'Klickstärke x2' },
       { id: 'u_click_2', name: 'Gamer Maus',   cost: 50000,  trigger: {type:'clicks', val:1000},icon:'🎮', desc:'Mit RGB Beleuchtung für mehr FPS.', type:'click', multi:2, text:'Klickstärke x2' },
+      
       { id: 'u_b0_1',    name: 'Carpaltunnel', cost: 1000,   trigger: {type:'build', id:0, val:10}, icon:'🩹', desc:'Mäuse arbeiten trotz Schmerzen weiter.', type:'build', target:0, multi:2, text:'Maus Produktion x2' },
       { id: 'u_b0_2',    name: 'Makro',        cost: 10000,  trigger: {type:'build', id:0, val:50}, icon:'⌨️', desc:'Automatisierte Klick-Skripte.', type:'build', target:0, multi:2, text:'Maus Produktion x2' },
+      
       { id: 'u_b1_1',    name: 'Nudelholz',    cost: 5000,   trigger: {type:'build', id:1, val:10}, icon:'🥖', desc:'Die Omas werden aggressiver.', type:'build', target:1, multi:2, text:'Oma Produktion x2' },
       { id: 'u_b1_2',    name: 'Lesebrille',   cost: 50000,  trigger: {type:'build', id:1, val:50}, icon:'👓', desc:'Sie sehen die Kleinis jetzt besser.', type:'build', target:1, multi:2, text:'Oma Produktion x2' },
+      
       { id: 'u_b2_1',    name: 'Dünger',       cost: 150000, trigger: {type:'build', id:2, val:10}, icon:'💩', desc:'100% biologisch abbaubar.', type:'build', target:2, multi:2, text:'Feld Produktion x2' },
-      { id: 'u_b3_1',    name: 'Dynamit',      cost: 1200000, trigger: {type:'build', id:3, val:10}, icon:'🧨', desc:'Sicherheit ist zweitrangig.', type:'build', target:3, multi:2, text:'Mine Produktion x2' }
+      { id: 'u_b3_1',    name: 'Dynamit',      cost: 1200000, trigger: {type:'build', id:3, val:10}, icon:'🧨', desc:'Sicherheit ist zweitrangig.', type:'build', target:3, multi:2, text:'Mine Produktion x2' },
+      { id: 'u_b4_1',    name: 'Roboterarm',   cost: 15000000, trigger: {type:'build', id:4, val:10}, icon:'🤖', desc:'Ersetzt menschliche Fehler.', type:'build', target:4, multi:2, text:'Fabrik Produktion x2' },
+      { id: 'u_b5_1',    name: 'Goldtresor',   cost: 200000000, trigger: {type:'build', id:5, val:10}, icon:'🔐', desc:'Noch sicherer als Fort Knox.', type:'build', target:5, multi:2, text:'Bank Produktion x2' },
+      
+      // New Upgrades for Endgame
+      { id: 'u_b7_1',    name: 'Reagenzglas',  cost: 5000000000, trigger: {type:'build', id:7, val:10}, icon:'🧪', desc:'Klonflüssigkeit mit Geschmack.', type:'build', target:7, multi:2, text:'Labor Produktion x2' },
+      { id: 'u_b8_1',    name: 'Mars Ticket',  cost: 75000000000, trigger: {type:'build', id:8, val:10}, icon:'🎟️', desc:'One-Way Ticket für Kleinis.', type:'build', target:8, multi:2, text:'Raketen Produktion x2' },
+      { id: 'u_b9_1',    name: 'Rick\'s Gun',  cost: 1500000000000, trigger: {type:'build', id:9, val:10}, icon:'🔫', desc:'Wubba Lubba Dub Dub!', type:'build', target:9, multi:2, text:'Portal Produktion x2' },
     ];
 
     /* --- GAME STATE --- */
@@ -403,6 +416,11 @@
     function init() {
       try {
         loadGame();
+        // Fix save compatibility if new buildings added
+        if(game.buildings.length < BUILDINGS.length) {
+            const diff = BUILDINGS.length - game.buildings.length;
+            for(let i=0; i<diff; i++) game.buildings.push(0);
+        }
       } catch(e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
       
       buildBuildingUI();
@@ -698,10 +716,15 @@
       const img = document.createElement('img'); img.src = IMG_URL; img.className = 'falling-face';
       img.style.left = (x-17)+'px'; img.style.top = (y-17)+'px'; document.getElementById('clickPanel').appendChild(img); setTimeout(()=>img.remove(), 1200);
     }
+    
+    // UPDATED FORMATTER FOR BIG NUMBERS
     function formatNum(num, decimals=0) {
       if(num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
-      if(num >= 1000000000) return (num/1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mrd";
-      return (num/1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mio";
+      if(num < 1000000000) return (num/1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mio";
+      if(num < 1000000000000) return (num/1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mrd";
+      if(num < 1000000000000000) return (num/1000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Bio"; // Billionen
+      if(num < 1000000000000000000) return (num/1000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Brd"; // Billiarden
+      return (num/1000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Trio"; // Trillionen
     }
 
     /* --- SHOP --- */
