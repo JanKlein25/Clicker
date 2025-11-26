@@ -9,7 +9,6 @@
   <style>
     :root {
       --primary: #ff6b6b;
-      --primary-dark: #ee5253;
       --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       --glass-bg: rgba(255, 255, 255, 0.1);
       --glass-border: rgba(255, 255, 255, 0.2);
@@ -25,7 +24,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       display: grid;
-      grid-template-rows: auto 1fr auto; /* Header, Game, Footer */
+      grid-template-rows: auto 1fr auto;
     }
 
     /* --- Animations --- */
@@ -34,12 +33,6 @@
       50% { transform: translateY(-15px); }
     }
     
-    @keyframes pop {
-      0% { transform: scale(1); }
-      50% { transform: scale(0.95); }
-      100% { transform: scale(1); }
-    }
-
     @keyframes flyUp {
       0% { opacity: 1; transform: translateY(0) scale(1); }
       100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
@@ -117,7 +110,6 @@
       transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* Floating Numbers */
     .particle {
       position: absolute;
       font-family: 'Fredoka', sans-serif;
@@ -201,11 +193,7 @@
       box-shadow: 0 4px 0 #d63031;
     }
 
-    .buy-btn:active {
-      transform: translateY(4px);
-      box-shadow: none;
-    }
-
+    .buy-btn:active { transform: translateY(4px); box-shadow: none; }
     .buy-btn:disabled {
       background: #555;
       box-shadow: none;
@@ -214,7 +202,6 @@
       transform: translateY(2px);
     }
 
-    /* --- Utils --- */
     .reset-btn {
       position: fixed;
       bottom: 10px;
@@ -226,9 +213,9 @@
       border-radius: 5px;
       font-size: 0.8rem;
       cursor: pointer;
+      z-index: 200;
     }
 
-    /* Mobile Tweaks */
     @media (max-width: 600px) {
       #klein { width: 220px; height: 220px; }
       #score { font-size: 2.8rem; }
@@ -248,32 +235,24 @@
 
   <main>
     <div class="click-zone" id="clickArea">
-      <!-- Bild zentriert und optisch aufgewertet -->
       <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" alt="Das Gesicht" id="klein">
     </div>
   </main>
 
   <div class="shop-container">
     <div class="shop-title">Upgrades</div>
-    <div class="shop-grid" id="shopGrid">
-      <!-- Items werden hier per JS generiert -->
-    </div>
+    <div class="shop-grid" id="shopGrid"></div>
   </div>
 
-  <button class="reset-btn" onclick="resetGame()">Spielstand löschen</button>
+  <button class="reset-btn" onclick="resetGame()">Reset</button>
 
   <script>
-    /* --- Game Configuration --- */
-    const GAME_CONFIG = {
-      fps: 30, // UI Updates per second (logic runs on requestAnimationFrame)
-      saveKey: 'kleinClickerSave_v2'
-    };
+    /* --- Settings --- */
+    const SAVE_KEY = 'kleinClickerSave_v3';
 
-    /* --- Game State --- */
+    /* --- State --- */
     let state = {
       score: 0,
-      totalClicks: 0,
-      startTime: Date.now(),
       upgrades: [
         { id: 'cursor',  name: 'Maus-Fan',    baseCost: 15,    cps: 1,    count: 0, icon: '👆' },
         { id: 'grandma', name: 'Nette Oma',   baseCost: 100,   cps: 8,    count: 0, icon: '👵' },
@@ -283,200 +262,199 @@
       ]
     };
 
-    /* --- DOM Elements --- */
+    /* --- Elements --- */
     const els = {
       score: document.getElementById('score'),
       cps: document.getElementById('cps'),
       shopGrid: document.getElementById('shopGrid'),
-      klein: document.getElementById('klein'),
-      clickArea: document.getElementById('clickArea')
+      clickArea: document.getElementById('clickArea'),
+      klein: document.getElementById('klein')
     };
 
-    /* --- Initialization --- */
+    let lastTime = 0;
+
+    /* --- Init --- */
     function init() {
       loadGame();
-      renderShop();
-      requestAnimationFrame(gameLoop);
+      renderShopHTML();
+      updateShopText(); // Einmalige Text-Aktualisierung beim Start
       
-      // Auto-Save alle 10 Sekunden
+      // Starte die Loop
+      lastTime = performance.now();
+      requestAnimationFrame(gameLoop);
+
+      // Auto-Save
       setInterval(saveGame, 10000);
     }
 
-    /* --- Core Logic --- */
-    let lastTime = performance.now();
-    let accumulatedScore = 0;
-
+    /* --- Game Loop --- */
     function gameLoop(currentTime) {
-      const deltaTime = (currentTime - lastTime) / 1000; // Zeit in Sekunden seit letztem Frame
-      lastTime = currentTime;
+      try {
+        // Delta Time berechnen (in Sekunden)
+        const dt = (currentTime - lastTime) / 1000;
+        lastTime = currentTime;
 
-      const cps = calculateCPS();
-      
-      if (cps > 0) {
-        state.score += cps * deltaTime;
-        accumulatedScore += cps * deltaTime;
+        // Sicherheit: Falls dt negativ oder unlogisch riesig ist (Tab war im Hintergrund), ignorieren
+        if (dt > 0 && dt < 1) {
+          const cps = calculateCPS();
+          if (cps > 0) {
+            state.score += cps * dt;
+          }
+        }
+
+        // NUR Score und Buttons updaten (Leichtgewicht)
+        updateScoreUI();
+        
+      } catch (e) {
+        console.error("Fehler in der Loop:", e);
       }
-
-      updateUI();
+      
       requestAnimationFrame(gameLoop);
     }
 
+    /* --- Logic --- */
     function calculateCPS() {
       return state.upgrades.reduce((total, u) => total + (u.count * u.cps), 0);
     }
 
     function getCost(upgrade) {
-      // Kostenformel: Basis * 1.15^Anzahl
       return Math.round(upgrade.baseCost * Math.pow(1.15, upgrade.count));
     }
 
-    /* --- Interaction --- */
-    els.clickArea.addEventListener('mousedown', (e) => {
-      handleUserClick(e);
-    });
-    
-    // Support für Touch ohne Delay
+    /* --- User Actions --- */
+    els.clickArea.addEventListener('mousedown', (e) => handleUserClick(e.clientX, e.clientY));
     els.clickArea.addEventListener('touchstart', (e) => {
-      e.preventDefault(); // Verhindert Zoom/Scroll beim schnellen Tippen
-      // Touch-Koordinaten nutzen
-      const touch = e.touches[0];
-      handleUserClick({ clientX: touch.clientX, clientY: touch.clientY });
+      e.preventDefault(); 
+      handleUserClick(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: false });
 
-    function handleUserClick(e) {
+    function handleUserClick(x, y) {
       state.score++;
-      state.totalClicks++;
+      spawnParticle(x, y, "+1");
       
-      // Visueller Effekt (Partikel)
-      spawnParticle(e.clientX, e.clientY, "+1");
-      
-      // Kleiner Bounce-Effekt resetten
+      // Klick Animation
       els.klein.style.transform = 'scale(0.95)';
       setTimeout(() => els.klein.style.transform = '', 50);
     }
 
     function buyUpgrade(index) {
-      const upgrade = state.upgrades[index];
-      const cost = getCost(upgrade);
+      const u = state.upgrades[index];
+      const cost = getCost(u);
 
       if (state.score >= cost) {
         state.score -= cost;
-        upgrade.count++;
-        updateShopItem(index);
+        u.count++;
+        
+        // Jetzt aktualisieren wir die Texte im Shop explizit
+        updateShopText(); 
         saveGame();
         
-        // Button Feedback Effekt
+        // Button Feedback
         const btn = document.getElementById(`btn-${index}`);
         if(btn) {
-            btn.textContent = "Gekauft!";
-            setTimeout(() => btn.textContent = "Kaufen", 500);
+           const originalText = btn.innerHTML;
+           btn.style.background = "#4cd137"; // Grün kurz aufleuchten
+           setTimeout(() => {
+             btn.style.background = ""; 
+           }, 200);
         }
       }
     }
 
-    /* --- Visuals --- */
-    function spawnParticle(x, y, text) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.textContent = text;
-      
-      // Zufällige Variation
-      const randomX = (Math.random() - 0.5) * 40;
-      
-      p.style.left = `${x + randomX}px`;
-      p.style.top = `${y - 20}px`;
-      p.style.fontSize = `${Math.random() * 0.5 + 1.5}rem`;
-      p.style.color = `hsl(${Math.random() * 60 + 30}, 100%, 70%)`; // Gold/Gelb/Orange Töne
-
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 800);
-    }
-
-    function updateUI() {
-      // Score formatieren (Tausendertrennzeichen)
+    /* --- UI Updates --- */
+    // Diese Funktion läuft 60x pro Sekunde - muss schnell sein!
+    function updateScoreUI() {
+      // Score anzeigen
       els.score.textContent = Math.floor(state.score).toLocaleString('de-DE');
-      els.cps.textContent = calculateCPS().toLocaleString('de-DE', {maximumFractionDigits: 1}) + " / Sek";
       
-      // Dokument Titel aktualisieren (Optional)
-      document.title = `${Math.floor(state.score).toLocaleString('de-DE')} - KleinClicker`;
-
-      // Buttons aktivieren/deaktivieren basierend auf Score
+      // Buttons aktivieren/deaktivieren
       state.upgrades.forEach((u, index) => {
         const btn = document.getElementById(`btn-${index}`);
-        if (btn) {
+        if(btn) {
           const cost = getCost(u);
           btn.disabled = state.score < cost;
-          // Preis im Button aktualisieren falls nötig, oder separat
-          document.getElementById(`cost-${index}`).textContent = cost.toLocaleString('de-DE');
         }
       });
     }
 
-    function renderShop() {
+    // Diese Funktion läuft NUR, wenn man etwas kauft oder beim Start
+    function updateShopText() {
+      els.cps.textContent = calculateCPS().toLocaleString('de-DE', {maximumFractionDigits: 1}) + " / Sek";
+      
+      state.upgrades.forEach((u, index) => {
+        // Kosten und Anzahl aktualisieren
+        const countEl = document.getElementById(`count-${index}`);
+        const costEl = document.getElementById(`cost-${index}`);
+        
+        if (countEl) countEl.textContent = u.count;
+        if (costEl) costEl.textContent = getCost(u).toLocaleString('de-DE');
+      });
+    }
+
+    function renderShopHTML() {
       els.shopGrid.innerHTML = '';
       state.upgrades.forEach((u, index) => {
-        const cost = getCost(u);
         const item = document.createElement('div');
         item.className = 'shop-item';
         item.innerHTML = `
           <div class="item-header">
             <span class="item-name">${u.icon} ${u.name}</span>
-            <span class="item-count" id="count-${index}">${u.count}</span>
+            <span class="item-count" id="count-${index}">0</span>
           </div>
           <div class="item-cps">+${u.cps} CPS</div>
           <button class="buy-btn" id="btn-${index}" onclick="buyUpgrade(${index})">
-             <span id="cost-${index}">${cost.toLocaleString('de-DE')}</span> Kleinis
+             <span id="cost-${index}">0</span> Kleinis
           </button>
         `;
         els.shopGrid.appendChild(item);
       });
     }
 
-    function updateShopItem(index) {
-      // Nur Anzahl aktualisieren, der Rest passiert in updateUI
-      document.getElementById(`count-${index}`).textContent = state.upgrades[index].count;
+    function spawnParticle(x, y, text) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = text;
+      const rX = (Math.random() - 0.5) * 40;
+      p.style.left = `${x + rX}px`;
+      p.style.top = `${y - 20}px`;
+      p.style.color = `hsl(${Math.random() * 60 + 30}, 100%, 70%)`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 800);
     }
 
-    /* --- Save/Load System --- */
+    /* --- Save System --- */
     function saveGame() {
-      const dataToSave = {
+      const data = {
         score: state.score,
-        upgrades: state.upgrades.map(u => ({ id: u.id, count: u.count })),
-        savedAt: Date.now()
+        upgrades: state.upgrades.map(u => ({ id: u.id, count: u.count }))
       };
-      localStorage.setItem(GAME_CONFIG.saveKey, JSON.stringify(dataToSave));
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
 
     function loadGame() {
-      const saved = localStorage.getItem(GAME_CONFIG.saveKey);
+      const saved = localStorage.getItem(SAVE_KEY);
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           state.score = parsed.score || 0;
-          
-          // Upgrades abgleichen (falls wir später neue hinzufügen, geht der Spielstand nicht kaputt)
           if (parsed.upgrades) {
-            parsed.upgrades.forEach(savedUpgrade => {
-              const match = state.upgrades.find(u => u.id === savedUpgrade.id);
-              if (match) {
-                match.count = savedUpgrade.count;
-              }
+            parsed.upgrades.forEach(savedU => {
+              const match = state.upgrades.find(u => u.id === savedU.id);
+              if (match) match.count = savedU.count;
             });
           }
-        } catch (e) {
-          console.error("Savegame korrupt, starte neu.");
-        }
+        } catch (e) { console.error("Savegame korrupt"); }
       }
     }
 
     function resetGame() {
-      if(confirm("Wirklich alles löschen?")) {
-        localStorage.removeItem(GAME_CONFIG.saveKey);
+      if(confirm("Alles löschen?")) {
+        localStorage.removeItem(SAVE_KEY);
         location.reload();
       }
     }
 
-    // Start!
+    // Los geht's
     init();
 
   </script>
