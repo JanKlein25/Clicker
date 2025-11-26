@@ -1,155 +1,258 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KleinClicker – Leaderboard Edition</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KleinClicker – Klick mich ins Gesicht!</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;600&display=swap');
-    *{box-sizing:border-box}
-    body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:white;min-height:100vh;display:flex;justify-content:center;padding:20px;gap:30px;flex-wrap:wrap}
-    .game{max-width:700px;text-align:center}
-    .leaderboard{width:320px;background:rgba(255,255,255,0.15);backdrop-filter:blur(12px);border-radius:20px;padding:20px;height:fit-content;position:sticky;top:20px}
-    h1{font-family:'Fredoka',cursive;font-size:3rem;margin:0 0 10px}
-    #score{font-size:3.5rem;font-weight:bold;margin:10px 0}
-    #cps{font-size:1.6rem;opacity:0.9}
-    #klein{width:300px;max-width:90vw;cursor:pointer;filter:drop-shadow(0 15px 30px rgba(0,0,0,0.6));animation:float 5s ease-in-out infinite}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-25px)}}
-    #klein:active{transform:scale(0.9) rotate(7deg)}
-    .particles{position:fixed;inset:0;pointer-events:none;z-index:99}
-    .shop{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:40px}
-    .item{background:rgba(255,255,0.2);padding:18px;border-radius:16px;width:230px}
-    .item button{width:100%;padding:14px;background:#ff4757;border:none;color:white;border-radius:12px;font-size:1.2rem;cursor:pointer}
-    .item button:disabled{background:#555;cursor:not-allowed}
-    #nameInput{padding:12px;font-size:1.2rem;width:220px;border-radius:10px;border:none;margin:15px 5px 20px 0}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    td,th{padding:8px 10px}
-    tr:nth-child(-n+3){background:rgba(255,215,0,0.3);font-weight:bold}
-    .me{background:rgba(0,255,0,0.3)!important;font-weight:bold}
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px 10px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: 'Fredoka', cursive;
+      font-size: 3.5rem;
+      margin: 10px 0 5px;
+      text-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+    }
+
+    #score {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    #cps {
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    #klein {
+      width: 300px;
+      max-width: 90vw;
+      cursor: pointer;
+      user-select: none;
+      filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+      transition: transform 0.1s ease;
+      animation: float 5s ease-in-out infinite;
+      margin: 20px 0;
+      position: relative;
+      z-index: 5;
+    }
+
+    #klein:active {
+      transform: scale(0.9) rotate(5deg);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-25px); }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .shop {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 40px;
+    }
+
+    .item {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 20px;
+      width: 240px;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.3s;
+    }
+
+    .item:hover { transform: translateY(-12px); }
+
+    .item button {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.2rem;
+      background: #ff4757;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+
+    .item button:hover:not(:disabled) {
+      background: #ff3742;
+      transform: scale(1.08);
+    }
+
+    .item button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
 
-  <div class="game">
+  <div class="container">
     <h1>Ich KleinClicker dir ins Gesicht</h1>
-    <div>Spieler: <strong id="playerName">???</strong></div>
     <div id="score">0</div>
     <div id="cps">0 Kleinis pro Sekunde</div>
 
-    <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="klein" alt="Klein">
+    <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png"
+         alt="Klein" id="klein">
+
     <div class="particles" id="particles"></div>
 
-    <div style="margin:30px 0">
-      <input type="text" id="nameInput" placeholder="Dein Name hier" maxlength="15">
-      <button onclick="setName()" style="padding:12px 20px;border:none;border-radius:10px;background:#ff4757;color:white;font-size:1.1rem;cursor:pointer">Name speichern</button>
-    </div>
-
-    <h2>Shop</h2>
+    <h2 style="margin:60px 0 20px;">Shop</h2>
     <div class="shop">
-      <div class="item"><p>Mouse-Fan (+1)</p><p>Anzahl: <span id="cursorCount">0</span></p><p>Preis: <span id="cursorCost">15</span></p><button onclick="buy(0)">Kaufen</button></div>
-      <div class="item"><p>Oma (+8)</p><p>Anzahl: <span id="grandmaCount">0</span></p><p>Preis: <span id="grandmaCost">100</span></p><button onclick="buy(1)">Kaufen</button></div>
-      <div class="item"><p>Kleini-Farm (+47)</p><p>Anzahl: <span id="farmCount">0</span></p><p>Preis: <span id="farmCost">1 100</span></p><button onclick="buy(2)">Kaufen</button></div>
-      <div class="item"><p>Kleini-Fabrik (+400)</p><p>Anzahl: <span id="factoryCount">0</span></p><p>Preis: <span id="factoryCost">10 000</span></p><button onclick="buy(3)">Kaufen</button></div>
+      <div class="item">
+        <p>Mouse-Fan (+1 pro Sekunde)</p>
+        <p>Anzahl: <span id="cursorCount">0</span></p>
+        <p>Preis: <span id="cursorCost">15</span> Kleinis</p>
+        <button onclick="buy(0)">Kaufen</button>
+      </div>
+      <div class="item">
+        <p>Oma (+8 pro Sekunde)</p>
+        <p>Anzahl: <span id="grandmaCount">0</span></p>
+        <p>Preis: <span id="grandmaCost">100</span> Kleinis</p>
+        <button onclick="buy(1)">Kaufen</button>
+      </div>
+      <div class="item">
+        <p>Kleini-Farm (+47 pro Sekunde)</p>
+        <p>Anzahl: <span id="farmCount">0</span></p>
+        <p>Preis: <span id="farmCost">1 100</span> Kleinis</p>
+        <button onclick="buy(2)">Kaufen</button>
+      </div>
+      <div class="item">
+        <p>Kleini-Fabrik (+400 pro Sekunde)</p>
+        <p>Anzahl: <span id="factoryCount">0</span></p>
+        <p>Preis: <span id="factoryCost">10 000</span> Kleinis</p>
+        <button onclick="buy(3)">Kaufen</button>
+      </div>
     </div>
-  </div>
-
-  <div class="leaderboard">
-    <h2>Leaderboard Top 10</h2>
-    <table id="board"><tr><td>Lädt…</td></tr></table>
-    <small>(aktualisiert sich alle 10 Sekunden)</small>
   </div>
 
   <script>
-    let score = 0, totalCPS = 0;
-    let playerName = localStorage.getItem("kleinPlayerName") || "";
-    if (playerName) document.getElementById("playerName").textContent = playerName;
+    let score = 0;
+    let totalCPS = 0;
 
     const upgrades = [
-      {name:"cursor",count:0,baseCost:15,cps:1,cost:15},
-      {name:"grandma",count:0,baseCost:100,cps:8,cost:100},
-      {name:"farm",count:0,baseCost:1100,cps:47,cost:1100},
-      {name:"factory",count:0,baseCost:10000,cps:400,cost:10000}
+      { name: "cursor",  count: 0, baseCost: 15,   cps: 1,    cost: 15 },
+      { name: "grandma", count: 0, baseCost: 100,  cps: 8,    cost: 100 },
+      { name: "farm",    count: 0, baseCost: 1100, cps: 47,   cost: 1100 },
+      { name: "factory", count: 0, baseCost: 10000,cps: 400,  cost: 10000 }
     ];
 
-    function setName() {
-      playerName = document.getElementById("nameInput").value.trim().substring(0,15) || "Anonym";
-      localStorage.setItem("kleinPlayerName", playerName);
-      document.getElementById("playerName").textContent = playerName;
-      loadLeaderboard(); // sofort aktualisieren
-    }
+    const scoreEl = document.getElementById("score");
+    const cpsEl = document.getElementById("cps");
+    const klein = document.getElementById("klein");
+    const particles = document.getElementById("particles");
 
-    // Kostenloses öffentliches JSONBin (funktioniert sofort)
-    const BIN_ID = "6739f8d1acd3cb34a8f8c5f5";
-    const API = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+    // Klick-Effekt + Partikel
+    klein.addEventListener("click", (e) => {
+      score++;
+      updateAll();
 
-    async function sendScore() {
-      if (!playerName || playerName==="Anonym") return;
-      const entry = {name: playerName, score: Math.floor(score), time: Date.now()};
-      try {
-        const res = await fetch(`${API}/latest`);
-        const json = await res.json();
-        let list = json.record || [];
-        // alten Eintrag vom selben Spieler entfernen
-        list = list.filter(x => x.name !== playerName);
-        list.push(entry);
-        list.sort((a,b)=>b.score-a.score);
-        list = list.slice(0,100); // max 100 Einträge
-        await fetch(API, {
-          method:"PUT",
-          headers:{"Content-Type":"application/json","X-Master-Key":"$2a$10$WvBf4i8yO0s7u9p0v1q2rO3t4u5v6w7x8y9z0"},
-          body:JSON.stringify(list)
-        });
-      } catch(e){}
-    }
+      const plus = document.createElement("div");
+      plus.textContent = "+1";
+      plus.style.position = "fixed";
+      plus.style.left = e.clientX + "px";
+      plus.style.top = (e.clientY - 30) + "px";
+      plus.style.color = "#ffd700";
+      plus.style.fontSize = "2.5rem";
+      plus.style.fontWeight = "bold";
+      plus.style.pointerEvents = "none";
+      plus.style.animation = "fly 1s forwards";
+      particles.appendChild(plus);
+      setTimeout(() => plus.remove(), 1000);
+    });
 
-    async function loadLeaderboard() {
-      try {
-        const res = await fetch(`${API}/latest`);
-        const json = await res.json();
-        const list = (json.record || []).sort((a,b)=>b.score-a.score);
-        let html = "";
-        list.slice(0,10).forEach((e,i)=>{
-          const isMe = e.name===playerName ? " class='me'" : "";
-          html += `<tr${isMe}><td>${i+1}.</td><td>${e.name}</td><td>${e.score.toLocaleString("de-DE")}</td></tr>`;
-        });
-        document.getElementById("board").innerHTML = html || "<tr><td>— noch leer —</td></tr>";
-      } catch(e){
-        document.getElementById("board").innerHTML = "<tr><td>Offline</td></tr>";
+    const style = document.createElement("style");
+    style.textContent = `@keyframes fly { from {opacity:1; transform:translateY(0)} to {opacity:0; transform:translateY(-100px)} }`;
+    document.head.appendChild(style);
+
+    function buy(i) {
+      const u = upgrades[i];
+      if (score >= u.cost) {
+        score -= u.cost;
+        u.count++;
+        u.cost = Math.round(u.cost * 1.15);
+        calculateCPS();
+        updateAll();
+        saveGame();
       }
     }
 
-    // Rest bleibt fast gleich …
-    const scoreEl=document.getElementById("score"), cpsEl=document.getElementById("cps");
-    const klein=document.getElementById("klein"), particles=document.getElementById("particles");
+    function calculateCPS() {
+      totalCPS = upgrades.reduce((s, u) => s + u.count * u.cps, 0);
+    }
 
-    klein.addEventListener("click",e=>{score++;updateAll();
-      const p=document.createElement("div");p.textContent="+1";p.style.position="fixed";
-      p.style.left=e.clientX+"px";p.style.top=(e.clientY-30)+"px";p.style.color="#ffd700";
-      p.style.fontSize="3rem";p.style.pointerEvents="none";p.style.animation="fly 1s forwards";
-      particles.appendChild(p);setTimeout(()=>p.remove(),1000);
-    });
+    function updateAll() {
+      scoreEl.textContent = Math.floor(score).toLocaleString("de-DE");
+      cpsEl.textContent = totalCPS.toLocaleString("de-DE") + " Kleinis pro Sekunde";
 
-    document.head.insertAdjacentHTML("beforeend",`<style>@keyframes fly{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-100px)}}</style>`);
-
-    function buy(i){const u=upgrades[i];if(score>=u.cost){score-=u.cost;u.count++;u.cost=Math.round(u.cost*1.15);calculateCPS();updateAll();saveGame();}}
-    function calculateCPS(){totalCPS=upgrades.reduce((s,u)=>s+u.count*u.cps,0);}
-    function updateAll(){
-      scoreEl.textContent=Math.floor(score).toLocaleString("de-DE");
-      cpsEl.textContent=totalCPS+" Kleinis pro Sekunde";
-      upgrades.forEach((u,i)=>{document.getElementById(u.name+"Count").textContent=u.count;
-        document.getElementById(u.name+"Cost").textContent=u.cost.toLocaleString("de-DE");
-        document.querySelectorAll(".item button")[i].disabled=score<u.cost;
+      upgrades.forEach((u, i) => {
+        document.getElementById(u.name + "Count").textContent = u.count;
+        document.getElementById(u.name + "Cost").textContent = u.cost.toLocaleString("de-DE");
+        document.querySelectorAll(".item button")[i].disabled = score < u.cost;
       });
     }
-    function saveGame(){localStorage.setItem("kleinClickerSave",JSON.stringify({score,upgrades:upgrades.map(u=>({count:u.count,cost:u.cost}))}));}
-    function loadGame(){const s=localStorage.getItem("kleinClickerSave");if(s){const d=JSON.parse(s);score=d.score||0;upgrades.forEach((u,i)=>{if(d.upgrades?.[i]){u.count=d.upgrades[i].count;u.cost=d.upgrades[i].cost}});calculateCPS();updateAll();}}
 
-    setInterval(()=>{if(totalCPS>0){score+=totalCPS;updateAll();saveGame();}
-      if(playerName&&playerName!=="Anonym"){sendScore();loadLeaderboard();}
-    },10000);
+    function saveGame() {
+      const data = { score, upgrades: upgrades.map(u => ({count: u.count, cost: u.cost})) };
+      localStorage.setItem("kleinClickerSave", JSON.stringify(data));
+    }
 
-    loadGame();updateAll();loadLeaderboard();
-    if(playerName) document.getElementById("nameInput").value = playerName;
+    function loadGame() {
+      const saved = localStorage.getItem("kleinClickerSave");
+      if (saved) {
+        const d = JSON.parse(saved);
+        score = d.score || 0;
+        upgrades.forEach((u, i) => {
+          if (d.upgrades?.[i]) { u.count = d.upgrades[i].count; u.cost = d.upgrades[i].cost; }
+        });
+        calculateCPS();
+        updateAll();
+      }
+    }
+
+    setInterval(() => {
+      if (totalCPS > 0) { score += totalCPS; updateAll(); saveGame(); }
+    }, 1000);
+
+    loadGame();
+    updateAll();
   </script>
 </body>
 </html>
