@@ -4,42 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KleinClicker – Klick mich ins Gesicht!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;600&display=swap');
-
-    * { box-sizing: border-box; }
-
+    * { box-sizing: border-box; margin:0; padding:0; }
     body {
-      margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
       color: white;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 20px 10px;
-      overflow-x: hidden;
-    }
-
-    .container {
-      text-align: center;
-      max-width: 1000px;
-      width: 100%;
+      padding: 20px;
     }
 
     h1 {
       font-family: 'Fredoka', cursive;
-      font-size: 3.5rem;
-      margin: 10px 0 5px;
-      text-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+      font-size: 3rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.4);
     }
 
     #score {
       font-size: 3rem;
       font-weight: bold;
       margin: 10px 0;
+      transition: transform 0.2s;
     }
 
     #cps {
@@ -53,55 +45,52 @@
       max-width: 90vw;
       cursor: pointer;
       user-select: none;
-      filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
       transition: transform 0.1s ease;
-      animation: float 5s ease-in-out infinite;
-      margin: 20px 0;
-      position: relative;
+      animation: float 4s ease-in-out infinite;
       z-index: 5;
     }
 
-    #klein:active {
-      transform: scale(0.9) rotate(5deg);
-    }
+    #klein:active { transform: scale(0.9) rotate(5deg); }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-25px); }
+      0%,100%{transform: translateY(0);}
+      50%{transform: translateY(-20px);}
     }
 
-    .particles {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      z-index: 10;
-    }
+    .particles { position: fixed; top:0; left:0; right:0; bottom:0; pointer-events:none; z-index:10; }
 
     .shop {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 25px;
+      gap: 20px;
       margin-top: 40px;
+      width: 100%;
+      max-width: 1000px;
     }
 
     .item {
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(12px);
-      border-radius: 18px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
       padding: 20px;
-      width: 240px;
+      width: 220px;
       border: 1px solid rgba(255,255,255,0.2);
-      transition: all 0.3s;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .item:hover { transform: translateY(-12px); }
+    .item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
 
     .item button {
       width: 100%;
-      padding: 14px;
-      font-size: 1.2rem;
-      background: #ff4757;
+      padding: 12px;
+      font-size: 1.1rem;
+      background: #ff6b6b;
       color: white;
       border: none;
       border-radius: 12px;
@@ -111,61 +100,98 @@
       transition: 0.3s;
     }
 
-    .item button:hover:not(:disabled) {
-      background: #ff3742;
-      transform: scale(1.08);
+    .item button:hover:not(:disabled) { background: #ff4757; transform: scale(1.05); }
+    .item button:disabled { background: #555; cursor: not-allowed; }
+
+    #usernamePrompt {
+      margin-bottom: 30px;
+      text-align: center;
     }
 
-    .item button:disabled {
-      background: #555;
-      cursor: not-allowed;
+    #usernamePrompt input {
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      margin-right: 10px;
     }
+
+    #usernamePrompt button {
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background: #ff6b6b;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #leaderboard {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.5);
+      padding: 15px 20px;
+      border-radius: 12px;
+      max-width: 200px;
+      text-align: left;
+    }
+
+    #leaderboard h2 { margin-bottom: 10px; font-size: 1.2rem; }
+    #leaderboard p { margin: 4px 0; font-size: 1rem; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Ich KleinClicker dir ins Gesicht</h1>
-    <div id="score">0</div>
-    <div id="cps">0 Kleinis pro Sekunde</div>
+  <h1>Ich KleinClicker dir ins Gesicht</h1>
+  <div id="usernamePrompt">
+    <input type="text" id="usernameInput" placeholder="Dein Name">
+    <button onclick="setUsername()">Start</button>
+  </div>
 
-    <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png"
-         alt="Klein" id="klein">
+  <div id="score">0</div>
+  <div id="cps">0 Kleinis pro Sekunde</div>
 
-    <div class="particles" id="particles"></div>
+  <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" alt="Klein" id="klein">
+  <div class="particles" id="particles"></div>
 
-    <h2 style="margin:60px 0 20px;">Shop</h2>
-    <div class="shop">
-      <div class="item">
-        <p>Mouse-Fan (+1 pro Sekunde)</p>
-        <p>Anzahl: <span id="cursorCount">0</span></p>
-        <p>Preis: <span id="cursorCost">15</span> Kleinis</p>
-        <button onclick="buy(0)">Kaufen</button>
-      </div>
-      <div class="item">
-        <p>Oma (+8 pro Sekunde)</p>
-        <p>Anzahl: <span id="grandmaCount">0</span></p>
-        <p>Preis: <span id="grandmaCost">100</span> Kleinis</p>
-        <button onclick="buy(1)">Kaufen</button>
-      </div>
-      <div class="item">
-        <p>Kleini-Farm (+47 pro Sekunde)</p>
-        <p>Anzahl: <span id="farmCount">0</span></p>
-        <p>Preis: <span id="farmCost">1 100</span> Kleinis</p>
-        <button onclick="buy(2)">Kaufen</button>
-      </div>
-      <div class="item">
-        <p>Kleini-Fabrik (+400 pro Sekunde)</p>
-        <p>Anzahl: <span id="factoryCount">0</span></p>
-        <p>Preis: <span id="factoryCost">10 000</span> Kleinis</p>
-        <button onclick="buy(3)">Kaufen</button>
-      </div>
+  <div class="shop">
+    <div class="item">
+      <p>Mouse-Fan (+1/sec)</p>
+      <p>Anzahl: <span id="cursorCount">0</span></p>
+      <p>Preis: <span id="cursorCost">15</span> Kleinis</p>
+      <button onclick="buy(0)">Kaufen</button>
     </div>
+    <div class="item">
+      <p>Oma (+8/sec)</p>
+      <p>Anzahl: <span id="grandmaCount">0</span></p>
+      <p>Preis: <span id="grandmaCost">100</span> Kleinis</p>
+      <button onclick="buy(1)">Kaufen</button>
+    </div>
+    <div class="item">
+      <p>Kleini-Farm (+47/sec)</p>
+      <p>Anzahl: <span id="farmCount">0</span></p>
+      <p>Preis: <span id="farmCost">1 100</span> Kleinis</p>
+      <button onclick="buy(2)">Kaufen</button>
+    </div>
+    <div class="item">
+      <p>Kleini-Fabrik (+400/sec)</p>
+      <p>Anzahl: <span id="factoryCount">0</span></p>
+      <p>Preis: <span id="factoryCost">10 000</span> Kleinis</p>
+      <button onclick="buy(3)">Kaufen</button>
+    </div>
+  </div>
+
+  <div id="leaderboard">
+    <h2>Leaderboard</h2>
+    <p>Warte auf Spieler...</p>
   </div>
 
   <script>
     let score = 0;
     let totalCPS = 0;
+    let username = "";
 
     const upgrades = [
       { name: "cursor",  count: 0, baseCost: 15,   cps: 1,    cost: 15 },
@@ -179,9 +205,10 @@
     const klein = document.getElementById("klein");
     const particles = document.getElementById("particles");
 
-    // Klick-Effekt + Partikel
     klein.addEventListener("click", (e) => {
       score++;
+      scoreEl.style.transform = "scale(1.2)";
+      setTimeout(() => scoreEl.style.transform = "scale(1)", 100);
       updateAll();
 
       const plus = document.createElement("div");
@@ -190,7 +217,7 @@
       plus.style.left = e.clientX + "px";
       plus.style.top = (e.clientY - 30) + "px";
       plus.style.color = "#ffd700";
-      plus.style.fontSize = "2.5rem";
+      plus.style.fontSize = "2rem";
       plus.style.fontWeight = "bold";
       plus.style.pointerEvents = "none";
       plus.style.animation = "fly 1s forwards";
@@ -210,7 +237,7 @@
         u.cost = Math.round(u.cost * 1.15);
         calculateCPS();
         updateAll();
-        saveGame();
+        saveScore();
       }
     }
 
@@ -221,37 +248,35 @@
     function updateAll() {
       scoreEl.textContent = Math.floor(score).toLocaleString("de-DE");
       cpsEl.textContent = totalCPS.toLocaleString("de-DE") + " Kleinis pro Sekunde";
-
-      upgrades.forEach((u, i) => {
+      upgrades.forEach((u,i)=>{
         document.getElementById(u.name + "Count").textContent = u.count;
         document.getElementById(u.name + "Cost").textContent = u.cost.toLocaleString("de-DE");
         document.querySelectorAll(".item button")[i].disabled = score < u.cost;
       });
     }
 
-    function saveGame() {
-      const data = { score, upgrades: upgrades.map(u => ({count: u.count, cost: u.cost})) };
-      localStorage.setItem("kleinClickerSave", JSON.stringify(data));
+    function setUsername() {
+      const input = document.getElementById("usernameInput").value.trim();
+      if(!input) return alert("Bitte einen Namen eingeben!");
+      username = input;
+      document.getElementById("usernamePrompt").style.display = "none";
+      alert("Willkommen, " + username + "!");
+      loadLeaderboard();
+      saveScore();
     }
 
-    function loadGame() {
-      const saved = localStorage.getItem("kleinClickerSave");
-      if (saved) {
-        const d = JSON.parse(saved);
-        score = d.score || 0;
-        upgrades.forEach((u, i) => {
-          if (d.upgrades?.[i]) { u.count = d.upgrades[i].count; u.cost = d.upgrades[i].cost; }
-        });
-        calculateCPS();
-        updateAll();
-      }
+    function saveScore() {
+      // Hier später Firebase Code einfügen
+    }
+
+    function loadLeaderboard() {
+      // Hier später Firebase Code einfügen
     }
 
     setInterval(() => {
-      if (totalCPS > 0) { score += totalCPS; updateAll(); saveGame(); }
-    }, 1000);
+      if(totalCPS>0){ score+=totalCPS; updateAll(); saveScore(); }
+    },1000);
 
-    loadGame();
     updateAll();
   </script>
 </body>
