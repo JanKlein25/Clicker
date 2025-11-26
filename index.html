@@ -1,3 +1,5 @@
+<!-- START OF FILE index.html -->
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -151,7 +153,19 @@
     .cw-title { font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--gold); font-weight: 900; letter-spacing: 1px; }
     .cw-balance { font-size: 1.1rem; color: #fff; font-weight: bold; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; border: 1px solid #444; }
 
-    .cw-body { padding: 30px; position: relative; }
+    .cw-body { padding: 20px; position: relative; }
+
+    /* CASINO NAVIGATION */
+    .casino-nav {
+      display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
+      background: #111; padding: 5px; border-radius: 8px; border: 1px solid #333;
+    }
+    .nav-btn {
+      flex: 1; padding: 10px; background: transparent; border: none;
+      color: #666; font-weight: bold; cursor: pointer; border-radius: 6px; transition: all 0.2s;
+    }
+    .nav-btn.active { background: #333; color: var(--gold); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .nav-btn:hover:not(.active) { color: #fff; }
 
     /* ROULETTE TICKER */
     .roulette-container {
@@ -176,6 +190,25 @@
     .rc-green { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #000; box-shadow: 0 0 15px var(--gold); z-index: 2; }
     .rc-logo { width: 40px; height: 40px; object-fit: contain; }
 
+    /* SLOT MACHINE STYLES */
+    .slot-machine {
+      background: #000; border: 4px solid #333; border-radius: 8px;
+      padding: 15px; margin-bottom: 25px; display: flex; justify-content: center; gap: 10px;
+      box-shadow: inset 0 0 30px #000;
+    }
+    .slot-reel {
+      width: 80px; height: 100px; background: linear-gradient(to bottom, #111, #222);
+      border: 2px solid #444; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; overflow: hidden; position: relative;
+      box-shadow: inset 0 0 10px #000;
+    }
+    .slot-reel.spinning span {
+      animation: slotBlur 0.1s infinite;
+      filter: blur(2px);
+    }
+    @keyframes slotBlur { 0% { transform: translateY(-5px); } 50% { transform: translateY(5px); } 100% { transform: translateY(-5px); } }
+
     /* CONTROLS */
     .bet-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
     .bet-input { background: #111; border: 1px solid #444; color: #fff; font-size: 1.2rem; padding: 10px; width: 150px; text-align: center; font-weight: bold; border-radius: 6px; }
@@ -194,6 +227,7 @@
     .btn-red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
     .btn-black { background: linear-gradient(135deg, #34495e, #2c3e50); }
     .btn-green { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000; }
+    .btn-slot { background: linear-gradient(135deg, #9b59b6, #8e44ad); flex: 0 0 200px; }
     .sub-text { font-size: 0.7rem; opacity: 0.8; font-weight: normal; }
 
     .history-bar { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; display: flex; justify-content: center; gap: 8px; }
@@ -252,25 +286,53 @@
         <div class="cw-balance">💎 <span id="casino-balance">0</span></div>
       </div>
       <div class="cw-body">
-        <div class="roulette-container">
-          <div class="roulette-marker"></div>
-          <div class="roulette-strip" id="rouletteStrip"></div>
+        
+        <!-- Navigation Tabs -->
+        <div class="casino-nav">
+            <button class="nav-btn active" id="btn-tab-roulette" onclick="switchCasinoTab('roulette')">Roulette</button>
+            <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Slots</button>
         </div>
+
+        <!-- Global Bet Controls -->
         <div class="bet-row">
-          <input type="number" id="betAmount" class="bet-input" placeholder="Einsatz">
-          <button class="control-btn" onclick="setBetMultiplier(0.5)">1/2</button>
-          <button class="control-btn" onclick="setBetMultiplier(2)">x2</button>
-          <button class="control-btn" style="color:var(--gold)" onclick="setBetMultiplier('max')">ALL</button>
+            <input type="number" id="betAmount" class="bet-input" placeholder="Einsatz">
+            <button class="control-btn" onclick="setBetMultiplier(0.5)">1/2</button>
+            <button class="control-btn" onclick="setBetMultiplier(2)">x2</button>
+            <button class="control-btn" style="color:var(--gold)" onclick="setBetMultiplier('max')">ALL</button>
         </div>
-        <div class="action-row">
-          <button class="bet-btn btn-red" onclick="spin('red')">ROT<span class="sub-text">Win x2</span></button>
-          <button class="bet-btn btn-green" onclick="spin('green')">GOLD<span class="sub-text">Win x14</span></button>
-          <button class="bet-btn btn-black" onclick="spin('black')">SCHWARZ<span class="sub-text">Win x2</span></button>
+
+        <!-- ROULETTE GAME -->
+        <div id="view-roulette">
+            <div class="roulette-container">
+              <div class="roulette-marker"></div>
+              <div class="roulette-strip" id="rouletteStrip"></div>
+            </div>
+            <div class="action-row">
+              <button class="bet-btn btn-red" onclick="spin('red')">ROT<span class="sub-text">Win x2</span></button>
+              <button class="bet-btn btn-green" onclick="spin('green')">GOLD<span class="sub-text">Win x14</span></button>
+              <button class="bet-btn btn-black" onclick="spin('black')">SCHWARZ<span class="sub-text">Win x2</span></button>
+            </div>
+            <div class="history-bar">
+                <span style="font-size:0.8rem; color:#666; margin-right:5px;">HISTORY:</span>
+                <div id="history-container" style="display:flex; gap:5px;"></div>
+            </div>
         </div>
-        <div class="history-bar">
-          <span style="font-size:0.8rem; color:#666; margin-right:5px;">HISTORY:</span>
-          <div id="history-container" style="display:flex; gap:5px;"></div>
+
+        <!-- SLOTS GAME -->
+        <div id="view-slots" style="display:none;">
+            <div class="slot-machine">
+                <div class="slot-reel" id="reel-1"><span>🍒</span></div>
+                <div class="slot-reel" id="reel-2"><span>🍒</span></div>
+                <div class="slot-reel" id="reel-3"><span>🍒</span></div>
+            </div>
+            <div class="action-row">
+                <button class="bet-btn btn-slot" onclick="spinSlots()">DREHEN<span class="sub-text">3 Gleiche = WIN</span></button>
+            </div>
+            <div style="margin-top:15px; font-size:0.8rem; color:#666;">
+                💎 Jackpot (x50) | 🍒/🍋/🍇/7️⃣ (x3 - x10)
+            </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -302,13 +364,13 @@
     const CARD_GAP = 4;
 
     const BUILDINGS = [
-      { id: 0, name: 'Maltes dreckige Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
-      { id: 1, name: 'Cedrics Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
-      { id: 2, name: 'Weedfarm',  baseCost: 1100,    baseCps: 8,      icon: '🌾' },
-      { id: 3, name: 'Strandkorbvermietung',    baseCost: 12000,   baseCps: 47,     icon: '⛏️' },
-      { id: 4, name: 'Tesla Aktie',       baseCost: 130000,  baseCps: 260,    icon: '🏭' },
-      { id: 5, name: 'Nicos Bankkonto',         baseCost: 1400000, baseCps: 1400,   icon: '🏦' },
-      { id: 6, name: 'Franjas feuchter Tempel',       baseCost: 20000000,baseCps: 7800,   icon: '🏛️' }
+      { id: 0, name: 'Kaputte Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
+      { id: 1, name: 'Nette Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
+      { id: 2, name: 'Kleini Feld',  baseCost: 1100,    baseCps: 8,      icon: '🌾' },
+      { id: 3, name: 'Meme Mine',    baseCost: 12000,   baseCps: 47,     icon: '⛏️' },
+      { id: 4, name: 'Fabrik',       baseCost: 130000,  baseCps: 260,    icon: '🏭' },
+      { id: 5, name: 'Bank',         baseCost: 1400000, baseCps: 1400,   icon: '🏦' },
+      { id: 6, name: 'Tempel',       baseCost: 20000000,baseCps: 7800,   icon: '🏛️' }
     ];
 
     const UPGRADES = [
@@ -399,18 +461,30 @@
       return power;
     }
 
-    /* --- CASINO LOGIC (PRECISION FIX) --- */
+    /* --- CASINO LOGIC --- */
     let isSpinning = false;
+    let currentCasinoMode = 'roulette'; // 'roulette' or 'slots'
 
     function openCasino() {
       document.getElementById('casinoModal').style.display = 'flex';
       updateCasinoUI();
+      // Reset Roulette
       generateStrip(50, null);
       const s = document.getElementById('rouletteStrip');
       s.style.transition = 'none'; s.style.transform = 'translateX(0px)';
     }
     function closeCasino() { document.getElementById('casinoModal').style.display = 'none'; }
     function updateCasinoUI() { document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score)); }
+
+    function switchCasinoTab(mode) {
+        if(isSpinning) return;
+        currentCasinoMode = mode;
+        document.getElementById('view-roulette').style.display = mode === 'roulette' ? 'block' : 'none';
+        document.getElementById('view-slots').style.display = mode === 'slots' ? 'block' : 'none';
+        
+        document.getElementById('btn-tab-roulette').className = mode === 'roulette' ? 'nav-btn active' : 'nav-btn';
+        document.getElementById('btn-tab-slots').className = mode === 'slots' ? 'nav-btn active' : 'nav-btn';
+    }
 
     function setBetMultiplier(multi) {
       const input = document.getElementById('betAmount');
@@ -422,13 +496,13 @@
       }
     }
 
+    /* --- ROULETTE ENGINE --- */
     function generateStrip(count, winningColor) {
       const strip = document.getElementById('rouletteStrip');
       strip.innerHTML = '';
       for(let i=0; i<count; i++) {
         let type = 'black';
         const r = Math.random();
-        // Index 60 is strictly forced to be winning color
         if(winningColor && i === 60) type = winningColor;
         else {
           if(r < 0.06) type = 'green';
@@ -445,11 +519,8 @@
 
     function spin(choice) {
       if(isSpinning) return;
-      const betInput = document.getElementById('betAmount');
-      let bet = parseInt(betInput.value);
-      if(isNaN(bet) || bet <= 0) { alert("Bitte Einsatz eingeben!"); return; }
-      if(bet > game.score) { bet = Math.floor(game.score); betInput.value = bet; }
-      if(bet <= 0) return;
+      const bet = getBet();
+      if(!bet) return;
 
       game.score -= bet;
       updateCasinoUI();
@@ -468,18 +539,9 @@
       strip.style.transform = 'translateX(0px)';
       strip.offsetHeight; 
       
-      /* --- PRECISION MATH FIX --- */
-      // Card is 70px wide + 4px gap = 74px total.
-      // We want to center Card index 60.
-      // Offset = 60 * 74px.
-      // To center it: add half a card width (35px).
-      // Center of card 60 is at: (60 * 74) + 35 pixels from start.
       const cardSize = 74;
       const targetIndex = 60;
       const centerOfTarget = (targetIndex * cardSize) + 35;
-      
-      // Random Jitter: strictly limited to +/- 25px
-      // This ensures we NEVER cross the border (which is 35px away)
       const jitter = Math.floor(Math.random() * 50) - 25; 
       const totalTranslate = centerOfTarget + jitter;
 
@@ -506,15 +568,108 @@
         else multiplier = 2;
       }
 
-      if(multiplier > 0) {
-        const win = bet * multiplier;
-        addScore(win);
+      if(multiplier > 0) triggerWin(bet * multiplier);
+      updateCasinoUI();
+      saveGame();
+    }
+
+    /* --- SLOTS ENGINE --- */
+    const SLOT_SYMBOLS = ['🍒', '🍋', '🍇', '💎', '7️⃣'];
+    
+    function spinSlots() {
+        if(isSpinning) return;
+        const bet = getBet();
+        if(!bet) return;
+
+        game.score -= bet;
+        updateCasinoUI();
+        isSpinning = true;
+        disableButtons(true);
+
+        // Start animation
+        const reels = [document.getElementById('reel-1'), document.getElementById('reel-2'), document.getElementById('reel-3')];
+        reels.forEach(r => r.classList.add('spinning'));
+        
+        let intervals = reels.map(r => setInterval(() => {
+            r.querySelector('span').textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+        }, 50));
+
+        // Determine result beforehand
+        const finalSymbols = [];
+        // Simple chance logic
+        const roll = Math.random();
+        let forcedWin = null; // null, 'cherry', 'diamond', etc.
+        
+        // 30% chance to win something
+        if (roll < 0.30) {
+           const typeRoll = Math.random();
+           if(typeRoll < 0.02) forcedWin = '💎';       // Jackpot
+           else if(typeRoll < 0.1) forcedWin = '7️⃣';
+           else if(typeRoll < 0.3) forcedWin = '🍇';
+           else if(typeRoll < 0.6) forcedWin = '🍋';
+           else forcedWin = '🍒';
+        }
+
+        for(let i=0; i<3; i++) {
+            if(forcedWin) finalSymbols.push(forcedWin);
+            else finalSymbols.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
+        }
+        
+        // Ensure loss if not forcedWin (prevent accidental random win)
+        if(!forcedWin && finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
+             finalSymbols[2] = finalSymbols[0] === '🍒' ? '🍋' : '🍒';
+        }
+
+        // Stop reels sequentially
+        [1500, 2000, 2500].forEach((delay, i) => {
+            setTimeout(() => {
+                clearInterval(intervals[i]);
+                reels[i].classList.remove('spinning');
+                reels[i].querySelector('span').textContent = finalSymbols[i];
+                
+                // Pop effect
+                reels[i].style.transform = "scale(1.2)";
+                setTimeout(()=> reels[i].style.transform = "scale(1)", 150);
+
+                if(i === 2) finishSlotSpin(finalSymbols, bet);
+            }, delay);
+        });
+    }
+
+    function finishSlotSpin(symbols, bet) {
+        isSpinning = false;
+        disableButtons(false);
+        
+        let multiplier = 0;
+        if(symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
+            const s = symbols[0];
+            if(s === '🍒') multiplier = 3;
+            else if(s === '🍋') multiplier = 5;
+            else if(s === '🍇') multiplier = 10;
+            else if(s === '7️⃣') multiplier = 25;
+            else if(s === '💎') multiplier = 50;
+        }
+
+        if(multiplier > 0) triggerWin(bet * multiplier);
+        updateCasinoUI();
+        saveGame();
+    }
+
+    /* --- SHARED CASINO FUNCS --- */
+    function getBet() {
+        const betInput = document.getElementById('betAmount');
+        let bet = parseInt(betInput.value);
+        if(isNaN(bet) || bet <= 0) { alert("Bitte Einsatz eingeben!"); return null; }
+        if(bet > game.score) { bet = Math.floor(game.score); betInput.value = bet; }
+        if(bet <= 0) return null;
+        return bet;
+    }
+
+    function triggerWin(amount) {
+        addScore(amount);
         spawnConfetti();
         document.getElementById('casinoWindow').classList.add('win-pulse');
         setTimeout(()=>document.getElementById('casinoWindow').classList.remove('win-pulse'), 500);
-      }
-      updateCasinoUI();
-      saveGame();
     }
 
     function renderHistory() {
@@ -525,7 +680,7 @@
     }
 
     function disableButtons(disable) {
-      document.querySelectorAll('.bet-btn, .control-btn, .close-btn').forEach(b => b.disabled = disable);
+      document.querySelectorAll('.bet-btn, .control-btn, .close-btn, .nav-btn').forEach(b => b.disabled = disable);
     }
     function spawnConfetti() {
       const win = document.getElementById('casinoWindow');
