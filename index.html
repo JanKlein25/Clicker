@@ -11,10 +11,12 @@
       --primary: #ff6b6b;
       --secondary: #4ecdc4;
       --gold: #ffeaa7;
+      --dark-overlay: rgba(0, 0, 0, 0.85);
       --bg-gradient: radial-gradient(circle at center, #2b32b2 0%, #1e3c72 100%);
       --glass-bg: rgba(255, 255, 255, 0.08);
       --glass-border: rgba(255, 255, 255, 0.15);
       --text-color: #ffffff;
+      --level-bar-height: 12px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
@@ -47,59 +49,130 @@
       100% { filter: brightness(100%) drop-shadow(0 0 0px gold); transform: scale(1); }
     }
 
+    @keyframes barStripe {
+      0% { background-position: 40px 0; }
+      100% { background-position: 0 0; }
+    }
+
+    @keyframes pulseText {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); color: var(--gold); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes levelUpPop {
+      0% { transform: scale(0.5); opacity: 0; }
+      60% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
     /* --- UI Elements --- */
     header {
       text-align: center;
-      padding: 15px;
+      padding: 10px 15px;
       background: rgba(0,0,0,0.3);
       backdrop-filter: blur(10px);
       z-index: 100;
       border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
     }
 
-    .level-bar-container {
+    /* --- NEW LEVEL SYSTEM STYLES --- */
+    .level-container {
       width: 100%;
-      height: 6px;
-      background: rgba(0,0,0,0.3);
-      margin-top: 10px;
-      border-radius: 3px;
+      max-width: 400px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 8px 15px;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      position: relative;
+      margin-top: 5px;
+    }
+
+    .level-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
+    .level-badge {
+      background: var(--secondary);
+      color: #1e3c72;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-right: 5px;
+    }
+
+    .rank-name {
+      color: var(--gold);
+      font-weight: bold;
+      font-family: 'Fredoka', sans-serif;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+
+    .level-bar-bg {
+      width: 100%;
+      height: var(--level-bar-height);
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
       overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
     }
 
     .level-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
       width: 0%;
-      transition: width 0.5s ease;
+      background: linear-gradient(45deg, 
+        var(--primary) 25%, 
+        #ff8787 25%, 
+        #ff8787 50%, 
+        var(--primary) 50%, 
+        var(--primary) 75%, 
+        #ff8787 75%, 
+        #ff8787 100%
+      );
+      background-size: 20px 20px;
+      animation: barStripe 1s linear infinite;
+      transition: width 0.3s ease-out;
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--primary);
     }
 
     h1 {
       font-family: 'Fredoka', sans-serif;
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       letter-spacing: 1px;
       text-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
 
-    .scoreboard { display: flex; flex-direction: column; align-items: center; }
+    .scoreboard { display: flex; flex-direction: column; align-items: center; width: 100%; }
 
     #score {
       font-family: 'Fredoka', sans-serif;
-      font-size: 3rem;
+      font-size: 2.8rem;
       font-weight: 700;
       background: linear-gradient(to bottom, #fff, #dfe6e9);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
-      transition: transform 0.1s;
+      margin-top: 5px;
     }
 
     #cps {
       font-size: 0.9rem;
       color: #b2bec3;
       background: rgba(0,0,0,0.3);
-      padding: 4px 12px;
+      padding: 2px 10px;
       border-radius: 12px;
-      margin-top: 5px;
     }
 
     /* --- Game Area --- */
@@ -117,7 +190,10 @@
       position: relative;
       cursor: pointer;
       z-index: 10;
+      transition: transform 0.1s;
     }
+    
+    .click-zone:active { transform: scale(0.95); }
 
     #klein {
       width: 260px;
@@ -125,10 +201,7 @@
       object-fit: contain;
       filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));
       animation: float 6s ease-in-out infinite;
-      transition: transform 0.05s;
     }
-
-    #klein:active { transform: scale(0.90); }
 
     /* --- Golden Klein Event --- */
     #goldenKlein {
@@ -141,7 +214,7 @@
       animation: shine 1.5s infinite;
     }
 
-    /* --- Falling Heads (Particles) --- */
+    /* --- Particles --- */
     .falling-head {
       position: absolute;
       width: 40px;
@@ -169,7 +242,7 @@
       100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
     }
 
-    /* --- Shop & Achievements --- */
+    /* --- Shop & Tabs --- */
     .bottom-panel {
       height: 40vh;
       background: rgba(0,0,0,0.4);
@@ -185,6 +258,7 @@
       justify-content: center;
       padding: 10px;
       gap: 15px;
+      background: rgba(0,0,0,0.2);
     }
 
     .tab-btn {
@@ -192,14 +266,15 @@
       border: none;
       color: #fff;
       font-family: 'Fredoka', sans-serif;
-      font-size: 1.1rem;
+      font-size: 1rem;
       padding: 5px 15px;
       opacity: 0.5;
       cursor: pointer;
       border-bottom: 2px solid transparent;
+      transition: all 0.2s;
     }
 
-    .tab-btn.active { opacity: 1; border-bottom: 2px solid var(--primary); }
+    .tab-btn.active { opacity: 1; border-bottom: 2px solid var(--primary); transform: translateY(-2px); }
 
     .panel-content {
       flex: 1;
@@ -225,8 +300,7 @@
       padding: 10px;
       transition: all 0.2s;
     }
-
-    .shop-item:hover { background: rgba(255,255,255,0.15); }
+    .shop-item:hover { background: rgba(255,255,255,0.15); transform: translateX(2px); }
 
     .item-icon { font-size: 2rem; margin-right: 15px; }
     .item-details { flex: 1; }
@@ -247,29 +321,80 @@
     .item-btn:active { transform: scale(0.95); }
     .item-btn:disabled { background: #555; opacity: 0.5; cursor: not-allowed; }
 
+    /* --- LEVEL UP MODAL --- */
+    #levelUpModal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--dark-overlay);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none; /* Flex when active */
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .levelup-card {
+      background: linear-gradient(135deg, #2b32b2, #1e3c72);
+      border: 2px solid var(--gold);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(255, 234, 167, 0.3);
+      animation: levelUpPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-width: 90%;
+    }
+
+    .levelup-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.5rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+      text-shadow: 0 4px 0 #d63031;
+    }
+
+    .levelup-stat { font-size: 1.2rem; margin: 10px 0; color: #fff; }
+    .levelup-bonus { font-size: 1.4rem; font-weight: bold; color: #4cd137; margin-bottom: 20px; }
+
+    .levelup-btn {
+      background: var(--gold);
+      color: #d63031;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.2rem;
+      border: none;
+      padding: 10px 30px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #b33939;
+      transition: transform 0.1s;
+    }
+    .levelup-btn:active { transform: translateY(4px); box-shadow: none; }
+
     /* --- Notification / Toast --- */
     .toast-container {
       position: fixed;
-      top: 80px;
-      right: 20px;
+      top: 10px;
+      right: 10px;
       display: flex;
       flex-direction: column;
       gap: 10px;
       z-index: 1000;
+      pointer-events: none; /* Klicks gehen durch */
     }
 
     .toast {
-      background: rgba(40, 40, 40, 0.9);
+      background: rgba(40, 40, 40, 0.95);
       border-left: 4px solid var(--secondary);
-      padding: 15px 20px;
+      padding: 12px 15px;
       border-radius: 4px;
       color: white;
       box-shadow: 0 5px 15px rgba(0,0,0,0.3);
       animation: slideIn 0.3s ease-out forwards;
-      min-width: 250px;
+      min-width: 200px;
     }
-    .toast h4 { color: var(--secondary); margin-bottom: 4px; font-family: 'Fredoka', sans-serif; }
-    .toast p { font-size: 0.9rem; opacity: 0.9; }
+    .toast h4 { color: var(--secondary); margin-bottom: 2px; font-family: 'Fredoka', sans-serif; font-size: 0.9rem; }
+    .toast p { font-size: 0.8rem; opacity: 0.9; }
 
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
@@ -279,13 +404,26 @@
     /* --- Mobile Tweak --- */
     @media (max-width: 600px) {
       #klein { width: 200px; height: 200px; }
-      h1 { font-size: 1.4rem; }
+      h1 { font-size: 1.2rem; }
       .bottom-panel { height: 45vh; }
       .shop-grid { grid-template-columns: 1fr; }
+      #score { font-size: 2.2rem; }
+      .level-container { width: 90%; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Level Up Modal -->
+  <div id="levelUpModal">
+    <div class="levelup-card">
+      <div class="levelup-title">LEVEL UP!</div>
+      <div class="levelup-stat">Du bist jetzt Level <span id="modalLevel">2</span></div>
+      <div class="levelup-stat" style="font-size: 1rem; opacity:0.8;">Neuer Rang: <span id="modalRank">Anfänger</span></div>
+      <div class="levelup-bonus">Globaler Bonus: +5% Produktion! 🚀</div>
+      <button class="levelup-btn" onclick="closeLevelModal()">Weiter klicken!</button>
+    </div>
+  </div>
 
   <!-- Golden Klein Event (Hidden by default) -->
   <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="goldenKlein" alt="GOLDEN" onmousedown="clickGolden()">
@@ -294,17 +432,26 @@
 
   <header>
     <h1>KleinClicker Ultimate</h1>
+    
+    <!-- ADVANCED LEVEL SYSTEM -->
+    <div class="level-container">
+      <div class="level-info">
+        <div>
+          <span class="level-badge" id="lvlBadge">Lvl 1</span>
+          <span class="rank-name" id="rankName">Zivilist</span>
+        </div>
+        <div style="font-size: 0.8rem; opacity: 0.7;">
+          <span id="currentXP">0</span> / <span id="nextXP">500</span> XP
+        </div>
+      </div>
+      <div class="level-bar-bg">
+        <div class="level-bar-fill" id="levelBar"></div>
+      </div>
+    </div>
+
     <div class="scoreboard">
       <div id="score">0</div>
       <div id="cps">0 / Sekunde</div>
-      
-      <!-- Level System -->
-      <div style="width: 100%; max-width: 300px; text-align: left; margin-top: 5px;">
-        <small style="opacity: 0.7;">Level <span id="levelDisplay">1</span></small>
-        <div class="level-bar-container">
-          <div class="level-bar-fill" id="levelBar"></div>
-        </div>
-      </div>
     </div>
   </header>
 
@@ -332,15 +479,23 @@
 
   <script>
     /* --- Settings & Config --- */
-    const SAVE_KEY = 'kleinClickerUltimate_v1';
+    const SAVE_KEY = 'kleinClickerUltimate_v2_LevelOverhaul';
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
+
+    // Level Ranks (Titel)
+    const RANKS = [
+      "Zivilist", "Maus-Schubser", "Klick-Lehrling", "Anfänger", 
+      "Fortgeschrittener", "Dauer-Klicker", "Profi", "Elite", 
+      "Meister", "Großmeister", "Legende", "Klick-Gott", 
+      "Klein-Imperator", "Transzendent", "Das Universum"
+    ];
 
     /* --- Game State --- */
     let state = {
       score: 0,
-      totalScore: 0, // Für Lifetime Stats/Level
+      totalScore: 0, // Dient als XP
       clickCount: 0,
-      startTime: Date.now(),
+      displayedLevel: 1, // Zum Tracken von Level-Ups
       upgrades: [
         { id: 'cursor',  name: 'Maus-Fan',    baseCost: 15,    cps: 1,    count: 0, icon: '👆' },
         { id: 'grandma', name: 'Nette Oma',   baseCost: 100,   cps: 8,    count: 0, icon: '👵' },
@@ -351,6 +506,7 @@
       ],
       achievements: [
         { id: 'start', name: 'Der Anfang', desc: 'Klicke 1 mal', condition: s => s.clickCount >= 1, unlocked: false },
+        { id: 'lvl5', name: 'Aufsteiger', desc: 'Erreiche Level 5', condition: s => getLevelData(s.totalScore).level >= 5, unlocked: false },
         { id: 'rich', name: 'Taschengeld', desc: 'Besitze 1.000 Kleinis', condition: s => s.score >= 1000, unlocked: false },
         { id: 'farmer', name: 'Landwirt', desc: 'Besitze 5 Farmen', condition: s => s.upgrades[2].count >= 5, unlocked: false },
         { id: 'million', name: 'Millionär', desc: 'Erreiche 1 Million Lifetime Score', condition: s => s.totalScore >= 1000000, unlocked: false }
@@ -369,15 +525,27 @@
       clickArea: document.getElementById('clickArea'),
       klein: document.getElementById('klein'),
       golden: document.getElementById('goldenKlein'),
+      // New Level Elements
+      lvlBadge: document.getElementById('lvlBadge'),
+      rankName: document.getElementById('rankName'),
+      currentXP: document.getElementById('currentXP'),
+      nextXP: document.getElementById('nextXP'),
       levelBar: document.getElementById('levelBar'),
-      levelDisplay: document.getElementById('levelDisplay')
+      modal: document.getElementById('levelUpModal'),
+      modalLevel: document.getElementById('modalLevel'),
+      modalRank: document.getElementById('modalRank')
     };
 
     /* --- Init --- */
     function init() {
       loadGame();
+      // Verhindere Level Up Popup direkt beim Laden
+      const realLevel = getLevelData(state.totalScore).level;
+      if (realLevel > state.displayedLevel) state.displayedLevel = realLevel;
+      
       renderShop();
       renderAchievements();
+      updateLevelUI(); // Einmal initial
       
       lastTime = performance.now();
       requestAnimationFrame(gameLoop);
@@ -391,11 +559,15 @@
       const dt = (currentTime - lastTime) / 1000;
       lastTime = currentTime;
 
-      if (dt > 0 && dt < 2) { // Lag prevention
+      if (dt > 0 && dt < 2) { 
         const cps = calculateCPS();
         const earned = cps * dt;
-        state.score += earned;
-        state.totalScore += earned;
+        
+        if (earned > 0) {
+          state.score += earned;
+          state.totalScore += earned;
+          checkLevelUp(); // Check ob genug passives Einkommen für Level Up
+        }
         
         checkAchievements();
         updateUI();
@@ -404,22 +576,83 @@
       requestAnimationFrame(gameLoop);
     }
 
+    /* --- Level System Logic (The new "High Effort" Part) --- */
+    // Formel: Base * Level^2. Level 1 -> 500 XP nötig. Level 2 -> 2000 XP total nötig...
+    // Das skaliert stärker, damit man später nicht jede Sekunde aufsteigt.
+    function getLevelData(totalScore) {
+      const baseXP = 200; // XP needed for lvl 1
+      // Level = Wurzel(Score / Base)
+      // Wir addieren 1, damit man bei 0 Punkten Level 1 ist.
+      let level = Math.floor(Math.sqrt(totalScore / baseXP)) + 1;
+      
+      // Berechne Grenzen für das aktuelle Level
+      // XP nötig für dieses Level (Startpunkt des Balkens)
+      let startXP = baseXP * Math.pow(level - 1, 2);
+      // XP nötig für nächstes Level (Endpunkt des Balkens)
+      let nextLevelXP = baseXP * Math.pow(level, 2);
+
+      return {
+        level: level,
+        startXP: startXP,
+        nextLevelXP: nextLevelXP,
+        currentInLevel: totalScore - startXP,
+        neededInLevel: nextLevelXP - startXP
+      };
+    }
+
+    function checkLevelUp() {
+      const data = getLevelData(state.totalScore);
+      if (data.level > state.displayedLevel) {
+        state.displayedLevel = data.level;
+        triggerLevelUp(data.level);
+      }
+    }
+
+    function triggerLevelUp(newLevel) {
+      // 1. Sound abspielen (optional, hier visuell)
+      // 2. Modal anzeigen
+      els.modalLevel.textContent = newLevel;
+      els.modalRank.textContent = getRankName(newLevel);
+      els.modal.style.display = 'flex';
+      
+      // 3. Konfetti Partikel im Hintergrund (Simpel)
+      for(let i=0; i<20; i++) {
+        setTimeout(() => {
+            spawnFallingHead(window.innerWidth/2, window.innerHeight/2);
+        }, i * 50);
+      }
+    }
+
+    function getRankName(lvl) {
+      // Alle 5 Level ein neuer Rang
+      const index = Math.min(Math.floor((lvl - 1) / 5), RANKS.length - 1);
+      return RANKS[index];
+    }
+
+    function getLevelMultiplier() {
+      // Pro Level +5% Bonus (Level 1 = 1.05x, Level 10 = 1.50x)
+      // Das macht Leveln extrem wertvoll!
+      return 1 + (state.displayedLevel * 0.05);
+    }
+
+    window.closeLevelModal = function() {
+      els.modal.style.display = 'none';
+      renderShop(); // Preise/CPS aktualisieren wegen neuem Multiplikator
+    };
+
     /* --- Mechanics --- */
     function calculateCPS() {
-      return state.upgrades.reduce((total, u) => total + (u.count * u.cps), 0);
+      const baseCPS = state.upgrades.reduce((total, u) => total + (u.count * u.cps), 0);
+      return baseCPS * getLevelMultiplier();
     }
 
     function calculateClickPower() {
-      // Klickstärke = 1 + 2% der aktuellen CPS.
-      return 1 + (calculateCPS() * 0.02); 
+      const baseClick = 1 + (calculateCPS() * 0.02); // 1 + 2% von CPS
+      return baseClick * getLevelMultiplier(); // Auch Klicks profitieren vom Level!
     }
 
     function getCost(upgrade) {
       return Math.round(upgrade.baseCost * Math.pow(1.15, upgrade.count));
-    }
-
-    function getLevel() {
-      return Math.floor(Math.sqrt(state.totalScore) / 10) + 1;
     }
 
     /* --- Interaction --- */
@@ -436,21 +669,21 @@
       state.score += power;
       state.totalScore += power;
       state.clickCount++;
+      
+      checkLevelUp();
 
       // Visuals
       spawnFloatingText(x, y, `+${Math.floor(power)}`);
       spawnFallingHead(x, y);
       
-      // Animation Reset für das Bild (nur das Bild wackelt/pulsiert leicht)
-      els.klein.style.transform = 'scale(0.9)';
+      els.klein.style.transform = 'scale(0.95)';
       setTimeout(() => els.klein.style.transform = '', 50);
-      
-      // Screen Shake wurde hier ENTFERNT
+      // NO SCREEN SHAKE here as requested
     }
 
     /* --- Golden Klein Event --- */
     function scheduleGoldenKlein() {
-      const delay = (Math.random() * 60000) + 30000;
+      const delay = (Math.random() * 60000) + 30000; // 30-90s
       setTimeout(showGoldenKlein, delay);
     }
 
@@ -476,6 +709,7 @@
       const bonus = Math.max(500, calculateCPS() * 300);
       state.score += bonus;
       state.totalScore += bonus;
+      checkLevelUp(); // Auch Goldener Klein gibt XP!
       
       showToast("GOLDENER KLEIN!", `+${Math.floor(bonus).toLocaleString()} Punkte!`);
       scheduleGoldenKlein();
@@ -499,9 +733,12 @@
 
     function renderShop() {
       els.shopGrid.innerHTML = '';
+      const levelMult = getLevelMultiplier(); // Zeige die geboosteten Werte an
+
       state.upgrades.forEach((u, index) => {
         const cost = getCost(u);
         const canBuy = state.score >= cost;
+        const realCPS = u.cps * levelMult;
         
         const div = document.createElement('div');
         div.className = 'shop-item';
@@ -512,7 +749,10 @@
             <span class="item-cost" style="color: ${canBuy ? '#ffeaa7' : '#ff6b6b'}">
               💎 ${cost.toLocaleString()}
             </span>
-            <div style="font-size:0.75rem; color:#aaa">+${u.cps} CPS</div>
+            <div style="font-size:0.75rem; color:#aaa">
+              +${realCPS.toLocaleString(undefined, {maximumFractionDigits:1})} CPS 
+              ${levelMult > 1 ? '<span style="color:#4cd137">(Boost!)</span>' : ''}
+            </div>
           </div>
           <div class="item-count">${u.count}</div>
           <button id="btn-${index}" class="item-btn" 
@@ -591,10 +831,28 @@
     }
 
     /* --- UI Updates --- */
+    function updateLevelUI() {
+      const data = getLevelData(state.totalScore);
+      
+      els.lvlBadge.textContent = "Lvl " + data.level;
+      els.rankName.textContent = getRankName(data.level);
+      
+      // Calculate smooth percentage
+      let percent = (data.currentInLevel / data.neededInLevel) * 100;
+      percent = Math.min(100, Math.max(0, percent)); // Clamp
+      
+      els.levelBar.style.width = percent + "%";
+      els.currentXP.textContent = Math.floor(data.currentInLevel).toLocaleString();
+      els.nextXP.textContent = Math.floor(data.neededInLevel).toLocaleString();
+    }
+
     function updateUI() {
       els.score.textContent = Math.floor(state.score).toLocaleString();
       els.cps.textContent = calculateCPS().toLocaleString(undefined, {maximumFractionDigits: 1}) + " / Sek";
       
+      updateLevelUI();
+
+      // Button Update Logic
       state.upgrades.forEach((u, index) => {
         const btn = document.getElementById(`btn-${index}`);
         if (btn) {
@@ -610,13 +868,6 @@
           }
         }
       });
-
-      const lvl = getLevel();
-      els.levelDisplay.textContent = lvl;
-      const currentBase = Math.pow((lvl-1)*10, 2);
-      const nextBase = Math.pow(lvl*10, 2);
-      const progress = (state.totalScore - currentBase) / (nextBase - currentBase);
-      els.levelBar.style.width = Math.min(100, Math.max(0, progress * 100)) + '%';
     }
 
     /* --- Tabs --- */
