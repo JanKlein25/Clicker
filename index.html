@@ -7,129 +7,135 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;600&display=swap');
 
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px 10px;
       overflow-x: hidden;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 1000px;
+      width: 100%;
     }
 
     h1 {
       font-family: 'Fredoka', cursive;
       font-size: 3.5rem;
-      margin: 20px 0 10px;
-      text-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+      margin: 10px 0 5px;
+      text-shadow: 3px 3px 10px rgba(0,0,0,0.4);
     }
 
     #score {
-      font-size: 2.8rem;
+      font-size: 3rem;
       font-weight: bold;
-      margin: 10px 0 30px;
+      margin: 10px 0;
+    }
+
+    #cps {
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
     }
 
     #klein {
-      width: 280px;
+      width: 300px;
+      max-width: 90vw;
       cursor: pointer;
-      transition: transform 0.08s;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
       user-select: none;
+      filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+      transition: transform 0.1s ease;
+      animation: float 5s ease-in-out infinite;
+      margin: 20px 0;
+      /* WICHTIG: nichts darf drüber liegen! */
+      position: relative;
+      z-index: 5;
     }
 
     #klein:active {
-      transform: scale(0.88) rotate(3deg);
-    }
-
-    .floating {
-      animation: float 4s ease-in-out infinite;
+      transform: scale(0.9) rotate(5deg);
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
+      0%, 100% { transform: translateY(0);
+      50% { transform: translateY(-25px); }
     }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
+    .particles {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 10;
     }
 
     .shop {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
-      margin-top: 50px;
+      gap: 25px;
+      margin-top: 40px;
     }
 
     .item {
       background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
       padding: 20px;
-      width: 220px;
+      width: 240px;
       border: 1px solid rgba(255,255,255,0.2);
       transition: all 0.3s;
     }
 
-    .item:hover {
-      transform: translateY(-10px);
-      background: rgba(255,255,255,0.25);
-    }
+    .item:hover { transform: translateY(-12px); }
 
     .item button {
       width: 100%;
-      padding: 12px;
-      font-size: 1.1rem;
-      background: #ff6b6b;
+      padding: 14px;
+      font-size: 1.2rem;
+      background: #ff4757;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       font-weight: bold;
       margin-top: 10px;
       transition: 0.3s;
     }
 
-    .item button:hover {
-      background: #ff5252;
-      transform: scale(1.05);
+    .item button:hover:not(:disabled) {
+      background: #ff3742;
+      transform: scale(1.08);
     }
 
     .item button:disabled {
-      background: #666;
+      background: #555;
       cursor: not-allowed;
-      transform: none;
-    }
-
-    .particles {
-      pointer-events: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 10;
-    }
-
-    footer {
-      margin-top: 80px;
-      font-size: 0.9rem;
-      opacity: 0.8;
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <h1>Ich KleinClicker dir ins Gesicht</h1>
-    <h2 id="score">0</h2>
-    <h3 id="cps">0 Kleinis pro Sekunde</h3>
+    <div id="score">0</div>
+    <div id="cps">0 Kleinis pro Sekunde</div>
 
-    <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" 
-         alt="Klein" id="klein" class="floating">
+    <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png"
+         alt="Klein" id="klein">
 
     <div class="particles" id="particles"></div>
 
-    <h2 style="margin-top:60px;">Shop – Shop – </h2>
+    <h2 style="margin:60px 0 20px;">Shop</h2>
     <div class="shop">
       <div class="item">
         <p>Mouse-Fan (+1 pro Sekunde)</p>
@@ -137,21 +143,18 @@
         <p>Preis: <span id="cursorCost">15</span> Kleinis</p>
         <button onclick="buy(0)">Kaufen</button>
       </div>
-
       <div class="item">
         <p>Oma (+8 pro Sekunde)</p>
         <p>Anzahl: <span id="grandmaCount">0</span></p>
         <p>Preis: <span id="grandmaCost">100</span> Kleinis</p>
         <button onclick="buy(1)">Kaufen</button>
       </div>
-
       <div class="item">
-        <p>Farm (+47 pro Sekunde)</p>
+        <p>Kleini-Farm (+47 pro Sekunde)</p>
         <p>Anzahl: <span id="farmCount">0</span></p>
         <p>Preis: <span id="farmCost">1 100</span> Kleinis</p>
         <button onclick="buy(2)">Kaufen</button>
       </div>
-
       <div class="item">
         <p>Kleini-Fabrik (+400 pro Sekunde)</p>
         <p>Anzahl: <span id="factoryCount">0</span></p>
@@ -159,20 +162,17 @@
         <button onclick="buy(3)">Kaufen</button>
       </div>
     </div>
-
-    <footer>Made with Liebe & Wahnsinn © 2025</footer>
   </div>
 
   <script>
-    // === Spiel-Daten ===
     let score = 0;
     let totalCPS = 0;
 
     const upgrades = [
-      { name: "cursor", count: 0, baseCost: 15,   cps: 1,   cost: 15 },
-      { name: "grandma", count: 0, baseCost: 100,  cps: 8,   cost: 100 },
-      { name: "farm",    count: 0, baseCost: 1100, cps: 47,  cost: 1100 },
-      { name: "factory", count: 0, baseCost: 10000,cps: 400, cost: 10000 }
+      { name: "cursor",  count: 0, baseCost: 15,   cps: 1,    cost: 15 },
+      { name: "grandma", count: 0, baseCost: 100,  cps: 8,    cost: 100 },
+      { name: "farm",    count: 0, baseCost: 1100, cps: 47,   cost: 1100 },
+      { name: "factory", count: 0, baseCost: 10000,cps: 400,  cost: 10000 }
     ];
 
     const scoreEl = document.getElementById("score");
@@ -180,84 +180,43 @@
     const klein = document.getElementById("klein");
     const particles = document.getElementById("particles");
 
-    // === Laden aus localStorage ===
-    function loadGame() {
-      const saved = localStorage.getItem("kleinClickerSave");
-      if (saved) {
-        const data = JSON.parse(saved);
-        score = data.score || 0;
-        upgrades.forEach((u, i) => {
-          if (data.upgrades && data.upgrades[i]) {
-            u.count = data.upgrades[i].count;
-            u.cost = data.upgrades[i].cost;
-          }
-        });
-        calculateCPS();
-        updateAll();
-      }
-    }
-
-    // === Speichern ===
-    function saveGame() {
-      const data = {
-        score: score,
-        upgrades: upgrades.map(u => ({count: u.count, cost: u.cost}))
-      };
-      localStorage.setItem("kleinClickerSave", JSON.stringify(data));
-    }
-
-    // === Partikel beim Klick ===
+    // Klick-Effekt + Partikel
     klein.addEventListener("click", (e) => {
       score++;
       updateScore();
-      save();
 
-      // +1 Animation
       const plus = document.createElement("div");
       plus.textContent = "+1";
-      plus.style.cssText = `
-        position: absolute;
-        color: #ffd700;
-        font-weight: bold 2rem Arial;
-        pointer-events: none;
-        left: ${e.clientX}px;
-        top: ${e.clientY - 20}px;
-        animation: fly 1s forwards;
-      `;
+      plus.style.position = "fixed";
+      plus.style.left = e.clientX + "px";
+      plus.style.top = (e.clientY - 30) + "px";
+      plus.style.color = "#ffd700";
+      plus.style.fontSize = "2.5rem";
+      plus.style.fontWeight = "bold";
+      plus.style.pointerEvents = "none";
+      plus.style.animation = "fly 1s forwards";
       particles.appendChild(plus);
       setTimeout(() => plus.remove(), 1000);
-
-      // Kleines Schütteln
-      klein.style.transform = "scale(0.88) rotate(-5deg)";
-      setTimeout(() => klein.style.transform = "", 150);
     });
 
-    // CSS-Animation für +1
     const style = document.createElement("style");
-    style.textContent = `
-      @keyframes fly {
-        0% { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(-80px); }
-      }
-    `;
+    style.textContent = `@keyframes fly { from {opacity:1; transform:translateY(0)} to {opacity:0; transform:translateY(-100px)} }`;
     document.head.appendChild(style);
 
-    // === Kaufen ===
-    function buy(index) {
-      const u = upgrades[index];
+    function buy(i) {
+      const u = upgrades[i];
       if (score >= u.cost) {
         score -= u.cost;
         u.count++;
         u.cost = Math.round(u.cost * 1.15);
         calculateCPS();
         updateAll();
-        save();
+        saveGame();
       }
     }
 
-    // === CPS berechnen & Anzeige ===
     function calculateCPS() {
-      totalCPS = upgrades.reduce((sum, u) => sum + u.count * u.cps, 0);
+      totalCPS = upgrades.reduce((s, u) => s + u.count * u.cps, 0);
     }
 
     function updateAll() {
@@ -267,21 +226,32 @@
       upgrades.forEach((u, i) => {
         document.getElementById(u.name + "Count").textContent = u.count;
         document.getElementById(u.name + "Cost").textContent = u.cost.toLocaleString("de-DE");
-        const btn = document.querySelectorAll(".item button")[i];
-        btn.disabled = score < u.cost;
+        document.querySelectorAll(".item button")[i].disabled = score < u.cost;
       });
     }
 
-    // === Automatischer CPS ===
-    setInterval(() => {
-      if (totalCPS > 0) {
-        score += totalCPS;
+    function saveGame() {
+      const data = { score, upgrades: upgrades.map(u => ({count: u.count, cost: u.cost})) };
+      localStorage.setItem("kleinClickerSave", JSON.stringify(data));
+    }
+
+    function loadGame() {
+      const saved = localStorage.getItem("kleinClickerSave");
+      if (saved) {
+        const d = JSON.parse(saved);
+        score = d.score || 0;
+        upgrades.forEach((u, i) => {
+          if (d.upgrades?.[i]) { u.count = d.upgrades[i].count; u.cost = d.upgrades[i].cost; }
+        });
+        calculateCPS();
         updateAll();
-        save();
       }
+    }
+
+    setInterval(() => {
+      if (totalCPS > 0) { score += totalCPS; updateAll(); saveGame(); }
     }, 1000);
 
-    // === Start ===
     loadGame();
     updateAll();
   </script>
