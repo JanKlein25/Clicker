@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker</title>
+  <title>KleinClicker Casino Royale</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
@@ -74,7 +74,8 @@
     
     .score-container { margin-bottom: 50px; text-align: center; z-index: 20; }
     #score { font-family: 'Roboto', sans-serif; font-size: 3.8rem; font-weight: 900; text-shadow: 0 0 30px rgba(255,255,255,0.1); line-height: 1; }
-    #cps { font-size: 1.2rem; color: #7f8c8d; margin-top: 10px; font-weight: 500; background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); }
+    .currency-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--gold); font-weight: 700; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+    #cps { font-size: 1.1rem; color: #7f8c8d; margin-top: 10px; font-weight: 500; background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); }
 
     #bigKlein {
       width: 300px; height: 300px; object-fit: contain; cursor: pointer;
@@ -155,7 +156,6 @@
 
     .cw-body { padding: 20px; position: relative; }
 
-    /* CASINO NAVIGATION */
     .casino-nav {
       display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
       background: #111; padding: 5px; border-radius: 8px; border: 1px solid #333;
@@ -190,7 +190,7 @@
     .rc-green { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #000; box-shadow: 0 0 15px var(--gold); z-index: 2; }
     .rc-logo { width: 40px; height: 40px; object-fit: contain; }
 
-    /* SLOT MACHINE STYLES */
+    /* SLOTS */
     .slot-machine {
       background: #000; border: 4px solid #333; border-radius: 8px;
       padding: 15px; margin-bottom: 25px; display: flex; justify-content: center; gap: 10px;
@@ -268,7 +268,7 @@
     <div class="tt-header">
       <div class="tt-title">
         <span id="tt-name-display">Name</span>
-        <span id="tt-price-display" class="tt-price">100</span>
+        <span id="tt-price-display" class="tt-price">100 Kleinis</span>
       </div>
     </div>
     <div class="tt-body">
@@ -283,17 +283,15 @@
       <button class="close-btn" onclick="closeCasino()">×</button>
       <div class="cw-header">
         <div class="cw-title">🎰 CASINO ROYALE</div>
-        <div class="cw-balance">💎 <span id="casino-balance">0</span></div>
+        <div class="cw-balance"><span id="casino-balance">0</span> Kleinis</div>
       </div>
       <div class="cw-body">
         
-        <!-- Navigation Tabs -->
         <div class="casino-nav">
             <button class="nav-btn active" id="btn-tab-roulette" onclick="switchCasinoTab('roulette')">Roulette</button>
             <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Slots</button>
         </div>
 
-        <!-- Global Bet Controls -->
         <div class="bet-row">
             <input type="number" id="betAmount" class="bet-input" placeholder="Einsatz">
             <button class="control-btn" onclick="setBetMultiplier(0.5)">1/2</button>
@@ -301,7 +299,6 @@
             <button class="control-btn" style="color:var(--gold)" onclick="setBetMultiplier('max')">ALL</button>
         </div>
 
-        <!-- ROULETTE GAME -->
         <div id="view-roulette">
             <div class="roulette-container">
               <div class="roulette-marker"></div>
@@ -318,7 +315,6 @@
             </div>
         </div>
 
-        <!-- SLOTS GAME -->
         <div id="view-slots" style="display:none;">
             <div class="slot-machine">
                 <div class="slot-reel" id="reel-1"><span>🍒</span></div>
@@ -329,7 +325,7 @@
                 <button class="bet-btn btn-slot" onclick="spinSlots()">DREHEN<span class="sub-text">3 Gleiche = WIN</span></button>
             </div>
             <div style="margin-top:15px; font-size:0.8rem; color:#666;">
-                💎 Jackpot (x50) | 🍒/🍋/🍇/7️⃣ (x3, x5, x10, x25)
+                💎 Jackpot (x50) | 🍒/🍋/🍇/7️⃣ (x3 - x10)
             </div>
         </div>
 
@@ -341,7 +337,8 @@
     <div class="bakery-name">KleinClicker</div>
     <div class="score-container">
       <div id="score">0</div>
-      <div id="cps">pro Sekunde: 0,0</div>
+      <div class="currency-label">KLEINIS</div>
+      <div id="cps">0,0 Kleinis / Sekunde</div>
     </div>
     <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
     <div class="buff-container" id="buffArea"></div>
@@ -364,13 +361,13 @@
     const CARD_GAP = 4;
 
     const BUILDINGS = [
-      { id: 0, name: 'Maltes dreckige Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
-      { id: 1, name: 'Cedrics Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
-      { id: 2, name: 'Weedfarm',  baseCost: 1100,    baseCps: 8,      icon: '🌾' },
-      { id: 3, name: 'Strandkorbvermietung',    baseCost: 12000,   baseCps: 47,     icon: '⛏️' },
-      { id: 4, name: 'Tesla Aktien',       baseCost: 130000,  baseCps: 260,    icon: '🏭' },
-      { id: 5, name: 'Nicos Bankkonto',         baseCost: 1400000, baseCps: 1400,   icon: '🏦' },
-      { id: 6, name: 'Franjas feuchter Tempel',       baseCost: 20000000,baseCps: 7800,   icon: '🏛️' }
+      { id: 0, name: 'Kaputte Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
+      { id: 1, name: 'Nette Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
+      { id: 2, name: 'Kleini Feld',  baseCost: 1100,    baseCps: 8,      icon: '🌾' },
+      { id: 3, name: 'Meme Mine',    baseCost: 12000,   baseCps: 47,     icon: '⛏️' },
+      { id: 4, name: 'Fabrik',       baseCost: 130000,  baseCps: 260,    icon: '🏭' },
+      { id: 5, name: 'Bank',         baseCost: 1400000, baseCps: 1400,   icon: '🏦' },
+      { id: 6, name: 'Tempel',       baseCost: 20000000,baseCps: 7800,   icon: '🏛️' }
     ];
 
     const UPGRADES = [
@@ -434,7 +431,7 @@
       if(cps > 0) addScore(cps * dt);
 
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
-      document.getElementById('cps').textContent = "pro Sekunde: " + formatNum(cps, 1);
+      document.getElementById('cps').textContent = formatNum(cps, 1) + " Kleinis / Sekunde";
       
       if(!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
       else if(casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
@@ -463,12 +460,11 @@
 
     /* --- CASINO LOGIC --- */
     let isSpinning = false;
-    let currentCasinoMode = 'roulette'; // 'roulette' or 'slots'
+    let currentCasinoMode = 'roulette'; 
 
     function openCasino() {
       document.getElementById('casinoModal').style.display = 'flex';
       updateCasinoUI();
-      // Reset Roulette
       generateStrip(50, null);
       const s = document.getElementById('rouletteStrip');
       s.style.transition = 'none'; s.style.transform = 'translateX(0px)';
@@ -586,7 +582,6 @@
         isSpinning = true;
         disableButtons(true);
 
-        // Start animation
         const reels = [document.getElementById('reel-1'), document.getElementById('reel-2'), document.getElementById('reel-3')];
         reels.forEach(r => r.classList.add('spinning'));
         
@@ -594,16 +589,13 @@
             r.querySelector('span').textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
         }, 50));
 
-        // Determine result beforehand
         const finalSymbols = [];
-        // Simple chance logic
         const roll = Math.random();
-        let forcedWin = null; // null, 'cherry', 'diamond', etc.
+        let forcedWin = null; 
         
-        // 30% chance to win something
         if (roll < 0.30) {
            const typeRoll = Math.random();
-           if(typeRoll < 0.02) forcedWin = '💎';       // Jackpot
+           if(typeRoll < 0.02) forcedWin = '💎';
            else if(typeRoll < 0.1) forcedWin = '7️⃣';
            else if(typeRoll < 0.3) forcedWin = '🍇';
            else if(typeRoll < 0.6) forcedWin = '🍋';
@@ -615,22 +607,17 @@
             else finalSymbols.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
         }
         
-        // Ensure loss if not forcedWin (prevent accidental random win)
         if(!forcedWin && finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
              finalSymbols[2] = finalSymbols[0] === '🍒' ? '🍋' : '🍒';
         }
 
-        // Stop reels sequentially
         [1500, 2000, 2500].forEach((delay, i) => {
             setTimeout(() => {
                 clearInterval(intervals[i]);
                 reels[i].classList.remove('spinning');
                 reels[i].querySelector('span').textContent = finalSymbols[i];
-                
-                // Pop effect
                 reels[i].style.transform = "scale(1.2)";
                 setTimeout(()=> reels[i].style.transform = "scale(1)", 150);
-
                 if(i === 2) finishSlotSpin(finalSymbols, bet);
             }, delay);
         });
@@ -700,7 +687,7 @@
     bigKlein.addEventListener('touchstart', (e) => { e.preventDefault(); for(let i=0; i<e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY); });
     function handleInteraction(x, y) {
       const power = getClickPower(); addScore(power); game.clicks++;
-      spawnFloatingText(x, y, `+${formatNum(power)}`); spawnFallingFace(x, y);
+      spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power!=1?'s':''}`); spawnFallingFace(x, y);
       bigKlein.style.transform = "scale(0.94)"; setTimeout(()=> bigKlein.style.transform = "scale(1)", 50);
     }
     function spawnFloatingText(x, y, text) {
@@ -727,13 +714,13 @@
       const list = document.getElementById('buildingList'); list.innerHTML = '';
       BUILDINGS.forEach((b, i) => {
         const el = document.createElement('div'); el.className = 'building-row'; el.id = `build-row-${i}`; el.onclick = () => buyBuilding(i);
-        el.innerHTML = `<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div><div class="b-cost" id="cost-${i}">0</div></div><div class="b-count" id="count-${i}">0</div>`;
+        el.innerHTML = `<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div><div class="b-cost" id="cost-${i}">0 Kleinis</div></div><div class="b-count" id="count-${i}">0</div>`;
         list.appendChild(el); updateSingleBuildingUI(i);
       });
     }
     function updateSingleBuildingUI(i) {
       document.getElementById(`count-${i}`).textContent = game.buildings[i];
-      document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i));
+      document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i)) + " Kleinis";
     }
     function updateBuildingStates() {
       BUILDINGS.forEach((b, i) => {
@@ -749,7 +736,7 @@
       if(game.score >= u.cost) { game.score -= u.cost; game.upgrades.push(uId); renderUpgrades(); hideTooltip(); }
     }
     function showTooltip(u) {
-      ttName.textContent = u.name; ttPrice.textContent = formatNum(u.cost);
+      ttName.textContent = u.name; ttPrice.textContent = formatNum(u.cost) + " Kleinis";
       ttPrice.className = game.score >= u.cost ? 'tt-price affordable' : 'tt-price expensive';
       ttEffect.textContent = "Effekt: " + u.text; ttDesc.textContent = u.desc;
       let statsHTML = '';
