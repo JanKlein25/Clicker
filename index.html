@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker Perfected</title>
+  <title>KleinClicker Ultimate</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
       --panel-left: #2b2b36;
-      --panel-right: #26262e;
+      --panel-right: #1e1e24;
       --gold: #f1c40f;
+      --green: #2ecc71;
+      --red: #e74c3c;
       --text-main: #ecf0f1;
-      --highlight: #3498db;
-      --tooltip-bg: #1a1a1a;
+      --tooltip-bg: rgba(20, 20, 25, 0.98);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -25,324 +26,297 @@
       height: 100vh;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
     }
 
-    /* --- TOP BAR (NEWS TICKER) --- */
-    #topBar {
-      height: 45px;
-      background: #111;
-      border-bottom: 2px solid #333;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.5);
-    }
-    
-    #newsTicker {
-      font-family: 'Merriweather', serif;
-      font-size: 0.95rem;
-      color: #bdc3c7;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-      text-align: center;
-      padding: 0 20px;
-    }
-    #newsTicker.show { opacity: 1; }
-
-    /* --- MAIN LAYOUT --- */
-    #gameContainer {
-      display: flex;
-      flex: 1;
-      z-index: 10;
-      height: calc(100vh - 45px);
-    }
-
-    /* --- LEFT PANEL --- */
+    /* --- LAYOUT --- */
+    /* Linke Seite: Interaktion */
     .left-panel {
       flex: 1;
-      background: radial-gradient(circle at center, #353b48 0%, #1e1e24 100%);
+      background: radial-gradient(circle at center, #353b48 0%, #15151a 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       position: relative;
-      border-right: 4px solid #000;
-      box-shadow: inset -10px 0 20px rgba(0,0,0,0.5);
-      overflow: hidden; /* Für Partikel */
+      border-right: 2px solid #000;
+      box-shadow: inset -10px 0 30px rgba(0,0,0,0.5);
+      overflow: hidden;
     }
 
+    /* Rechte Seite: Shop */
+    .right-panel {
+      width: 400px;
+      background: var(--panel-right);
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid #333;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+      z-index: 50;
+    }
+
+    /* --- ELEMENTS LEFT --- */
     .bakery-name {
       position: absolute;
-      top: 20px;
-      width: 100%;
-      text-align: center;
+      top: 30px;
       font-family: 'Merriweather', serif;
       font-weight: 900;
-      font-size: 1.8rem;
-      text-shadow: 0 3px 0 #000;
+      font-size: 2rem;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.5);
       color: var(--gold);
-      background: linear-gradient(to right, transparent, rgba(0,0,0,0.5), transparent);
-      padding: 10px 0;
+      opacity: 0.9;
+      letter-spacing: 1px;
     }
 
     .score-container {
-      margin-bottom: 30px;
+      margin-bottom: 40px;
       text-align: center;
       z-index: 20;
     }
 
     #score {
       font-family: 'Merriweather', serif;
-      font-size: 3.2rem;
-      font-weight: bold;
-      text-shadow: 0 0 15px rgba(255,255,255,0.1);
+      font-size: 3.5rem;
+      font-weight: 700;
+      text-shadow: 0 0 20px rgba(255,255,255,0.15);
+      line-height: 1.1;
     }
     
     #cps {
-      font-size: 1.2rem;
-      color: #95a5a6;
-      margin-top: 5px;
+      font-size: 1.3rem;
+      color: #bdc3c7;
+      margin-top: 8px;
+      font-weight: 500;
+      background: rgba(0,0,0,0.3);
+      padding: 5px 15px;
+      border-radius: 20px;
     }
 
     #bigKlein {
-      width: 280px;
-      height: 280px;
+      width: 300px;
+      height: 300px;
       object-fit: contain;
       cursor: pointer;
-      transition: transform 0.05s;
-      filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
+      transition: transform 0.05s, filter 0.2s;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
       z-index: 20;
     }
-    #bigKlein:active { transform: scale(0.96); }
-    #bigKlein:hover { filter: drop-shadow(0 0 20px rgba(255,255,255,0.15)); }
+    #bigKlein:active { transform: scale(0.94); }
+    #bigKlein:hover { filter: drop-shadow(0 0 25px rgba(255,255,255,0.1)); }
 
-    /* --- RIGHT PANEL (STORE) --- */
-    .right-panel {
-      width: 380px;
-      background: var(--panel-right);
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid #444;
-    }
-
+    /* --- ELEMENTS RIGHT (SHOP) --- */
     .store-header {
-      background: #1a1a1d;
-      padding: 12px;
+      background: #111;
+      padding: 15px;
       text-align: center;
       font-family: 'Merriweather', serif;
       font-weight: bold;
-      color: var(--gold);
+      color: #95a5a6;
       border-bottom: 1px solid #333;
-      border-top: 1px solid #333;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
 
-    /* Upgrades Grid */
+    /* UPGRADES AREA */
     .upgrades-container {
-      padding: 8px;
-      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      background: rgba(0,0,0,0.2);
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      min-height: 60px;
-      max-height: 150px; /* Scrollbar falls zu viele Upgrades */
+      gap: 8px;
+      min-height: 70px;
+      max-height: 200px;
       overflow-y: auto;
+      border-bottom: 2px solid #000;
     }
     
     .upgrade-crate {
-      width: 54px;
-      height: 54px;
-      background: #333;
-      border: 2px solid #555;
+      width: 58px;
+      height: 58px;
+      background: linear-gradient(135deg, #333, #222);
+      border: 1px solid #555;
       cursor: pointer;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.8rem;
-      transition: all 0.1s;
-      border-radius: 4px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
-    .upgrade-crate:hover { border-color: #fff; background: #444; z-index: 100; }
+    .upgrade-crate:hover { 
+      border-color: #fff; 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+      z-index: 100;
+    }
     
-    /* TOOLTIP (Improved) */
+    /* TOOLTIP REDESIGN */
     .upgrade-crate .tooltip {
       visibility: hidden;
-      width: 280px;
+      width: 320px;
       background-color: var(--tooltip-bg);
       color: #fff;
-      border: 2px solid #fff;
-      padding: 12px;
-      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0;
+      border-radius: 8px;
       position: absolute;
       top: 100%;
       right: 0;
       opacity: 0;
-      transition: opacity 0.2s;
+      transition: opacity 0.15s;
       pointer-events: none;
       font-family: 'Roboto', sans-serif;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
       z-index: 2000;
+      overflow: hidden;
+      margin-top: 10px;
     }
-    
-    /* Tooltip content styling */
-    .tt-header { display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px solid #555; padding-bottom:5px; }
-    .tt-name { font-weight:bold; color:var(--text-main); font-size:1rem; }
-    .tt-cost { font-weight:bold; color:#e74c3c; } /* Red by default, green via JS */
-    .tt-desc { font-size:0.8rem; color:#bdc3c7; font-style: italic; margin-bottom: 8px;}
-    .tt-stats { font-size: 0.85rem; color: #fff; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 4px;}
-    .stat-old { color: #95a5a6; text-decoration: line-through; margin-right: 5px; }
-    .stat-new { color: #2ecc71; font-weight: bold; }
 
     .upgrade-crate:hover .tooltip { visibility: visible; opacity: 1; }
 
-    /* Buildings List */
+    .tt-top { padding: 12px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .tt-header { display:flex; justify-content:space-between; align-items: center; margin-bottom: 4px; }
+    .tt-name { font-weight:900; font-size:1.1rem; color: var(--gold); font-family: 'Merriweather', serif; }
+    .tt-cost { font-weight:bold; color: var(--red); font-size: 0.95rem; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; }
+    .tt-cost.green { color: var(--green); }
+    .tt-desc { font-size: 0.8rem; color: #ccc; font-style: italic; line-height: 1.3; }
+
+    .tt-stats { padding: 12px; background: rgba(0,0,0,0.4); }
+    .stat-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; color: #aaa; }
+    .stat-row.highlight { color: #fff; font-weight: bold; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 1rem; }
+    .val-old { text-decoration: line-through; margin-right: 5px; opacity: 0.6; }
+    .val-new { color: var(--green); }
+    .val-gain { color: var(--green); text-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
+
+    /* BUILDINGS LIST */
     .buildings-list {
       flex: 1;
       overflow-y: auto;
       scrollbar-width: thin;
-      scrollbar-color: #555 #222;
+      scrollbar-color: #555 #111;
     }
 
     .building-row {
-      height: 70px;
-      background: linear-gradient(to bottom, #3a3a42, #2c2c32);
+      height: 75px;
+      background: linear-gradient(to right, #333, #25252b);
       border-bottom: 1px solid #111;
       display: flex;
       align-items: center;
       padding: 0 15px;
       cursor: pointer;
       position: relative;
-      opacity: 0.6;
+      opacity: 0.6; 
       transition: all 0.2s;
     }
-    .building-row:hover { opacity: 1; background: linear-gradient(to bottom, #4a4a52, #3c3c42); }
+    .building-row:hover { opacity: 1; background: #3a3a42; }
     .building-row.can-afford { opacity: 1; }
     
-    .b-icon { font-size: 2.2rem; width: 60px; text-align: center; margin-right: 15px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+    .b-icon { font-size: 2.4rem; width: 64px; text-align: center; margin-right: 15px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
     .b-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-    .b-name { font-weight: 900; font-family: 'Merriweather', serif; font-size: 1.2rem; text-shadow: 1px 1px 0 #000; color:#fff; }
-    .b-cost { color: #e74c3c; font-weight: bold; font-size: 0.95rem; }
-    .b-cost.affordable { color: #2ecc71; }
-    .b-count { font-size: 2.2rem; font-weight: bold; color: rgba(0,0,0,0.2); margin-left: auto; }
+    .b-name { font-weight: 700; font-family: 'Merriweather', serif; font-size: 1.1rem; color: #fff; margin-bottom: 2px; }
+    .b-cps { font-size: 0.75rem; color: #7f8c8d; }
+    .b-cost { color: var(--red); font-weight: bold; font-size: 0.9rem; }
+    .b-cost.affordable { color: var(--green); }
+    .b-count { font-size: 2.5rem; font-weight: 900; color: rgba(0,0,0,0.15); margin-left: auto; }
 
-    /* --- FALLING FACES (Particles) --- */
+    /* --- ANIMATIONS & PARTICLES --- */
     .falling-face {
       position: absolute;
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       pointer-events: none;
       z-index: 15;
-      animation: fallDown 1.5s cubic-bezier(0.5, 0, 1, 1) forwards;
+      animation: physicsFall 1.2s cubic-bezier(0.5, 0, 0.8, 0.8) forwards;
     }
-    @keyframes fallDown {
+    @keyframes physicsFall {
       0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-      100% { transform: translateY(600px) rotate(720deg) scale(0.5); opacity: 0; }
+      100% { transform: translateY(800px) rotate(360deg) scale(0.8); opacity: 0; }
     }
 
     .click-text {
       position: absolute;
       color: #fff;
       font-weight: 900;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       pointer-events: none;
       animation: floatUp 0.8s ease-out forwards;
       z-index: 100;
-      text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
     @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-80px); }
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      50% { opacity: 1; transform: translateY(-40px) scale(1.1); }
+      100% { opacity: 0; transform: translateY(-80px) scale(1); }
     }
 
-    /* --- BUFFS --- */
-    .buff-container {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      display: flex;
-      gap: 10px;
-      z-index: 50;
-    }
-    .buff-icon {
-      width: 48px;
-      height: 48px;
-      background: rgba(0,0,0,0.8);
-      border: 2px solid var(--gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      position: relative;
-      box-shadow: 0 0 10px var(--gold);
-    }
-
-    /* --- GOLDEN KLEIN --- */
+    /* GOLDEN KLEIN */
     #goldenKlein {
       position: absolute;
-      width: 90px;
-      height: 90px;
-      z-index: 2000;
+      width: 80px;
+      height: 80px;
+      z-index: 9999;
       cursor: pointer;
       display: none;
-      animation: pulse 1s infinite;
-      filter: drop-shadow(0 0 15px gold);
+      filter: drop-shadow(0 0 20px gold);
+      animation: wobble 2s infinite;
     }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    @keyframes wobble { 0%,100% {transform:rotate(0deg);} 25% {transform:rotate(-5deg);} 75% {transform:rotate(5deg);} }
 
-    /* Mobile */
-    @media (max-width: 800px) {
-      #gameContainer { flex-direction: column; overflow-y: auto; }
-      .left-panel { min-height: 45vh; border-right: none; border-bottom: 4px solid #000; }
-      .right-panel { width: 100%; height: auto; }
-      #bigKlein { width: 180px; height: 180px; }
-      .upgrade-crate .tooltip { width: 220px; right: 100%; top: 0; }
+    /* BUFF ICONS */
+    .buff-container { position: absolute; bottom: 20px; left: 20px; display: flex; gap: 8px; z-index: 100; }
+    .buff-icon { 
+      width: 50px; height: 50px; 
+      background: rgba(0,0,0,0.8); 
+      border: 2px solid var(--gold); 
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; 
+      font-size: 1.5rem; 
+      box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+    /* MOBILE TWEAKS */
+    @media (max-width: 850px) {
+      body { flex-direction: column; overflow-y: auto; height: auto; }
+      .left-panel { min-height: 50vh; border-right: none; border-bottom: 2px solid #333; }
+      .right-panel { width: 100%; min-height: 50vh; }
+      .upgrade-crate .tooltip { width: 250px; top: auto; bottom: 100%; right: 0; margin-bottom: 10px; }
     }
   </style>
 </head>
 <body>
 
-  <div id="topBar">
-    <div id="newsTicker">Willkommen! Klicke auf das Gesicht, um dein Imperium zu starten.</div>
+  <!-- Game Container -->
+  <div class="left-panel" id="clickPanel">
+    <div class="bakery-name">KleinClicker</div>
+    
+    <div class="score-container">
+      <div id="score">0</div>
+      <div id="cps">pro Sekunde: 0,0</div>
+    </div>
+
+    <div class="buff-container" id="buffArea"></div>
+    
+    <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein" alt="Klick mich!">
+    <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="goldenKlein" alt="GOLD">
   </div>
 
-  <div id="gameContainer">
-    <!-- Left: Interaction -->
-    <div class="left-panel" id="clickPanel">
-      <div class="bakery-name">KleinClicker Imperium</div>
-      
-      <div class="score-container">
-        <div id="score">0</div>
-        <div id="cps">pro Sekunde: 0,0</div>
-      </div>
+  <div class="right-panel">
+    <div class="store-header">Upgrades</div>
+    <div class="upgrades-container" id="upgradeGrid"></div>
 
-      <div class="buff-container" id="buffArea"></div>
-      
-      <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein" alt="Klick mich!">
-      
-      <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="goldenKlein" alt="GOLD">
-    </div>
-
-    <!-- Right: Shop -->
-    <div class="right-panel">
-      <div class="store-header">UPGRADES</div>
-      <div class="upgrades-container" id="upgradeGrid"></div>
-
-      <div class="store-header">GEBÄUDE</div>
-      <div class="buildings-list" id="buildingList"></div>
-    </div>
+    <div class="store-header">Markt</div>
+    <div class="buildings-list" id="buildingList"></div>
   </div>
 
   <script>
-    /* --- CONFIG & DATA --- */
-    const GAME_VERSION = 1.1;
-    const SAVE_KEY = 'KleinClickerPerfectSave';
-
-    // Buildings
+    /* --- CONFIGURATION --- */
+    const SAVE_KEY = 'KleinClicker_V2_NoTicker';
+    
+    // Buildings Definition
     const BUILDINGS = [
       { id: 0, name: 'Kaputte Maus', baseCost: 15,      baseCps: 0.1,    icon: '👆' },
       { id: 1, name: 'Nette Oma',    baseCost: 100,     baseCps: 1,      icon: '👵' },
@@ -353,233 +327,226 @@
       { id: 6, name: 'Tempel',       baseCost: 20000000,baseCps: 7800,   icon: '🏛️' }
     ];
 
-    // Upgrades
-    // target: index in BUILDINGS. -1 means "Clicking".
+    // Upgrades Definition
+    // type: 'build' (multiplies building) or 'click' (multiplies click base)
     const UPGRADES = [
-      { id: 'u_click_1', name: 'Plastik Maus', cost: 500,    trigger: {type:'clicks', val:100}, icon:'🖱️', desc:'Klicks sind doppelt so effektiv.', type:'click', multi:2 },
-      { id: 'u_click_2', name: 'Gamer Maus',   cost: 50000,  trigger: {type:'clicks', val:1000},icon:'🎮', desc:'Klicks sind doppelt so effektiv.', type:'click', multi:2 },
+      { id: 'u_click_1', name: 'Plastik Maus', cost: 500,    trigger: {type:'clicks', val:100}, icon:'🖱️', desc:'Verdoppelt deine Klickstärke.', type:'click', multi:2 },
+      { id: 'u_click_2', name: 'Gamer Maus',   cost: 50000,  trigger: {type:'clicks', val:1000},icon:'🎮', desc:'RGB Beleuchtung für mehr Klicks (x2).', type:'click', multi:2 },
       
       { id: 'u_b0_1',    name: 'Carpaltunnel', cost: 1000,   trigger: {type:'build', id:0, val:10}, icon:'🩹', desc:'Mäuse sind doppelt so effizient.', type:'build', target:0, multi:2 },
+      { id: 'u_b0_2',    name: 'Makro',        cost: 10000,  trigger: {type:'build', id:0, val:50}, icon:'⌨️', desc:'Autoclicker installiert (Maus x2).', type:'build', target:0, multi:2 },
+
       { id: 'u_b1_1',    name: 'Nudelholz',    cost: 5000,   trigger: {type:'build', id:1, val:10}, icon:'🥖', desc:'Omas arbeiten doppelt so hart.', type:'build', target:1, multi:2 },
-      { id: 'u_b1_2',    name: 'Brille',       cost: 20000,  trigger: {type:'build', id:1, val:50}, icon:'👓', desc:'Omas sehen besser (x2 Prod).', type:'build', target:1, multi:2 },
+      { id: 'u_b1_2',    name: 'Lesebrille',   cost: 50000,  trigger: {type:'build', id:1, val:50}, icon:'👓', desc:'Omas sehen die Kekse besser (x2).', type:'build', target:1, multi:2 },
       
-      { id: 'u_b2_1',    name: 'Dünger',       cost: 55000,  trigger: {type:'build', id:2, val:10}, icon:'💩', desc:'Felder wachsen schneller (x2).', type:'build', target:2, multi:2 },
-      { id: 'u_b3_1',    name: 'Dynamit',      cost: 600000, trigger: {type:'build', id:3, val:10}, icon:'🧨', desc:'Minen sprengen mehr weg (x2).', type:'build', target:3, multi:2 }
+      { id: 'u_b2_1',    name: 'Dünger',       cost: 150000, trigger: {type:'build', id:2, val:10}, icon:'💩', desc:'Felder wachsen schneller (x2).', type:'build', target:2, multi:2 },
+      { id: 'u_b3_1',    name: 'Dynamit',      cost: 1200000, trigger: {type:'build', id:3, val:10}, icon:'🧨', desc:'Minen sprengen mehr weg (x2).', type:'build', target:3, multi:2 }
     ];
 
-    const NEWS = [
-      "Klein wurde im Fernsehen gesehen!",
-      "Omas streiken für mehr Bingo-Abende.",
-      "Der Kurs für Kleinis steigt ins Unermessliche!",
-      "Wissenschaftler sind verwirrt: Wo kommen all die Kleinis her?",
-      "Jemand hat gerade auf ein Gesicht geklickt.",
-      "Ein goldenes Gesicht wurde gesichtet!"
-    ];
-
-    /* --- GAME STATE --- */
+    /* --- STATE --- */
     let game = {
       score: 0,
       totalScore: 0,
       clicks: 0,
       buildings: new Array(BUILDINGS.length).fill(0),
-      upgrades: [],
-      startTime: Date.now()
+      upgrades: []
     };
 
     let buffs = {
-      frenzy: { active: false, time: 0 },
-      lucky: { active: false, time: 0 }
+      frenzy: { active: false, time: 0, multi: 7 }
     };
 
     let lastTime = performance.now();
-    
-    /* --- ELEMENTS --- */
-    const elScore = document.getElementById('score');
-    const elCps = document.getElementById('cps');
-    const elTicker = document.getElementById('newsTicker');
-    const elGrid = document.getElementById('upgradeGrid');
-    const elList = document.getElementById('buildingList');
 
-    /* --- INIT --- */
+    /* --- INITIALIZATION --- */
     function init() {
       loadGame();
-      createBuildingUI();
+      buildBuildingUI();
       renderUpgrades();
       requestAnimationFrame(gameLoop);
-      setInterval(slowLoop, 1000); // 1s Loop für Save & News
+      setInterval(slowLoop, 500); // 2x per second for heavy UI updates
       scheduleGolden();
-      updateNews(); // First news
     }
 
     /* --- LOOPS --- */
     function gameLoop(now) {
       let dt = (now - lastTime) / 1000;
-      if(dt > 1) dt = 1;
+      if(dt > 1) dt = 1; 
       lastTime = now;
 
       // Logic
       updateBuffs(dt);
-      const cps = calculateCPS();
+      
+      const cps = calculateTotalCPS();
       if(cps > 0) {
-        game.score += cps * dt;
-        game.totalScore += cps * dt;
+        addScore(cps * dt);
       }
 
-      // Render
-      elScore.textContent = formatNum(Math.floor(game.score));
-      elCps.textContent = "pro Sekunde: " + formatNum(cps, 1);
-      document.title = formatNum(Math.floor(game.score)) + " KleinClicker";
-
-      updateBuildingButtons();
-
+      // Fast UI (Numbers)
+      document.getElementById('score').textContent = formatNum(Math.floor(game.score));
+      document.getElementById('cps').textContent = "pro Sekunde: " + formatNum(cps, 1);
+      
+      // Building Availability (Grey out if expensive)
+      updateBuildingStates();
+      
       requestAnimationFrame(gameLoop);
     }
 
     function slowLoop() {
       saveGame();
-      updateNews();
-      renderUpgrades(); // Refresh tooltips/unlocks
+      renderUpgrades(); // Re-render to check if new upgrades unlocked or prices changed color
     }
 
-    /* --- CALCULATIONS --- */
-    function getBuildingMultiplier(bIndex) {
+    /* --- MATH & LOGIC --- */
+    function addScore(amount) {
+      game.score += amount;
+      game.totalScore += amount;
+    }
+
+    function getBuildingMultiplier(index) {
       let m = 1;
+      // Upgrade Multipliers
       UPGRADES.forEach(u => {
-        if(u.type === 'build' && u.target === bIndex && game.upgrades.includes(u.id)) {
+        if(u.type === 'build' && u.target === index && game.upgrades.includes(u.id)) {
           m *= u.multi;
         }
       });
-      // Frenzy buff affects production
-      if(buffs.frenzy.active) m *= 7;
+      // Buffs
+      if(buffs.frenzy.active) m *= buffs.frenzy.multi;
       return m;
     }
 
-    function getSingleBuildingCPS(bIndex) {
-      return BUILDINGS[bIndex].baseCps * getBuildingMultiplier(bIndex);
+    function getBuildingCPS(index) {
+      return BUILDINGS[index].baseCps * getBuildingMultiplier(index);
     }
 
-    function calculateCPS() {
+    function calculateTotalCPS() {
       let cps = 0;
-      BUILDINGS.forEach((b, i) => {
-        cps += game.buildings[i] * getSingleBuildingCPS(i);
+      game.buildings.forEach((count, i) => {
+        cps += count * getBuildingCPS(i);
       });
       return cps;
     }
 
     function getClickPower() {
-      // Basis = 1 + 1% von CPS
-      let base = 1 + (calculateCPS() * 0.01);
+      // Base is 1 + 2% of CPS
+      let power = 1 + (calculateTotalCPS() * 0.02);
       
       // Click Upgrades
       UPGRADES.forEach(u => {
-        if(u.type === 'click' && game.upgrades.includes(u.id)) base *= u.multi;
+        if(u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi;
       });
-
-      // Frenzy wirkt auch auf Klicks
-      if(buffs.frenzy.active) base *= 7;
-
-      return base;
+      
+      if(buffs.frenzy.active) power *= buffs.frenzy.multi;
+      
+      return power;
     }
 
     /* --- INTERACTION --- */
     const bigKlein = document.getElementById('bigKlein');
     const clickPanel = document.getElementById('clickPanel');
 
-    bigKlein.addEventListener('mousedown', (e) => {
-      const power = getClickPower();
-      game.score += power;
-      game.totalScore += power;
-      game.clicks++;
-
-      // Floating Text
-      spawnText(e.clientX, e.clientY, `+${formatNum(power)}`);
-      
-      // FALLING FACES (The visual effect)
-      spawnFallingFace(e.clientX, e.clientY);
+    bigKlein.addEventListener('mousedown', (e) => handleInteraction(e.clientX, e.clientY));
+    bigKlein.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Stop zoom
+      for(let i=0; i<e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY);
     });
 
-    function spawnFallingFace(x, y) {
-      const img = document.createElement('img');
-      img.src = bigKlein.src;
-      img.className = 'falling-face';
-      // Zufällige Position leicht variieren
-      const offsetX = (Math.random() - 0.5) * 60; 
-      img.style.left = (x - 15 + offsetX) + 'px';
-      img.style.top = (y - 15) + 'px';
+    function handleInteraction(x, y) {
+      const power = getClickPower();
+      addScore(power);
+      game.clicks++;
       
-      clickPanel.appendChild(img);
-      setTimeout(() => img.remove(), 1500);
+      spawnFloatingText(x, y, `+${formatNum(power)}`);
+      spawnFallingFace(x, y);
+      
+      // Scale Effect
+      bigKlein.style.transform = "scale(0.94)";
+      setTimeout(()=> bigKlein.style.transform = "scale(1)", 50);
     }
 
-    function spawnText(x, y, txt) {
+    /* --- VISUALS --- */
+    function spawnFloatingText(x, y, text) {
       const el = document.createElement('div');
       el.className = 'click-text';
-      el.textContent = txt;
-      el.style.left = x + 'px';
+      el.textContent = text;
+      // Randomize pos slightly
+      const rx = x - 20 + Math.random()*40;
+      el.style.left = rx + 'px';
       el.style.top = y + 'px';
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 800);
     }
 
-    /* --- FORMATTING (The "No K" Rule) --- */
-    function formatNum(num, decimals=0) {
-      if(num < 1000000) {
-        // Unter 1 Million: 1.250 (Deutsche Schreibweise)
-        return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
-      } else {
-        // Über 1 Million: 1,5 Millionen
-        if(num >= 1000000000) return (num/1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Milliarden";
-        return (num/1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Millionen";
-      }
+    function spawnFallingFace(x, y) {
+      const img = document.createElement('img');
+      img.src = bigKlein.src;
+      img.className = 'falling-face';
+      img.style.left = (x - 17) + 'px';
+      img.style.top = (y - 17) + 'px';
+      clickPanel.appendChild(img);
+      setTimeout(() => img.remove(), 1200);
     }
 
-    /* --- SHOP SYSTEM --- */
-    function getCost(bIndex) {
-      return Math.floor(BUILDINGS[bIndex].baseCost * Math.pow(1.15, game.buildings[bIndex]));
+    /* --- FORMATTING (Strictly NO "k") --- */
+    function formatNum(num, decimals=0) {
+      if(num < 1000000) {
+        return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
+      }
+      // Ab 1 Million ausschreiben
+      if(num >= 1000000000) return (num/1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mrd";
+      return (num/1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mio";
+    }
+
+    /* --- SHOP: BUILDINGS --- */
+    function getBuildingCost(i) {
+      return Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15, game.buildings[i]));
     }
 
     function buyBuilding(i) {
-      const cost = getCost(i);
+      const cost = getBuildingCost(i);
       if(game.score >= cost) {
         game.score -= cost;
         game.buildings[i]++;
-        updateBuildingRow(i);
+        updateSingleBuildingUI(i);
+        // Recalculate Upgrades (new one might unlock)
         renderUpgrades();
       }
     }
 
-    function createBuildingUI() {
-      elList.innerHTML = '';
+    function buildBuildingUI() {
+      const list = document.getElementById('buildingList');
+      list.innerHTML = '';
       BUILDINGS.forEach((b, i) => {
-        const div = document.createElement('div');
-        div.className = 'building-row';
-        div.id = `b-row-${i}`;
-        div.onclick = () => buyBuilding(i);
-        div.innerHTML = `
+        const el = document.createElement('div');
+        el.className = 'building-row';
+        el.id = `build-row-${i}`;
+        el.onclick = () => buyBuilding(i);
+        el.innerHTML = `
           <div class="b-icon">${b.icon}</div>
           <div class="b-info">
             <div class="b-name">${b.name}</div>
-            <div class="b-cost" id="b-cost-${i}">0</div>
+            <div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div>
+            <div class="b-cost" id="cost-${i}">0</div>
           </div>
-          <div class="b-count" id="b-count-${i}">0</div>
+          <div class="b-count" id="count-${i}">0</div>
         `;
-        elList.appendChild(div);
-        updateBuildingRow(i);
+        list.appendChild(el);
+        updateSingleBuildingUI(i);
       });
     }
 
-    function updateBuildingRow(i) {
-      const countEl = document.getElementById(`b-count-${i}`);
-      const costEl = document.getElementById(`b-cost-${i}`);
-      countEl.textContent = game.buildings[i];
-      costEl.textContent = formatNum(getCost(i));
+    function updateSingleBuildingUI(i) {
+      document.getElementById(`count-${i}`).textContent = game.buildings[i];
+      document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i));
     }
 
-    function updateBuildingButtons() {
+    function updateBuildingStates() {
       BUILDINGS.forEach((b, i) => {
-        const row = document.getElementById(`b-row-${i}`);
-        const costEl = document.getElementById(`b-cost-${i}`);
-        const cost = getCost(i);
+        const row = document.getElementById(`build-row-${i}`);
+        const costEl = document.getElementById(`cost-${i}`);
+        const cost = getBuildingCost(i);
+        
         if(game.score >= cost) {
           row.classList.add('can-afford');
           costEl.classList.add('affordable');
@@ -590,7 +557,7 @@
       });
     }
 
-    /* --- UPGRADES & TOOLTIPS --- */
+    /* --- SHOP: UPGRADES (THE COMPLEX PART) --- */
     function buyUpgrade(uId) {
       const u = UPGRADES.find(x => x.id === uId);
       if(game.score >= u.cost) {
@@ -601,7 +568,9 @@
     }
 
     function renderUpgrades() {
-      elGrid.innerHTML = '';
+      const container = document.getElementById('upgradeGrid');
+      container.innerHTML = '';
+
       const available = UPGRADES.filter(u => {
         if(game.upgrades.includes(u.id)) return false;
         if(u.trigger.type === 'clicks' && game.clicks >= u.trigger.val) return true;
@@ -613,122 +582,167 @@
         const div = document.createElement('div');
         div.className = 'upgrade-crate';
         div.innerHTML = u.icon;
-        
-        // Dynamic Tooltip Content
-        let statsHtml = '';
-        if(u.type === 'build') {
-            const bIndex = u.target;
-            const bName = BUILDINGS[bIndex].name;
-            const currentCps = getSingleBuildingCPS(bIndex);
-            const newCps = currentCps * u.multi;
-            const totalGain = (newCps - currentCps) * game.buildings[bIndex];
-            
-            statsHtml = `
-              <div class="tt-stats">
-                Gebäude: ${bName}<br>
-                Prod: <span class="stat-old">${formatNum(currentCps, 1)}</span> 
-                ➜ <span class="stat-new">${formatNum(newCps, 1)}</span><br>
-                Total Bonus: +${formatNum(totalGain, 1)} CPS
-              </div>
-            `;
-        } else {
-            statsHtml = `<div class="tt-stats">Klickstärke x${u.multi}</div>`;
-        }
 
-        const canBuy = game.score >= u.cost;
-        const color = canBuy ? '#2ecc71' : '#e74c3c';
+        const canAfford = game.score >= u.cost;
+        const colorClass = canAfford ? 'green' : '';
         
+        // --- CALCULATION LOGIC FOR TOOLTIP ---
+        let statsHTML = '';
+        
+        if(u.type === 'build') {
+          const bIdx = u.target;
+          const count = game.buildings[bIdx];
+          
+          // Current state
+          const currentMulti = getBuildingMultiplier(bIdx); // Includes frenzy if active, careful
+          const base = BUILDINGS[bIdx].baseCps;
+          const currentSingleCPS = base * currentMulti;
+          
+          // Predicted state (Add this upgrade's multiplier)
+          // Since upgrades stack multiplicatively in this logic:
+          const newSingleCPS = currentSingleCPS * u.multi; 
+          
+          // Total Gain
+          const gainPerUnit = newSingleCPS - currentSingleCPS;
+          const totalGain = gainPerUnit * count;
+          
+          const gainText = count > 0 
+            ? `+${formatNum(totalGain, 1)} CPS` 
+            : `(Vorbereitung für ${BUILDINGS[bIdx].name})`;
+
+          statsHTML = `
+            <div class="stat-row">
+              <span>Einzeln:</span>
+              <span>
+                <span class="val-old">${formatNum(currentSingleCPS, 1)}</span> 
+                <span class="val-new">➜ ${formatNum(newSingleCPS, 1)}</span>
+              </span>
+            </div>
+            <div class="stat-row highlight">
+              <span>Gesamt Bonus:</span>
+              <span class="val-gain">${gainText}</span>
+            </div>
+          `;
+        } else {
+          // Click Upgrade
+          const currentClick = getClickPower();
+          const newClick = currentClick * u.multi;
+          statsHTML = `
+             <div class="stat-row highlight">
+              <span>Klick-Power:</span>
+              <span class="val-gain">x${u.multi}</span>
+            </div>
+            <div class="stat-row" style="font-size:0.7rem; margin-top:5px;">
+              ${formatNum(currentClick, 1)} ➜ ${formatNum(newClick, 1)}
+            </div>
+          `;
+        }
+        // -------------------------------------
+
         div.innerHTML += `
           <div class="tooltip">
-            <div class="tt-header">
-              <span class="tt-name">${u.name}</span>
-              <span class="tt-cost" style="color:${color}">${formatNum(u.cost)}</span>
+            <div class="tt-top">
+              <div class="tt-header">
+                <span class="tt-name">${u.name}</span>
+                <span class="tt-cost ${colorClass}">${formatNum(u.cost)}</span>
+              </div>
+              <div class="tt-desc">${u.desc}</div>
             </div>
-            <div class="tt-desc">${u.desc}</div>
-            ${statsHtml}
+            <div class="tt-stats">
+              ${statsHTML}
+            </div>
           </div>
         `;
-        
-        div.onclick = () => buyUpgrade(u.id);
-        if(!canBuy) div.style.opacity = '0.5';
-        
-        elGrid.appendChild(div);
+
+        if(!canAfford) {
+          div.style.opacity = 0.5;
+          div.style.filter = "grayscale(1)";
+        } else {
+          div.onclick = () => buyUpgrade(u.id);
+        }
+
+        container.appendChild(div);
       });
     }
 
-    /* --- NEWS TICKER (Fixed Fade) --- */
-    function updateNews() {
-      elTicker.classList.remove('show');
-      
-      setTimeout(() => {
-        const msg = NEWS[Math.floor(Math.random() * NEWS.length)];
-        elTicker.textContent = msg;
-        elTicker.classList.add('show');
-      }, 500); // Warten bis ausgeblendet
-    }
-
-    /* --- BUFFS & GOLDEN KLEIN --- */
+    /* --- BUFFS --- */
     function updateBuffs(dt) {
       if(buffs.frenzy.active) {
         buffs.frenzy.time -= dt;
         if(buffs.frenzy.time <= 0) {
           buffs.frenzy.active = false;
-          renderBuffIcons();
+          renderBuffs();
         }
       }
     }
 
-    function renderBuffIcons() {
+    function renderBuffs() {
       const area = document.getElementById('buffArea');
       area.innerHTML = '';
       if(buffs.frenzy.active) {
-        area.innerHTML += `<div class="buff-icon">🔥</div>`;
+        area.innerHTML = `<div class="buff-icon">🔥</div>`;
       }
     }
 
+    /* --- GOLDEN KLEIN (10-20 Minuten) --- */
     function scheduleGolden() {
-      const delay = (Math.random() * 60000) + 30000; 
+      // 600000ms = 10 Minuten. 
+      // Delay = Zufall(0-10min) + 10min = 10 bis 20 Minuten
+      const delay = (Math.random() * 600000) + 600000; 
       setTimeout(spawnGolden, delay);
     }
 
     function spawnGolden() {
       const g = document.getElementById('goldenKlein');
-      g.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-      g.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+      const maxX = document.getElementById('clickPanel').offsetWidth - 80;
+      const maxY = document.getElementById('clickPanel').offsetHeight - 80;
+      
+      g.style.left = Math.random() * maxX + 'px';
+      g.style.top = Math.random() * maxY + 'px';
       g.style.display = 'block';
-      setTimeout(() => { g.style.display = 'none'; scheduleGolden(); }, 10000);
+      
+      // Bleibt 10 Sekunden (10000ms), dann verschwindet er
+      setTimeout(() => { 
+        if(g.style.display === 'block') {
+           g.style.display = 'none'; 
+           scheduleGolden(); 
+        }
+      }, 10000);
     }
 
-    document.getElementById('goldenKlein').onmousedown = function() {
+    document.getElementById('goldenKlein').onmousedown = function(e) {
+      e.stopPropagation(); // Don't trigger regular click
       this.style.display = 'none';
       
-      // Frenzy Effect
+      // Effect: Frenzy x7 for 30s
       buffs.frenzy.active = true;
       buffs.frenzy.time = 30;
-      renderBuffIcons();
-      spawnText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7)");
+      renderBuffs();
+      spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7 CPS)");
       
       scheduleGolden();
     };
 
-    /* --- SAVE --- */
+    /* --- SAVE SYSTEM --- */
     function saveGame() {
-      localStorage.setItem(SAVE_KEY, JSON.stringify({
+      const data = {
         score: game.score,
-        buildings: game.buildings,
-        upgrades: game.upgrades,
         totalScore: game.totalScore,
-        clicks: game.clicks
-      }));
+        clicks: game.clicks,
+        buildings: game.buildings,
+        upgrades: game.upgrades
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
+    
     function loadGame() {
-      const d = JSON.parse(localStorage.getItem(SAVE_KEY));
-      if(d) {
-        game.score = d.score || 0;
-        game.totalScore = d.totalScore || 0;
-        game.clicks = d.clicks || 0;
-        if(d.buildings) d.buildings.forEach((n,i) => game.buildings[i] = n);
-        game.upgrades = d.upgrades || [];
+      const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+      if(saved) {
+        game.score = saved.score || 0;
+        game.totalScore = saved.totalScore || 0;
+        game.clicks = saved.clicks || 0;
+        if(saved.buildings) game.buildings = saved.buildings;
+        game.upgrades = saved.upgrades || [];
       }
     }
 
