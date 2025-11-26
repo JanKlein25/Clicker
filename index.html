@@ -296,7 +296,7 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Fixed_Final_V2';
+    const SAVE_KEY = 'KleinClicker_Precision_V6';
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
     const CARD_WIDTH = 70;
     const CARD_GAP = 4;
@@ -344,7 +344,7 @@
     function init() {
       try {
         loadGame();
-      } catch(e) { console.log("Save corrupted, resetting"); localStorage.removeItem(SAVE_KEY); }
+      } catch(e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
       
       buildBuildingUI();
       renderUpgrades();
@@ -353,7 +353,6 @@
       setInterval(slowLoop, 1000); 
       scheduleGolden();
       
-      // Global Tooltip Follow
       document.addEventListener('mousemove', (e) => {
         if (tooltipEl.style.display === 'block') {
           let top = e.clientY + 10; let left = e.clientX - 330;
@@ -400,7 +399,7 @@
       return power;
     }
 
-    /* --- CASINO LOGIC --- */
+    /* --- CASINO LOGIC (PRECISION FIX) --- */
     let isSpinning = false;
 
     function openCasino() {
@@ -429,6 +428,7 @@
       for(let i=0; i<count; i++) {
         let type = 'black';
         const r = Math.random();
+        // Index 60 is strictly forced to be winning color
         if(winningColor && i === 60) type = winningColor;
         else {
           if(r < 0.06) type = 'green';
@@ -463,18 +463,28 @@
 
       generateStrip(80, result);
       
-      const cardFullWidth = CARD_WIDTH + CARD_GAP;
-      const targetIndex = 60;
-      const randomOffset = Math.floor(Math.random() * 50) - 25; 
-      const pixelOffset = (targetIndex * cardFullWidth) + randomOffset;
-      
       const strip = document.getElementById('rouletteStrip');
       strip.style.transition = 'none';
       strip.style.transform = 'translateX(0px)';
-      strip.offsetHeight; // force reflow
+      strip.offsetHeight; 
       
+      /* --- PRECISION MATH FIX --- */
+      // Card is 70px wide + 4px gap = 74px total.
+      // We want to center Card index 60.
+      // Offset = 60 * 74px.
+      // To center it: add half a card width (35px).
+      // Center of card 60 is at: (60 * 74) + 35 pixels from start.
+      const cardSize = 74;
+      const targetIndex = 60;
+      const centerOfTarget = (targetIndex * cardSize) + 35;
+      
+      // Random Jitter: strictly limited to +/- 25px
+      // This ensures we NEVER cross the border (which is 35px away)
+      const jitter = Math.floor(Math.random() * 50) - 25; 
+      const totalTranslate = centerOfTarget + jitter;
+
       strip.style.transition = 'transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1)'; 
-      strip.style.transform = `translateX(-${pixelOffset}px)`;
+      strip.style.transform = `translateX(-${totalTranslate}px)`;
       
       const marker = document.querySelector('.roulette-marker');
       marker.style.animation = "shake 0.1s infinite";
@@ -611,12 +621,13 @@
       available.forEach(u => {
         const div = document.createElement('div'); div.className = 'upgrade-crate'; div.innerHTML = u.icon;
         div.onmouseenter = () => showTooltip(u); div.onmouseleave = () => hideTooltip();
-        if(game.score >= u.cost) { div.onclick = () => buyUpgrade(u.id); } else { div.style.opacity = 0.5; div.style.filter = "grayscale(1)"; }
+        if(game.score >= u.cost) { div.onclick = () => buyUpgrade(u.id); } 
+        else { div.style.opacity = 0.5; div.style.filter = "grayscale(1)"; }
         container.appendChild(div);
       });
     }
 
-    /* --- GOLDEN (10-20m) --- */
+    /* --- GOLDEN --- */
     function updateBuffs(dt) { if(buffs.frenzy.active) { buffs.frenzy.time -= dt; if(buffs.frenzy.time <= 0) { buffs.frenzy.active = false; renderBuffs(); } } }
     function renderBuffs() { document.getElementById('buffArea').innerHTML = buffs.frenzy.active ? `<div class="buff-icon">🔥</div>` : ''; }
     function scheduleGolden() { const delay = (Math.random() * 600000) + 600000; setTimeout(spawnGolden, delay); }
@@ -631,7 +642,7 @@
       spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7 CPS)"); scheduleGolden();
     };
 
-    /* --- SAVE/LOAD --- */
+    /* --- SAVE --- */
     function saveGame() {
       const data = { score: game.score, totalScore: game.totalScore, clicks: game.clicks, buildings: game.buildings, upgrades: game.upgrades, casinoHistory: game.casinoHistory };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
