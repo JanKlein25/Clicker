@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="de">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -20,6 +23,8 @@
       --text-main: #ecf0f1;
       --tooltip-bg: rgba(10, 10, 15, 0.98);
       --purple: #9b59b6;
+      --blue: #3498db;
+      /* NEU für Prestige */
     }
 
     * {
@@ -1089,6 +1094,50 @@
       animation: pulse 1s infinite alternate;
     }
 
+    /* --- PRESTIGE NEUE STYLES --- */
+    #prestigeBtn {
+      margin-top: 15px;
+      background: linear-gradient(45deg, #3498db, #2980b9);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(52, 152, 219, 0.6);
+      z-index: 25;
+      animation: pulseBlue 2s infinite;
+    }
+
+    #prestigeModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 13000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+
+    @keyframes pulseBlue {
+      0% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(52, 152, 219, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+      }
+    }
+
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -1127,6 +1176,50 @@
       <span id="tt-effect-display" class="tt-effect">Verdoppelt Produktion</span>
       <div id="tt-desc-display">Beschreibung...</div>
       <div id="tt-stats-container" class="tt-stats"></div>
+    </div>
+  </div>
+
+  <!-- PRESTIGE MODAL (NEU) -->
+  <div id="prestigeModal">
+    <div class="lb-window" style="border-color: #3498db; box-shadow: 0 0 80px rgba(52, 152, 219, 0.4);">
+      <button class="close-btn" onclick="closePrestige()">×</button>
+      <div class="lb-header" style="background: linear-gradient(to bottom, #2980b9, #2c3e50);">
+        <div class="lb-title" style="color:#fff;">🚀 ZEITREISE</div>
+      </div>
+      <div class="lb-list" style="text-align:center; padding:30px;">
+        <div style="color:#e74c3c; font-weight:bold; font-size:1.2rem; margin-bottom:20px;">
+          WARNUNG: HARD RESET
+        </div>
+        <div style="color:#ccc; margin-bottom:20px;">
+          Du setzt alle Gebäude, Upgrades und dein aktuelles Geld zurück.<br>
+          Du behältst deine Statistiken, Erfolge und Leaderboard-Platzierung.
+        </div>
+
+        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; margin-bottom:20px;">
+          <div>Aktueller Prestige-Level: <span id="modal-current-prestige"
+              style="color:#3498db; font-weight:bold;">0</span></div>
+          <div style="font-size:1.5rem; margin:10px 0;">⬇️</div>
+          <div>Mögliches Neues Level: <span id="modal-new-prestige"
+              style="color:#2ecc71; font-weight:bold; font-size:1.3rem;">0</span></div>
+          <div style="color:#2ecc71; font-size:0.9rem; margin-top:5px;">(+<span id="modal-gain-prestige">0</span> Level
+            dazu)</div>
+        </div>
+
+        <button onclick="doPrestige()" id="confirmPrestigeBtn" style="
+          background: linear-gradient(45deg, #e74c3c, #c0392b);
+          border: 2px solid rgba(255,255,255,0.2);
+          color: white;
+          padding: 15px 30px;
+          border-radius: 50px;
+          font-weight: 900;
+          font-size: 1.1rem;
+          cursor: pointer;
+          width: 100%;
+          box-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
+        ">
+          RESET DURCHFÜHREN
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1216,6 +1309,19 @@
     </div>
     <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
     <button id="leaderboardBtn" onclick="openLeaderboard()">🏆 LEADERBOARD</button>
+
+    <!-- PRESTIGE BUTTON (NEU) -->
+    <button id="prestigeBtn" onclick="openPrestige()" style="display:none;">
+      🚀 AUFSTEIGEN
+      <div style="font-size:0.7rem; font-weight:normal;">Prestige verfügbar</div>
+    </button>
+
+    <!-- PRESTIGE BADGE (NEU) -->
+    <div id="prestige-badge"
+      style="display:none; margin-top:10px; color:#3498db; font-weight:bold; background:rgba(0,0,0,0.5); padding:5px 15px; border-radius:20px; border:1px solid #3498db;">
+      ⭐ Rang: <span id="prestige-level-display">0</span> (Bonus: +<span id="prestige-bonus-display">0</span>%)
+    </div>
+
     <div class="buff-container" id="buffArea"></div>
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein"
       alt="Klick mich!">
@@ -1288,12 +1394,13 @@
       { id: 'u_b9_1', name: 'Rick\'s Gun', cost: 1500000000000, trigger: { type: 'build', id: 9, val: 10 }, icon: '🔫', desc: 'Wubba Lubba Dub Dub!', type: 'build', target: 9, multi: 2, text: 'Portal Produktion x2' },
     ];
 
-    /* --- GAME STATE --- */
+    /* --- GAME STATE (UPDATED FOR PRESTIGE) --- */
     let game = {
       score: 0, totalScore: 0, clicks: 0, clickLevel: 1,
       buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
       casinoHistory: [],
-      playerName: "Spieler" + Math.floor(Math.random() * 1000)
+      playerName: "Spieler" + Math.floor(Math.random() * 1000),
+      prestige: 0 // NEU: Speichert deine Prestige Level
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
@@ -1308,7 +1415,6 @@
     const MAX_VISUALS = 30;
 
     /* --- FIREBASE CONFIG --- */
-    // TODO: FÜGE HIER DEINE FIREBASE DATEN EIN
     const firebaseConfig = {
       apiKey: "AIzaSyA9UzTCyFOxOr6EiGATnkXA_QMQZRcqX0I",
       authDomain: "kleinclicker.firebaseapp.com",
@@ -1410,6 +1516,9 @@
       else if (casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
 
       updateBuildingStates();
+
+      checkPrestigeUnlock(); // NEU: Check ob Prestige verfügbar
+
       requestAnimationFrame(gameLoop);
     }
     function slowLoop() {
@@ -1479,12 +1588,21 @@
 
     /* --- MATH & CLICK UPGRADES --- */
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
+
+    // NEU: Prestige Multiplikator Berechnung
+    function getPrestigeMultiplier() {
+      // Jeder Prestige Punkt gibt +10% (Faktor 0.1)
+      return 1 + (game.prestige * 0.10);
+    }
+
     function getBuildingMultiplier(index) {
       let m = 1;
       UPGRADES.forEach(u => { if (u.type === 'build' && u.target === index && game.upgrades.includes(u.id)) m *= u.multi; });
       if (buffs.frenzy.active) m *= buffs.frenzy.multi;
-      return m;
+
+      return m * getPrestigeMultiplier(); // NEU: Prestige Bonus
     }
+
     function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
     function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
 
@@ -1498,7 +1616,9 @@
 
       UPGRADES.forEach(u => { if (u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
       if (buffs.frenzy.active) power *= buffs.frenzy.multi;
-      return power;
+
+      // Klickpower kriegt den Prestige Bonus NOCHMAL direkt drauf für extra Power
+      return power * getPrestigeMultiplier();
     }
 
     function getClickLevelCost() {
@@ -1874,17 +1994,18 @@
       spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7 CPS)"); scheduleGolden();
     };
 
-    /* --- SAVE --- */
+    /* --- SAVE (UPDATED FOR PRESTIGE) --- */
     function saveGame() {
       const data = {
         score: game.score,
         totalScore: game.totalScore,
         clicks: game.clicks,
-        clickLevel: game.clickLevel, // Save Level
+        clickLevel: game.clickLevel,
         buildings: game.buildings,
         upgrades: game.upgrades,
         casinoHistory: game.casinoHistory,
-        playerName: game.playerName
+        playerName: game.playerName,
+        prestige: game.prestige || 0 // NEU
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
@@ -1894,11 +2015,94 @@
         game.score = saved.score || 0;
         game.totalScore = saved.totalScore || 0;
         game.clicks = saved.clicks || 0;
-        game.clickLevel = saved.clickLevel || 1; // Load Level
+        game.clickLevel = saved.clickLevel || 1;
         if (saved.buildings) game.buildings = saved.buildings;
         game.upgrades = saved.upgrades || [];
         game.casinoHistory = saved.casinoHistory || [];
         if (saved.playerName) game.playerName = saved.playerName;
+        game.prestige = saved.prestige || 0; // NEU
+      }
+    }
+
+    /* --- PRESTIGE LOGIK (NEU) --- */
+    // Cookie Clicker Formel: Kubikwurzel aus (TotalScore / 1 Million)
+    // 1 Mio = 1 Punkt, 8 Mio = 2 Punkte, 1 Mrd = 10 Punkte
+    function calculatePotentialPrestige() {
+      if (game.totalScore < 1000000) return 0;
+      return Math.floor(Math.cbrt(game.totalScore / 1000000));
+    }
+
+    function openPrestige() {
+      const current = game.prestige;
+      const potentialTotal = calculatePotentialPrestige();
+      const gain = potentialTotal - current;
+
+      if (gain <= 0 && current === 0) return;
+
+      document.getElementById('modal-current-prestige').textContent = formatNum(current);
+      document.getElementById('modal-new-prestige').textContent = formatNum(potentialTotal);
+      document.getElementById('modal-gain-prestige').textContent = formatNum(gain);
+
+      const btn = document.getElementById('confirmPrestigeBtn');
+      if (gain > 0) {
+        btn.disabled = false;
+        btn.innerHTML = `RESET & +${formatNum(gain)} LEVEL`;
+        btn.style.opacity = "1";
+      } else {
+        btn.disabled = true;
+        btn.innerHTML = "Du brauchst mehr Score!";
+        btn.style.opacity = "0.5";
+      }
+
+      document.getElementById('prestigeModal').style.display = 'flex';
+    }
+
+    function closePrestige() {
+      document.getElementById('prestigeModal').style.display = 'none';
+    }
+
+    function doPrestige() {
+      const potentialTotal = calculatePotentialPrestige();
+      if (potentialTotal <= game.prestige) return;
+
+      // 1. Prestige erhöhen
+      game.prestige = potentialTotal;
+
+      // 2. Spiel zurücksetzen (Hard Reset für Gebäude/Geld/KlickLevel/Upgrades)
+      game.score = 0;
+      game.clicks = 0;
+      game.clickLevel = 1;
+      game.buildings = new Array(BUILDINGS.length).fill(0);
+      game.upgrades = [];
+
+      // TotalScore NICHT zurücksetzen, sonst verliert man den Fortschritt für das nächste Prestige!
+      // Casino History und Name bleiben auch.
+
+      // 3. Speichern und UI neu laden
+      saveGame();
+      location.reload();
+    }
+
+    function checkPrestigeUnlock() {
+      const potential = calculatePotentialPrestige();
+      const gain = potential - game.prestige;
+
+      const btn = document.getElementById('prestigeBtn');
+
+      if (gain > 0) {
+        btn.style.display = 'block';
+        btn.classList.add('win-pulse');
+      } else {
+        btn.style.display = 'none';
+      }
+
+      // Badge anzeigen wenn man schon Prestige hat
+      const badge = document.getElementById('prestige-badge');
+      if (game.prestige > 0) {
+        badge.style.display = 'block';
+        document.getElementById('prestige-level-display').textContent = formatNum(game.prestige);
+        // +10% pro Level
+        document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 10);
       }
     }
 
@@ -1965,4 +2169,3 @@
 </body>
 
 </html>
-```
