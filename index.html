@@ -1270,7 +1270,6 @@
             <button class="bet-btn btn-slot" onclick="spinSlots()">DREHEN<span class="sub-text">3 Gleiche =
                 WIN</span></button>
           </div>
-          <!-- HIER IST DIE GEÄNDERTE ZEILE: -->
           <div style="margin-top:15px; font-size:0.85rem; color:#888; letter-spacing: 1px;">
             🍒x3 • 🍋x5 • 🍇x10 • 7️⃣x25 • <span style="color:var(--gold); font-weight:bold;">💎x50</span>
           </div>
@@ -1319,7 +1318,7 @@
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein"
       alt="Klick mich!">
 
-    <!-- PRESTIGE BADGE (JETZT UNTER DEM BILD) -->
+    <!-- PRESTIGE BADGE -->
     <div id="prestige-badge"
       style="display:none; margin-top:25px; width: 80%; max-width:300px; color:#3498db; background:rgba(0,0,0,0.6); padding:10px; border-radius:12px; border:1px solid #3498db; text-align:center; z-index: 20;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -1348,7 +1347,7 @@
     <div class="upgrades-container" id="upgradeGrid"></div>
 
     <!-- NEW CLICKER UPGRADE SECTION -->
-    <div class="store-header">Clicker Zentrale</div>
+    <div class="store-header">Clicker Zentrale 2.0</div>
     <div class="click-booster" id="clickBooster">
       <div class="cb-card">
         <div class="cb-info">
@@ -1409,18 +1408,18 @@
       { id: 'u_b9_1', name: 'Rick\'s Gun', cost: 1500000000000, trigger: { type: 'build', id: 9, val: 10 }, icon: '🔫', desc: 'Wubba Lubba Dub Dub!', type: 'build', target: 9, multi: 2, text: 'Portal Produktion x2' },
     ];
 
-    /* --- GAME STATE (UPDATED FOR PRESTIGE) --- */
+    /* --- GAME STATE --- */
     let game = {
       score: 0, totalScore: 0, clicks: 0, clickLevel: 1,
       buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
       casinoHistory: [],
       playerName: "Spieler" + Math.floor(Math.random() * 1000),
-      prestige: 0 // NEU: Speichert deine Prestige Level
+      prestige: 0
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
     // NEW: ACTIVE CPS TRACKING
-    let clickHistory = []; // Stores clicks from the last second
+    let clickHistory = [];
 
     let lastTime = performance.now();
     let casinoUnlocked = false;
@@ -1465,7 +1464,6 @@
     function init() {
       try {
         loadGame();
-        // Fix save compatibility if new buildings added
         if (game.buildings.length < BUILDINGS.length) {
           const diff = BUILDINGS.length - game.buildings.length;
           for (let i = 0; i < diff; i++) game.buildings.push(0);
@@ -1480,7 +1478,6 @@
       setInterval(slowLoop, 1000);
       scheduleGolden();
 
-      // Ask for name if default
       if (game.playerName.startsWith("Spieler")) {
         const newName = prompt("Wie möchtest du auf dem Leaderboard heißen?", game.playerName);
         if (newName && newName.trim() !== "") {
@@ -1505,23 +1502,15 @@
       if (dt > 1) dt = 1; lastTime = now;
       updateBuffs(dt);
 
-      // 1. Calculate Passive CPS
       const passiveCps = calculateTotalCPS();
-
-      // 2. Calculate Active CPS (Rolling Average of last 1000ms)
-      // Filter out clicks older than 1 second
       clickHistory = clickHistory.filter(c => now - c.time < 1000);
-      // Sum up the value of remaining clicks
       const activeClickCPS = clickHistory.reduce((sum, c) => sum + c.val, 0);
 
-      // 3. Add Passive Score (Active score is added instantly on click)
       if (passiveCps > 0) addScore(passiveCps * dt);
 
-      // 4. Update Displays
       const displayCps = passiveCps + activeClickCPS;
 
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
-      // Display the combined Dynamic CPS
       document.getElementById('cps').textContent = formatNum(displayCps, 1) + " Kleinis / Sekunde";
 
       updateDynamicBackground();
@@ -1531,15 +1520,16 @@
       else if (casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
 
       updateBuildingStates();
-
-      checkPrestigeUnlock(); // Check ob Prestige verfügbar (und Fortschritt anzeigen)
+      checkPrestigeUnlock();
 
       requestAnimationFrame(gameLoop);
     }
     function slowLoop() {
       saveGame();
       renderUpgrades();
-      // Sync Score to Firebase
+      // Aktualisiere Gebäudeanzeigen für dynamische Buffs
+      BUILDINGS.forEach((_, i) => updateSingleBuildingUI(i));
+
       if (dbRef) {
         dbRef.child(game.playerName).set({
           name: game.playerName,
@@ -1554,13 +1544,9 @@
       const container = document.getElementById('visual-canvas');
       container.innerHTML = '';
       visualElements = [];
-
-      // Spawn existing buildings
       let totalCreated = 0;
-      // Prioritize expensive buildings visually
       for (let i = BUILDINGS.length - 1; i >= 0; i--) {
         if (game.buildings[i] > 0) {
-          // Determine how many icons to show (logarithmic scaling)
           let count = Math.min(Math.ceil(Math.log2(game.buildings[i] + 1)), 5);
           for (let k = 0; k < count; k++) {
             if (totalCreated < MAX_VISUALS) {
@@ -1577,15 +1563,10 @@
       const el = document.createElement('div');
       el.className = 'bg-icon';
       el.textContent = iconChar;
-
-      // Random Position
       el.style.left = Math.random() * 90 + '%';
       el.style.top = Math.random() * 90 + '%';
-      // Random Size variation
       el.style.fontSize = (1 + Math.random()) + 'rem';
-      // Random Animation Duration
       el.style.animationDuration = (10 + Math.random() * 20) + 's';
-
       container.appendChild(el);
       visualElements.push(el);
     }
@@ -1593,20 +1574,17 @@
     function updateDynamicBackground() {
       const panel = document.getElementById('clickPanel');
       let s = game.totalScore;
-      // Simple milestones for colors
-      if (s < 10000) { /* Default Blue/Black */ }
-      else if (s < 1000000) { panel.style.background = `radial-gradient(circle at center, #8e44ad 0%, #000000 100%)`; } // Purple
-      else if (s < 1000000000) { panel.style.background = `radial-gradient(circle at center, #d35400 0%, #2d3436 100%)`; } // Orange/Dark
-      else if (s < 1000000000000) { panel.style.background = `radial-gradient(circle at center, #f1c40f 0%, #2c3e50 100%)`; } // Gold
-      else { panel.style.background = `radial-gradient(circle at center, #16a085 0%, #000 100%)`; } // Matrix Green/Space
+      if (s < 10000) { }
+      else if (s < 1000000) { panel.style.background = `radial-gradient(circle at center, #8e44ad 0%, #000000 100%)`; }
+      else if (s < 1000000000) { panel.style.background = `radial-gradient(circle at center, #d35400 0%, #2d3436 100%)`; }
+      else if (s < 1000000000000) { panel.style.background = `radial-gradient(circle at center, #f1c40f 0%, #2c3e50 100%)`; }
+      else { panel.style.background = `radial-gradient(circle at center, #16a085 0%, #000 100%)`; }
     }
 
     /* --- MATH & CLICK UPGRADES --- */
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
 
-    // NEU: Prestige Multiplikator Berechnung
     function getPrestigeMultiplier() {
-      // Jeder Prestige Punkt gibt +10% (Faktor 0.1)
       return 1 + (game.prestige * 0.10);
     }
 
@@ -1614,30 +1592,25 @@
       let m = 1;
       UPGRADES.forEach(u => { if (u.type === 'build' && u.target === index && game.upgrades.includes(u.id)) m *= u.multi; });
       if (buffs.frenzy.active) m *= buffs.frenzy.multi;
-
-      return m * getPrestigeMultiplier(); // NEU: Prestige Bonus
+      return m * getPrestigeMultiplier();
     }
 
     function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
     function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
 
-    // MODIFIED CLICK FORMULA
-    function getClickPower() {
-      // Base calculation now includes Click Level
-      // Base: 1, Level 1: 3, Level 10: 30... + % of CPS
-      let levelPower = 1 + (game.clickLevel * 2);
-      let cpsPower = calculateTotalCPS() * 0.05; // 5% of CPS added
+    // MODIFIED CLICK FORMULA (Accepts Level for preview)
+    function getClickPower(lvl = game.clickLevel) {
+      let levelPower = 1 + (lvl * 2);
+      let cpsPower = calculateTotalCPS() * 0.05;
       let power = levelPower + cpsPower;
 
       UPGRADES.forEach(u => { if (u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
       if (buffs.frenzy.active) power *= buffs.frenzy.multi;
 
-      // Klickpower kriegt den Prestige Bonus NOCHMAL direkt drauf für extra Power
       return power * getPrestigeMultiplier();
     }
 
     function getClickLevelCost() {
-      // High cost for balancing: 500 * 2.5^Level
       return Math.floor(500 * Math.pow(2.5, game.clickLevel));
     }
 
@@ -1648,7 +1621,6 @@
         game.clickLevel++;
         updateClickUI();
 
-        // Effect
         const btn = document.getElementById('btn-buy-click');
         btn.style.transform = "scale(1.1)";
         setTimeout(() => btn.style.transform = "scale(1)", 100);
@@ -1657,8 +1629,11 @@
 
     function updateClickUI() {
       const cost = getClickLevelCost();
-      const power = getClickPower();
-      document.getElementById('click-dmg-display').textContent = formatNum(power, 1);
+      const currentPower = getClickPower(game.clickLevel);
+      const nextPower = getClickPower(game.clickLevel + 1);
+
+      // CLICKER ZENTRALE 2.0: Current ➜ Next
+      document.getElementById('click-dmg-display').innerHTML = `${formatNum(currentPower, 1)} <span style="font-size:0.8em; color:#7f8c8d">➜</span> <span style="color:#2ecc71">${formatNum(nextPower, 1)}</span>`;
       document.getElementById('click-cost-display').textContent = formatNum(cost);
 
       const btn = document.getElementById('btn-buy-click');
@@ -1939,19 +1914,33 @@
       const list = document.getElementById('buildingList'); list.innerHTML = '';
       BUILDINGS.forEach((b, i) => {
         const el = document.createElement('div'); el.className = 'building-row'; el.id = `build-row-${i}`; el.onclick = () => buyBuilding(i);
-        el.innerHTML = `<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div><div class="b-cost" id="cost-${i}">0 Kleinis</div></div><div class="b-count" id="count-${i}">0</div>`;
+        // CHANGE: Added IDs for dynamic CPS and Gain preview
+        el.innerHTML = `<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps" id="b-cps-${i}">Prod: ...</div><div class="b-cost"><span id="cost-${i}">0 Kleinis</span> <span id="gain-${i}" style="color:#2ecc71; font-size:0.8rem; margin-left:6px; font-weight:normal;"></span></div></div><div class="b-count" id="count-${i}">0</div>`;
         list.appendChild(el); updateSingleBuildingUI(i);
       });
     }
     function updateSingleBuildingUI(i) {
       document.getElementById(`count-${i}`).textContent = game.buildings[i];
       document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i)) + " Kleinis";
+
+      // DYNAMIC MARKET & PREVIEW
+      const realCps = getBuildingCPS(i);
+      document.getElementById(`b-cps-${i}`).textContent = `Prod: ${formatNum(realCps, 1)}/s`;
+      document.getElementById(`gain-${i}`).textContent = `(+${formatNum(realCps, 1)} CPS)`;
     }
     function updateBuildingStates() {
       BUILDINGS.forEach((b, i) => {
-        const row = document.getElementById(`build-row-${i}`); const costEl = document.getElementById(`cost-${i}`);
-        if (game.score >= getBuildingCost(i)) { row.classList.add('can-afford'); costEl.classList.add('affordable'); }
-        else { row.classList.remove('can-afford'); costEl.classList.remove('affordable'); }
+        const row = document.getElementById(`build-row-${i}`);
+        // FIX: Target parent container .b-cost instead of span #cost-i
+        const costDiv = row.querySelector('.b-cost');
+
+        if (game.score >= getBuildingCost(i)) {
+          row.classList.add('can-afford');
+          costDiv.classList.add('affordable');
+        } else {
+          row.classList.remove('can-afford');
+          costDiv.classList.remove('affordable');
+        }
       });
     }
 
@@ -2009,7 +1998,7 @@
       spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7 CPS)"); scheduleGolden();
     };
 
-    /* --- SAVE (UPDATED FOR PRESTIGE) --- */
+    /* --- SAVE --- */
     function saveGame() {
       const data = {
         score: game.score,
@@ -2020,7 +2009,7 @@
         upgrades: game.upgrades,
         casinoHistory: game.casinoHistory,
         playerName: game.playerName,
-        prestige: game.prestige || 0 // NEU
+        prestige: game.prestige || 0
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
@@ -2035,13 +2024,11 @@
         game.upgrades = saved.upgrades || [];
         game.casinoHistory = saved.casinoHistory || [];
         if (saved.playerName) game.playerName = saved.playerName;
-        game.prestige = saved.prestige || 0; // NEU
+        game.prestige = saved.prestige || 0;
       }
     }
 
-    /* --- PRESTIGE LOGIK (NEU) --- */
-    // Cookie Clicker Formel: Kubikwurzel aus (TotalScore / 1 Million)
-    // 1 Mio = 1 Punkt, 8 Mio = 2 Punkte, 1 Mrd = 10 Punkte
+    /* --- PRESTIGE LOGIK --- */
     function calculatePotentialPrestige() {
       if (game.totalScore < 1000000) return 0;
       return Math.floor(Math.cbrt(game.totalScore / 1000000));
@@ -2080,76 +2067,52 @@
       const potentialTotal = calculatePotentialPrestige();
       if (potentialTotal <= game.prestige) return;
 
-      // 1. Prestige erhöhen
       game.prestige = potentialTotal;
 
-      // 2. Spiel zurücksetzen (Hard Reset für Gebäude/Geld/KlickLevel/Upgrades)
       game.score = 0;
       game.clicks = 0;
       game.clickLevel = 1;
       game.buildings = new Array(BUILDINGS.length).fill(0);
       game.upgrades = [];
 
-      // TotalScore NICHT zurücksetzen, sonst verliert man den Fortschritt für das nächste Prestige!
-      // Casino History und Name bleiben auch.
-
-      // 3. Speichern und UI neu laden
       saveGame();
       location.reload();
     }
 
     function checkPrestigeUnlock() {
-      // 1. Berechne aktuellen potenziellen Rang basierend auf Total Score
       const potential = calculatePotentialPrestige();
-
-      // 2. Button Logik (Zeigen wenn wir aufsteigen können)
       const gain = potential - game.prestige;
       const btn = document.getElementById('prestigeBtn');
 
       if (gain > 0) {
         btn.style.display = 'block';
         btn.classList.add('win-pulse');
-        // Button Text updaten damit man sieht was man kriegt
         btn.innerHTML = `🚀 AUFSTEIGEN (+${gain} Level)`;
       } else {
         btn.style.display = 'none';
       }
 
-      // 3. Badge & Fortschrittsbalken Logik
       const badge = document.getElementById('prestige-badge');
-
-      // Wir zeigen das Badge an, sobald man entweder Prestige hat ODER nah am ersten Level ist (> 100k Score)
       if (game.prestige > 0 || game.totalScore > 100000) {
         badge.style.display = 'block';
-
-        // Welcher Rang ist das nächste Ziel?
         const currentProgressRank = Math.max(game.prestige, potential);
         const nextTargetRank = currentProgressRank + 1;
-
-        // Formel umkehren: Wie viel Score braucht man für Rang X? -> X^3 * 1.000.000
         const scoreNeededForNext = Math.pow(nextTargetRank, 3) * 1000000;
         const scoreForCurrent = Math.pow(currentProgressRank, 3) * 1000000;
-
         const remaining = scoreNeededForNext - game.totalScore;
-
-        // Prozentberechnung für den Balken (relativ zum aktuellen Level)
         const totalDistance = scoreNeededForNext - scoreForCurrent;
         const coveredDistance = game.totalScore - scoreForCurrent;
         let percent = (coveredDistance / totalDistance) * 100;
-        if (percent < 0) percent = 0; // Schutz
+        if (percent < 0) percent = 0;
         if (percent > 100) percent = 100;
 
-        // UI Updates
         document.getElementById('prestige-level-display').textContent = formatNum(game.prestige);
         document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 10);
-
-        // Balken & Text
         document.getElementById('prestige-progress-bar').style.width = percent + "%";
 
         if (remaining > 0) {
           document.getElementById('prestige-next-req').textContent = formatNum(remaining) + " Kleinis";
         } else {
-          // Falls man genau auf der Schwelle ist oder drüber (bevor Button geklickt wird)
           document.getElementById('prestige-next-req').textContent = "Bereit zum Aufstieg!";
         }
       }
@@ -2174,13 +2137,11 @@
 
       list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Lade...</div>';
 
-      // Get top 20 scores
       dbRef.orderByChild('score').limitToLast(20).once('value').then(snapshot => {
         const scores = [];
         snapshot.forEach(child => {
           scores.push(child.val());
         });
-        // Firebase returns ascending, so reverse it
         renderLeaderboard(scores.reverse());
       }).catch(err => {
         list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Fehler beim Laden :(</div>';
