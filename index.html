@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker Alive</title>
+  <title>KleinClicker Empire</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
@@ -16,6 +16,7 @@
       --gold: #f1c40f;
       --green: #2ecc71;
       --red: #e74c3c;
+      --diamond: #3498db; /* Neue Farbe für Prestige */
       --text-main: #ecf0f1;
       --tooltip-bg: rgba(10, 10, 15, 0.98);
     }
@@ -29,7 +30,6 @@
       height: 100vh;
       overflow: hidden;
       display: flex;
-      /* Zurück zum Standard-Layout (Links/Rechts) ohne Ticker */
       flex-direction: row; 
     }
 
@@ -53,7 +53,6 @@
     /* --- LAYOUT --- */
     .left-panel {
       flex: 1; 
-      /* Dynamic Background Logic handled in JS */
       background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
       transition: background 2s ease;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -65,7 +64,21 @@
       border-left: 1px solid #222; box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 50;
     }
 
-    /* --- VISUAL ELEMENTS (Background Icons) --- */
+    /* --- PRESTIGE UI ELEMENTS --- */
+    .prestige-badge {
+        position: absolute; top: 20px; left: 20px;
+        background: rgba(52, 152, 219, 0.15);
+        border: 1px solid var(--diamond);
+        color: var(--diamond);
+        padding: 8px 15px; border-radius: 20px;
+        font-weight: bold; font-size: 0.9rem;
+        display: none; /* Hidden initially */
+        align-items: center; gap: 5px;
+        box-shadow: 0 0 15px rgba(52, 152, 219, 0.2);
+        z-index: 30;
+    }
+
+    /* --- VISUAL ELEMENTS --- */
     #visual-canvas {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         pointer-events: none; z-index: 1; overflow: hidden;
@@ -104,18 +117,33 @@
     #bigKlein:active { transform: scale(0.96); filter: brightness(0.9); }
     #bigKlein:hover { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(255,255,255,0.1)); }
 
-    /* --- CASINO BUTTON --- */
+    /* --- BUTTONS --- */
+    .button-row { display: flex; gap: 15px; margin-top: 30px; z-index: 25; }
+
     #casinoBtn {
-      margin-top: 30px;
       background: linear-gradient(45deg, #e67e22, #f39c12);
       border: 2px solid rgba(255,255,255,0.2); color: #fff;
       padding: 12px 30px; border-radius: 50px;
       font-weight: 900; font-size: 1.2rem; cursor: pointer;
       box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
-      display: none; z-index: 25; transition: all 0.2s;
+      display: none; transition: all 0.2s;
       letter-spacing: 1px;
     }
     #casinoBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(243, 156, 18, 0.8); }
+
+    /* Prestige Button Style */
+    #prestigeBtn {
+      background: linear-gradient(45deg, #2980b9, #3498db);
+      border: 2px solid rgba(255,255,255,0.2); color: #fff;
+      padding: 12px 30px; border-radius: 50px;
+      font-weight: 900; font-size: 1.2rem; cursor: pointer;
+      box-shadow: 0 0 20px rgba(52, 152, 219, 0.4);
+      display: none; transition: all 0.2s;
+      letter-spacing: 1px;
+      animation: pulseBlue 2s infinite;
+    }
+    #prestigeBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); }
+    @keyframes pulseBlue { 0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } }
 
     /* --- SHOP --- */
     .store-header { 
@@ -148,21 +176,22 @@
     .b-cost.affordable { color: var(--green); }
     .b-count { font-size: 1.8rem; font-weight: 900; color: rgba(255,255,255,0.05); margin-left: auto; }
 
-    /* --- CASINO MODAL --- */
-    #casinoModal {
+    /* --- MODALS --- */
+    .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.92); z-index: 12000;
       display: none; align-items: center; justify-content: center;
       backdrop-filter: blur(8px);
     }
     
-    .casino-window {
+    .modal-window {
       background: #18181b; width: 95%; max-width: 600px;
       border: 1px solid #333; border-radius: 16px;
       padding: 0; text-align: center;
       box-shadow: 0 0 80px rgba(0,0,0,0.8);
       position: relative; overflow: hidden;
       animation: zoomIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      display: flex; flex-direction: column;
     }
     @keyframes zoomIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
 
@@ -175,6 +204,16 @@
     .cw-balance { font-size: 1.1rem; color: #fff; font-weight: bold; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; border: 1px solid #444; }
 
     .cw-body { padding: 20px; position: relative; }
+
+    /* Prestige Info Styles */
+    .p-info { color: #ccc; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
+    .p-gain { font-size: 2.5rem; font-weight: 900; color: var(--diamond); margin: 15px 0; display: block; text-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
+    .p-btn-confirm { 
+        background: var(--red); color: white; border: none; padding: 15px 30px; 
+        font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; 
+        width: 100%; text-transform: uppercase; 
+    }
+    .p-btn-confirm:hover { background: #c0392b; }
 
     .casino-nav {
       display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
@@ -298,9 +337,30 @@
     </div>
   </div>
 
+  <!-- PRESTIGE MODAL -->
+  <div id="prestigeModal" class="modal-overlay" style="display:none;">
+    <div class="modal-window">
+        <button class="close-btn" onclick="closeModal('prestigeModal')">×</button>
+        <div class="cw-header">
+            <div class="cw-title" style="color:var(--diamond);">💎 FIRMA VERKAUFEN</div>
+        </div>
+        <div class="cw-body">
+            <div class="p-info">
+                Bist du sicher? Wenn du deine Firma verkaufst, <b>verlierst du alles</b> (Gebäude, Kleinis, Upgrades).<br><br>
+                Dafür erhältst du <b>Diamanten</b>, die deine Produktion beim nächsten Mal dauerhaft erhöhen.
+            </div>
+            <div style="margin: 20px 0;">
+                Du erhältst: <span class="p-gain" id="prestige-gain-display">+0 💎</span>
+                <div style="color:var(--diamond); font-weight:bold; margin-top:5px;">(Jeder Diamant = +10% auf ALLES)</div>
+            </div>
+            <button class="p-btn-confirm" onclick="executePrestige()">Alles verkaufen & Neustart</button>
+        </div>
+    </div>
+  </div>
+
   <div id="casinoModal">
     <div class="casino-window" id="casinoWindow">
-      <button class="close-btn" onclick="closeCasino()">×</button>
+      <button class="close-btn" onclick="closeModal('casinoModal')">×</button>
       <div class="cw-header">
         <div class="cw-title">🎰 CASINO ROYALE</div>
         <div class="cw-balance"><span id="casino-balance">0</span> Kleinis</div>
@@ -357,13 +417,24 @@
     <!-- VISUAL BACKGROUND AREA -->
     <div id="visual-canvas"></div>
 
+    <!-- PRESTIGE BADGE -->
+    <div id="prestige-badge" class="prestige-badge">
+        💎 <span id="prestige-count">0</span> (Bonus: <span id="prestige-bonus">0</span>%)
+    </div>
+
     <div class="bakery-name">KleinClicker</div>
     <div class="score-container">
       <div id="score">0</div>
       <div class="currency-label">KLEINIS</div>
       <div id="cps">0,0 Kleinis / Sekunde</div>
     </div>
-    <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
+    
+    <div class="button-row">
+        <!-- PRESTIGE BUTTON -->
+        <button id="prestigeBtn" onclick="openPrestigeModal()">💎 FIRMA VERKAUFEN</button>
+        <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
+    </div>
+
     <div class="buff-container" id="buffArea"></div>
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein" alt="Klick mich!">
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="goldenKlein" alt="GOLD">
@@ -420,9 +491,13 @@
 
     /* --- GAME STATE --- */
     let game = {
-      score: 0, totalScore: 0, clicks: 0, 
-      buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
-      casinoHistory: []
+      score: 0, 
+      totalScore: 0, // Lebenszeit-Verdienst im aktuellen Lauf (wichtig für Prestige)
+      clicks: 0, 
+      buildings: new Array(BUILDINGS.length).fill(0), 
+      upgrades: [],
+      casinoHistory: [],
+      prestige: 0 // ANZAHL DIAMANTEN
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
     let lastTime = performance.now();
@@ -430,7 +505,7 @@
 
     // Visual State
     let visualElements = [];
-    const MAX_VISUALS = 30; // Max floating icons to prevent lag
+    const MAX_VISUALS = 30; 
 
     /* --- UI --- */
     const tooltipEl = document.getElementById('global-tooltip');
@@ -444,17 +519,19 @@
     function init() {
       try {
         loadGame();
-        // Fix save compatibility if new buildings added
         if(game.buildings.length < BUILDINGS.length) {
             const diff = BUILDINGS.length - game.buildings.length;
             for(let i=0; i<diff; i++) game.buildings.push(0);
         }
+        // Sicherstellen, dass Prestige existiert
+        if(typeof game.prestige === 'undefined') game.prestige = 0;
       } catch(e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
       
       buildBuildingUI();
       renderUpgrades();
       renderHistory();
       initVisuals();
+      updatePrestigeUI(); // Badge anzeigen falls Diamanten da sind
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000); 
       scheduleGolden();
@@ -482,26 +559,96 @@
       
       updateDynamicBackground();
       
+      // Casino Unlock bei 1k
       if(!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
       else if(casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
+
+      // Prestige Unlock bei 1 Mio
+      if(game.totalScore >= 1000000) {
+          document.getElementById('prestigeBtn').style.display = 'block';
+      }
 
       updateBuildingStates();
       requestAnimationFrame(gameLoop);
     }
     function slowLoop() { saveGame(); renderUpgrades(); }
 
+    /* --- PRESTIGE LOGIC (DAS HERZSTÜCK) --- */
+    function getPrestigeMultiplier() {
+        // Jeder Diamant = 10% mehr (0.10)
+        // Bei 5 Diamanten: 1 + (5 * 0.10) = 1.5 (50% Bonus)
+        return 1 + (game.prestige * 0.10);
+    }
+
+    function openPrestigeModal() {
+        document.getElementById('prestigeModal').style.display = 'flex';
+        
+        // BERECHNUNG: Wurzel aus (TotalScore / 1.000.000)
+        // Beispiel: 1 Mio Score = 1 Diamant. 4 Mio Score = 2 Diamanten.
+        let potential = Math.floor(Math.sqrt(game.totalScore / 1000000));
+        
+        // Minimum Anzeige 0, falls man pleite ist (sollte nicht passieren da Button erst bei 1M kommt)
+        if (potential < 1) potential = 0; 
+        
+        document.getElementById('prestige-gain-display').textContent = `+${formatNum(potential)} 💎`;
+        
+        // Speichern wir den Wert temporär im Button oder einer Variable, um ihn bei Klick abzurufen
+        // (Oder berechnen wir ihn einfach neu, da sich Score kaum ändert in der Sekunde)
+        document.getElementById('prestigeModal').dataset.gain = potential;
+    }
+
+    function executePrestige() {
+        let gain = parseInt(document.getElementById('prestigeModal').dataset.gain);
+        
+        if(gain <= 0) {
+            alert("Du musst mindestens 1 Million Gesamteinnahmen in diesem Lauf haben, um einen Diamanten zu bekommen!");
+            return;
+        }
+
+        // 1. Diamanten gutschreiben
+        game.prestige += gain;
+
+        // 2. Reset des Fortschritts
+        game.score = 0;
+        game.totalScore = 0; // WICHTIG: Reset für den nächsten Lauf
+        game.clicks = 0;
+        game.buildings = new Array(BUILDINGS.length).fill(0);
+        game.upgrades = [];
+        
+        // 3. UI Reset
+        closeModal('prestigeModal');
+        document.getElementById('prestigeBtn').style.display = 'none'; // Button weg bis wieder 1 Mio
+        document.getElementById('casinoBtn').style.display = 'none';
+        casinoUnlocked = false;
+        
+        // 4. Alles neu rendern
+        initVisuals();
+        buildBuildingUI();
+        renderUpgrades();
+        updatePrestigeUI();
+        saveGame();
+        
+        alert(`Erfolgreich verkauft! Du startest neu mit +${gain} Diamanten.`);
+    }
+
+    function updatePrestigeUI() {
+        if(game.prestige > 0) {
+            const badge = document.getElementById('prestige-badge');
+            badge.style.display = 'flex';
+            document.getElementById('prestige-count').textContent = formatNum(game.prestige);
+            // Anzeige des Bonus in Prozent (Diamanten * 10)
+            document.getElementById('prestige-bonus').textContent = formatNum(game.prestige * 10);
+        }
+    }
+
     /* --- VISUALS & BACKGROUND --- */
     function initVisuals() {
         const container = document.getElementById('visual-canvas');
         container.innerHTML = '';
         visualElements = [];
-        
-        // Spawn existing buildings
         let totalCreated = 0;
-        // Prioritize expensive buildings visually
         for(let i=BUILDINGS.length-1; i>=0; i--) {
             if(game.buildings[i] > 0) {
-                // Determine how many icons to show (logarithmic scaling)
                 let count = Math.min(Math.ceil(Math.log2(game.buildings[i] + 1)), 5);
                 for(let k=0; k<count; k++) {
                     if(totalCreated < MAX_VISUALS) {
@@ -518,15 +665,10 @@
         const el = document.createElement('div');
         el.className = 'bg-icon';
         el.textContent = iconChar;
-        
-        // Random Position
         el.style.left = Math.random() * 90 + '%';
         el.style.top = Math.random() * 90 + '%';
-        // Random Size variation
         el.style.fontSize = (1 + Math.random()) + 'rem';
-        // Random Animation Duration
         el.style.animationDuration = (10 + Math.random() * 20) + 's';
-        
         container.appendChild(el);
         visualElements.push(el);
     }
@@ -534,29 +676,34 @@
     function updateDynamicBackground() {
         const panel = document.getElementById('clickPanel');
         let s = game.totalScore;
-        // Simple milestones for colors
-        if(s < 10000) { /* Default Blue/Black */ }
-        else if(s < 1000000) { panel.style.background = `radial-gradient(circle at center, #8e44ad 0%, #000000 100%)`; } // Purple
-        else if(s < 1000000000) { panel.style.background = `radial-gradient(circle at center, #d35400 0%, #2d3436 100%)`; } // Orange/Dark
-        else if(s < 1000000000000) { panel.style.background = `radial-gradient(circle at center, #f1c40f 0%, #2c3e50 100%)`; } // Gold
-        else { panel.style.background = `radial-gradient(circle at center, #16a085 0%, #000 100%)`; } // Matrix Green/Space
+        if(s < 10000) panel.style.background = `radial-gradient(circle at center, #2c3e50 0%, #000000 100%)`;
+        else if(s < 1000000) panel.style.background = `radial-gradient(circle at center, #8e44ad 0%, #000000 100%)`;
+        else if(s < 1000000000) panel.style.background = `radial-gradient(circle at center, #d35400 0%, #2d3436 100%)`;
+        else panel.style.background = `radial-gradient(circle at center, #f1c40f 0%, #2c3e50 100%)`;
     }
 
-    /* --- MATH --- */
+    /* --- MATH (MIT PRESTIGE BONUS) --- */
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
+    
     function getBuildingMultiplier(index) {
       let m = 1;
       UPGRADES.forEach(u => { if(u.type === 'build' && u.target === index && game.upgrades.includes(u.id)) m *= u.multi; });
       if(buffs.frenzy.active) m *= buffs.frenzy.multi;
-      return m;
+      
+      // HIER KOMMT DER PRESTIGE BONUS DRAUF
+      return m * getPrestigeMultiplier();
     }
+    
     function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
     function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
+    
     function getClickPower() {
       let power = 1 + (calculateTotalCPS() * 0.02);
       UPGRADES.forEach(u => { if(u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
       if(buffs.frenzy.active) power *= buffs.frenzy.multi;
-      return power;
+      
+      // HIER AUCH PRESTIGE BONUS
+      return power * getPrestigeMultiplier();
     }
 
     /* --- CASINO LOGIC --- */
@@ -570,7 +717,9 @@
       const s = document.getElementById('rouletteStrip');
       s.style.transition = 'none'; s.style.transform = 'translateX(0px)';
     }
-    function closeCasino() { document.getElementById('casinoModal').style.display = 'none'; }
+    function closeCasino(id) { document.getElementById(id).style.display = 'none'; } // Generic close
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; } // Alias
+    
     function updateCasinoUI() { document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score)); }
 
     function switchCasinoTab(mode) {
@@ -900,7 +1049,7 @@
 
     /* --- SAVE --- */
     function saveGame() {
-      const data = { score: game.score, totalScore: game.totalScore, clicks: game.clicks, buildings: game.buildings, upgrades: game.upgrades, casinoHistory: game.casinoHistory };
+      const data = { score: game.score, totalScore: game.totalScore, clicks: game.clicks, buildings: game.buildings, upgrades: game.upgrades, casinoHistory: game.casinoHistory, prestige: game.prestige };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
     function loadGame() {
@@ -909,6 +1058,7 @@
         game.score = saved.score || 0; game.totalScore = saved.totalScore || 0; game.clicks = saved.clicks || 0;
         if(saved.buildings) game.buildings = saved.buildings;
         game.upgrades = saved.upgrades || []; game.casinoHistory = saved.casinoHistory || [];
+        game.prestige = saved.prestige || 0;
       }
     }
     init();
