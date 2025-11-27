@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker Style</title>
+  <title>KleinClicker Empire</title>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
@@ -16,7 +16,6 @@
       --gold: #f1c40f;
       --green: #2ecc71;
       --red: #e74c3c;
-      --blue: #3498db;
       --purple: #9b59b6;
       --text-main: #ecf0f1;
       --tooltip-bg: rgba(10, 10, 15, 0.98);
@@ -89,15 +88,16 @@
       filter: drop-shadow(0 4px 0px rgba(0,0,0,0.5)); z-index: 20;
     }
     
-    .score-container { margin-bottom: 30px; text-align: center; z-index: 20; }
+    .score-container { margin-bottom: 50px; text-align: center; z-index: 20; }
     #score { font-family: 'Roboto', sans-serif; font-size: 3.2rem; font-weight: 900; text-shadow: 0 0 30px rgba(255,255,255,0.1); line-height: 1; }
     .currency-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--gold); font-weight: 700; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
     #cps { font-size: 1.1rem; color: #7f8c8d; margin-top: 10px; font-weight: 500; background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); }
 
-    /* --- CHARACTER CONTAINER --- */
+    /* --- CHARACTER & ORBIT SYSTEM --- */
     .character-wrapper {
         position: relative; width: 300px; height: 300px; z-index: 20;
         cursor: pointer; transition: transform 0.05s;
+        display: flex; justify-content: center; align-items: center;
     }
     .character-wrapper:active { transform: scale(0.96); }
     .character-wrapper:hover { transform: scale(1.02); }
@@ -105,24 +105,30 @@
     #bigKlein {
       width: 100%; height: 100%; object-fit: contain; 
       filter: drop-shadow(0 30px 60px rgba(0,0,0,0.5));
-      border-radius: 50%;
+      border-radius: 50%; z-index: 10; position: relative;
     }
 
-    /* ACCESSORIES OVERLAY */
-    .accessory {
-        position: absolute; pointer-events: none;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 5rem; line-height: 1;
-        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+    /* ORBITS */
+    .orbit-ring {
+        position: absolute; top: 50%; left: 50%;
+        border-radius: 50%; border: 1px dashed rgba(255,255,255,0.05);
+        transform: translate(-50%, -50%); pointer-events: none;
     }
-    /* Positions for accessories */
-    .acc-eyes { top: 35%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; width: 100%; text-align: center; }
-    .acc-head { top: -10%; left: 50%; transform: translateX(-50%); font-size: 6rem; }
-    .acc-neck { bottom: 0%; left: 50%; transform: translateX(-50%); font-size: 5rem; }
-    .acc-aura { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120%; height: 120%; border-radius: 50%; z-index: -1; }
+    .orbit-item {
+        position: absolute; top: 50%; left: 50%;
+        width: 40px; height: 40px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem;
+        animation: orbitRotate linear infinite;
+    }
+    /* Define orbits with different speeds and radii via JS logic or specific classes */
+    @keyframes orbitRotate {
+        from { transform: rotate(0deg) translateX(var(--radius)) rotate(0deg); }
+        to { transform: rotate(360deg) translateX(var(--radius)) rotate(-360deg); }
+    }
 
     /* --- BUTTONS --- */
-    .menu-btn-row { display: flex; gap: 10px; margin-top: 30px; z-index: 25; }
+    .menu-btn-row { display: flex; gap: 10px; margin-top: 40px; z-index: 25; }
     
     .action-btn {
       border: 2px solid rgba(255,255,255,0.2); color: #fff;
@@ -134,10 +140,10 @@
     #casinoBtn { background: linear-gradient(45deg, #e67e22, #f39c12); box-shadow: 0 0 20px rgba(243, 156, 18, 0.4); }
     #casinoBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(243, 156, 18, 0.8); }
 
-    #styleBtn { background: linear-gradient(45deg, #8e44ad, #9b59b6); box-shadow: 0 0 20px rgba(142, 68, 173, 0.4); }
-    #styleBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(142, 68, 173, 0.8); }
+    #blackMarketBtn { background: linear-gradient(45deg, #2c3e50, #4a69bd); box-shadow: 0 0 20px rgba(74, 105, 189, 0.4); }
+    #blackMarketBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(74, 105, 189, 0.8); }
 
-    /* --- SHOP & CASINO MODALS --- */
+    /* --- MODALS --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.92); z-index: 12000;
@@ -166,22 +172,20 @@
 
     .cw-body { padding: 20px; position: relative; overflow-y: auto; }
 
-    /* --- STYLE SHOP SPECIFIC --- */
-    .style-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
-    .style-item {
+    /* --- BLACK MARKET GRID --- */
+    .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .market-item {
         background: #111; border: 1px solid #333; border-radius: 8px; padding: 15px;
-        cursor: pointer; transition: all 0.2s; position: relative;
+        cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column; align-items: center;
     }
-    .style-item:hover { background: #222; border-color: #555; }
-    .style-item.owned { border-color: var(--green); }
-    .style-item.equipped { border-color: var(--gold); background: rgba(241, 196, 15, 0.1); box-shadow: 0 0 15px rgba(241, 196, 15, 0.2); }
+    .market-item:hover { background: #222; border-color: #555; transform: translateY(-2px); }
+    .market-item.owned { border-color: var(--green); opacity: 0.5; filter: grayscale(0.5); }
     
-    .si-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
-    .si-name { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; color: #fff; }
-    .si-price { font-size: 0.8rem; color: var(--gold); font-weight: bold; }
-    .si-status { font-size: 0.7rem; margin-top: 5px; text-transform: uppercase; color: #666; }
-    .style-item.owned .si-status { color: var(--green); }
-    .style-item.equipped .si-status { color: var(--gold); font-weight: bold; }
+    .mi-icon { font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
+    .mi-name { font-weight: bold; font-size: 0.95rem; margin-bottom: 5px; color: #fff; }
+    .mi-price { font-size: 0.85rem; color: var(--gold); font-weight: bold; }
+    .mi-status { font-size: 0.7rem; margin-top: 8px; text-transform: uppercase; color: #666; font-weight: bold; }
+    .market-item.owned .mi-status { color: var(--green); }
 
     /* --- RIGHT PANEL --- */
     .store-header { 
@@ -335,16 +339,17 @@
     </div>
   </div>
 
-  <!-- STYLE SHOP MODAL -->
-  <div id="styleModal" class="modal-overlay">
+  <!-- BLACK MARKET MODAL -->
+  <div id="marketModal" class="modal-overlay">
     <div class="modal-window">
-        <button class="close-btn" onclick="closeModal('styleModal')">×</button>
+        <button class="close-btn" onclick="closeModal('marketModal')">×</button>
         <div class="cw-header">
-            <div class="cw-title">🕶️ GARDEROBE</div>
-            <div class="cw-balance"><span id="style-balance">0</span> Kleinis</div>
+            <div class="cw-title" style="color:#e74c3c;">🕵️ SCHWARZMARKT</div>
+            <div class="cw-balance"><span id="market-balance">0</span> Kleinis</div>
         </div>
         <div class="cw-body">
-            <div id="style-list" class="style-grid"></div>
+            <p style="color:#aaa; font-size:0.8rem; margin-bottom:15px;">Illegale & seltene Objekte, die deinen Status zeigen.</p>
+            <div id="market-list" class="market-grid"></div>
         </div>
     </div>
   </div>
@@ -360,15 +365,15 @@
       <div id="cps">0,0 Kleinis / Sekunde</div>
     </div>
     
-    <!-- CHARACTER -->
+    <!-- CHARACTER & ORBITS -->
     <div class="character-wrapper" id="charContainer" onclick="handleInteraction(event.clientX, event.clientY)">
         <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein" alt="Klick mich!">
-        <!-- Accessories will be injected here -->
-        <div id="accessories-layer"></div>
+        <!-- Orbit layer injected here -->
+        <div id="orbit-layer"></div>
     </div>
 
     <div class="menu-btn-row">
-        <button id="styleBtn" class="action-btn" onclick="openStyleShop()">🕶️ STYLE</button>
+        <button id="blackMarketBtn" class="action-btn" onclick="openBlackMarket()">📦 MARKT</button>
         <button id="casinoBtn" class="action-btn" onclick="openCasino()">🎰 CASINO</button>
     </div>
 
@@ -421,16 +426,18 @@
       { id: 'u_b5_1',    name: 'Goldtresor',   cost: 200000000, trigger: {type:'build', id:5, val:10}, icon:'🔐', desc:'Noch sicherer als Fort Knox.', type:'build', target:5, multi:2, text:'Bank Produktion x2' },
     ];
 
-    // STYLE ITEMS (COSMETICS)
-    const STYLES = [
-        { id: 's_glasses', name: 'Sonnenbrille', cost: 50000, icon: '🕶️', type: 'eyes', css: 'acc-eyes' },
-        { id: 's_crown',   name: 'Krone',        cost: 1000000, icon: '👑', type: 'head', css: 'acc-head' },
-        { id: 's_chain',   name: 'Goldkette',    cost: 5000000, icon: '⛓️', type: 'neck', css: 'acc-neck' },
-        { id: 's_laser',   name: 'Laser Augen',  cost: 50000000, icon: '🔴', type: 'eyes', css: 'acc-eyes', text: '🔴 🔴' },
-        { id: 's_money',   name: 'Geld Regen',   cost: 100000000, icon: '💸', type: 'bg', css: '' }, // Changes BG
-        { id: 's_aura',    name: 'Gott Aura',    cost: 1000000000, icon: '✨', type: 'aura', css: 'acc-aura', text: '' },
-        { id: 's_hat',     name: 'Zylinder',     cost: 250000, icon: '🎩', type: 'head', css: 'acc-head' },
-        { id: 's_clown',   name: 'Clown',        cost: 10000, icon: '🤡', type: 'head', css: 'acc-head' }
+    // BLACK MARKET ITEMS (STATUS SYMBOLS)
+    // Speed: lower is faster (seconds per rotation). Radius: distance from center.
+    const BLACK_MARKET = [
+        { id: 'bm_guard',   name: 'Bodyguard',    cost: 100000,      icon: '👮‍♂️', speed: 8,  radius: 170 },
+        { id: 'bm_dog',     name: 'Kampfhund',    cost: 500000,      icon: '🐕', speed: 6,  radius: 190 },
+        { id: 'bm_car',     name: 'Lambo',        cost: 5000000,     icon: '🏎️', speed: 4,  radius: 220 },
+        { id: 'bm_jet',     name: 'Privatjet',    cost: 50000000,    icon: '✈️', speed: 10, radius: 260 },
+        { id: 'bm_yacht',   name: 'Yacht',        cost: 250000000,   icon: '🛳️', speed: 15, radius: 300 },
+        { id: 'bm_diamond', name: 'Riesen Diamant',cost: 1000000000,  icon: '💎', speed: 3,  radius: 160 },
+        { id: 'bm_island',  name: 'Privatinsel',  cost: 5000000000,  icon: '🏝️', speed: 20, radius: 350 },
+        { id: 'bm_ufo',     name: 'Alien Ufo',    cost: 50000000000, icon: '🛸', speed: 2,  radius: 240 },
+        { id: 'bm_planet',  name: 'Eigener Planet',cost: 1000000000000,icon: '🪐',speed: 30, radius: 400 }
     ];
 
     /* --- GAME STATE --- */
@@ -438,8 +445,7 @@
       score: 0, totalScore: 0, clicks: 0, 
       buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
       casinoHistory: [],
-      ownedStyles: [], // IDs of bought styles
-      equipped: { head: null, eyes: null, neck: null, bg: null, aura: null }
+      ownedItems: [] // IDs of bought market items
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
     let lastTime = performance.now();
@@ -465,15 +471,14 @@
             const diff = BUILDINGS.length - game.buildings.length;
             for(let i=0; i<diff; i++) game.buildings.push(0);
         }
-        if(!game.ownedStyles) game.ownedStyles = [];
-        if(!game.equipped) game.equipped = { head: null, eyes: null, neck: null, bg: null, aura: null };
+        if(!game.ownedItems) game.ownedItems = [];
       } catch(e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
       
       buildBuildingUI();
       renderUpgrades();
       renderHistory();
       initVisuals();
-      applyStyles(); // Apply loaded styles
+      renderOrbits(); // Render Status Symbols
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000); 
       scheduleGolden();
@@ -539,101 +544,66 @@
         visualElements.push(el);
     }
 
-    function updateDynamicBackground() {
-        // Only if no custom background is equipped
-        if(!game.equipped.bg) {
-            const panel = document.getElementById('clickPanel');
-            let s = game.totalScore;
-            if(s < 10000) panel.style.background = `radial-gradient(circle at center, #2c3e50 0%, #000000 100%)`;
-            else if(s < 1000000) panel.style.background = `radial-gradient(circle at center, #8e44ad 0%, #000000 100%)`;
-            else if(s < 1000000000) panel.style.background = `radial-gradient(circle at center, #d35400 0%, #2d3436 100%)`;
-            else panel.style.background = `radial-gradient(circle at center, #f1c40f 0%, #2c3e50 100%)`;
-        }
+    /* --- BLACK MARKET & ORBITS --- */
+    function openBlackMarket() {
+        document.getElementById('marketModal').style.display = 'flex';
+        renderMarket();
+        document.getElementById('market-balance').textContent = formatNum(Math.floor(game.score));
     }
 
-    /* --- STYLE SHOP LOGIC --- */
-    function openStyleShop() {
-        document.getElementById('styleModal').style.display = 'flex';
-        renderStyleShop();
-        document.getElementById('style-balance').textContent = formatNum(Math.floor(game.score));
-    }
-
-    function renderStyleShop() {
-        const grid = document.getElementById('style-list');
+    function renderMarket() {
+        const grid = document.getElementById('market-list');
         grid.innerHTML = '';
-        STYLES.forEach(s => {
-            const isOwned = game.ownedStyles.includes(s.id);
-            const isEquipped = Object.values(game.equipped).includes(s.id);
-            
+        BLACK_MARKET.forEach(item => {
+            const isOwned = game.ownedItems.includes(item.id);
             const el = document.createElement('div');
-            el.className = `style-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}`;
-            el.onclick = () => handleStyleClick(s);
-            
-            let status = isEquipped ? 'Ausgerüstet' : (isOwned ? 'Besitz' : 'Kaufen');
+            el.className = `market-item ${isOwned ? 'owned' : ''}`;
+            if(!isOwned) el.onclick = () => buyMarketItem(item);
             
             el.innerHTML = `
-                <span class="si-icon">${s.icon}</span>
-                <div class="si-name">${s.name}</div>
-                ${!isOwned ? `<div class="si-price">${formatNum(s.cost)}</div>` : ''}
-                <div class="si-status">${status}</div>
+                <span class="mi-icon">${item.icon}</span>
+                <div class="mi-name">${item.name}</div>
+                ${!isOwned ? `<div class="mi-price">${formatNum(item.cost)}</div>` : ''}
+                <div class="mi-status">${isOwned ? 'Im Besitz' : 'Kaufen'}</div>
             `;
             grid.appendChild(el);
         });
     }
 
-    function handleStyleClick(style) {
-        if(game.ownedStyles.includes(style.id)) {
-            // Equip/Unequip
-            if(game.equipped[style.type] === style.id) {
-                game.equipped[style.type] = null; // Unequip
-            } else {
-                game.equipped[style.type] = style.id; // Equip (replaces old)
-            }
-            applyStyles();
-            renderStyleShop();
-        } else {
-            // Buy
-            if(game.score >= style.cost) {
-                game.score -= style.cost;
-                game.ownedStyles.push(style.id);
-                // Auto equip on buy
-                game.equipped[style.type] = style.id;
-                applyStyles();
-                renderStyleShop();
-                document.getElementById('style-balance').textContent = formatNum(Math.floor(game.score));
-            }
+    function buyMarketItem(item) {
+        if(game.score >= item.cost) {
+            game.score -= item.cost;
+            game.ownedItems.push(item.id);
+            renderMarket();
+            renderOrbits();
+            document.getElementById('market-balance').textContent = formatNum(Math.floor(game.score));
         }
     }
 
-    function applyStyles() {
-        const layer = document.getElementById('accessories-layer');
-        const panel = document.getElementById('clickPanel');
+    function renderOrbits() {
+        const layer = document.getElementById('orbit-layer');
         layer.innerHTML = '';
         
-        // Reset BG logic
-        panel.style.background = ''; 
-        if(game.equipped.bg) {
-            // Custom BGs
-            if(game.equipped.bg === 's_money') panel.style.background = `radial-gradient(circle, #27ae60 0%, #000 100%)`; 
-        } else {
-            updateDynamicBackground(); // Fallback to score based
-        }
-
-        // Apply Accessories
-        Object.keys(game.equipped).forEach(key => {
-            const id = game.equipped[key];
-            if(id) {
-                const styleDef = STYLES.find(s => s.id === id);
-                if(styleDef && styleDef.type !== 'bg') {
-                    const div = document.createElement('div');
-                    div.className = `accessory ${styleDef.css}`;
-                    div.textContent = styleDef.text ? styleDef.text : styleDef.icon;
-                    if(styleDef.type === 'aura') {
-                        div.style.background = 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%)';
-                        div.style.animation = 'pulse 2s infinite';
-                    }
-                    layer.appendChild(div);
-                }
+        game.ownedItems.forEach(id => {
+            const item = BLACK_MARKET.find(i => i.id === id);
+            if(item) {
+                // Create Item
+                const div = document.createElement('div');
+                div.className = 'orbit-item';
+                div.textContent = item.icon;
+                div.style.animationDuration = item.speed + 's';
+                div.style.setProperty('--radius', (item.radius/2) + 'px'); // Radius relative to 300px container
+                
+                // Optional: Create visible ring (optional)
+                /*
+                const ring = document.createElement('div');
+                ring.className = 'orbit-ring';
+                ring.style.width = item.radius + 'px';
+                ring.style.height = item.radius + 'px';
+                layer.appendChild(ring);
+                */
+                
+                layer.appendChild(div);
             }
         });
     }
@@ -891,11 +861,10 @@
     /* --- INTERACTIONS --- */
     const bigKlein = document.getElementById('bigKlein');
     const charContainer = document.getElementById('charContainer');
-    // Using container for event to avoid accessories blocking clicks
+    
     function handleInteraction(x, y) {
       const power = getClickPower(); addScore(power); game.clicks++;
       spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power!=1?'s':''}`); spawnFallingFace(x, y);
-      
       bigKlein.style.transform = "scale(0.94)"; setTimeout(()=> bigKlein.style.transform = "scale(1)", 50);
     }
     function spawnFloatingText(x, y, text) {
@@ -998,7 +967,7 @@
       const data = { 
           score: game.score, totalScore: game.totalScore, clicks: game.clicks, 
           buildings: game.buildings, upgrades: game.upgrades, casinoHistory: game.casinoHistory,
-          ownedStyles: game.ownedStyles, equipped: game.equipped
+          ownedItems: game.ownedItems
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
@@ -1008,8 +977,7 @@
         game.score = saved.score || 0; game.totalScore = saved.totalScore || 0; game.clicks = saved.clicks || 0;
         if(saved.buildings) game.buildings = saved.buildings;
         game.upgrades = saved.upgrades || []; game.casinoHistory = saved.casinoHistory || [];
-        game.ownedStyles = saved.ownedStyles || [];
-        game.equipped = saved.equipped || { head: null, eyes: null, neck: null, bg: null, aura: null };
+        game.ownedItems = saved.ownedItems || [];
       }
     }
     init();
