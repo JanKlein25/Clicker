@@ -18,7 +18,6 @@
       --red: #e74c3c;
       --text-main: #ecf0f1;
       --tooltip-bg: rgba(10, 10, 15, 0.98);
-      --dark-gray: #2d3436;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
@@ -30,6 +29,7 @@
       height: 100vh;
       overflow: hidden;
       display: flex;
+      /* Zurück zum Standard-Layout (Links/Rechts) ohne Ticker */
       flex-direction: row; 
     }
 
@@ -39,7 +39,6 @@
       background: var(--tooltip-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
       pointer-events: none; z-index: 10000; padding: 0; display: none;
       box-shadow: 0 10px 50px rgba(0,0,0,1);
-      transition: transform 0.1s ease-out; /* Smooth follow */
     }
     .tt-header { background: rgba(255,255,255,0.03); padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .tt-title { font-family: 'Merriweather', serif; font-weight: 900; font-size: 1.1rem; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
@@ -50,14 +49,11 @@
     .tt-effect { color: #fff; font-weight: bold; margin-bottom: 8px; display: block; font-size: 0.95rem; border-left: 3px solid var(--gold); padding-left: 10px; }
     .tt-stats { background: rgba(0,0,0,0.4); padding: 10px; margin-top: 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.05); }
     .stat-highlight { color: var(--green); font-weight: bold; font-size: 0.95rem; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); }
-    .tt-building-info { margin-top: 10px; font-size: 0.8rem; color: #bbb; }
-    .tt-building-info span { display: block; margin-top: 4px; }
-    .tt-building-info .current-cps { color: #fff; font-weight: bold; }
-    .tt-building-info .new-cps-gain { color: var(--green); font-weight: bold; }
 
     /* --- LAYOUT --- */
     .left-panel {
       flex: 1; 
+      /* Dynamic Background Logic handled in JS */
       background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
       transition: background 2s ease;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -108,29 +104,18 @@
     #bigKlein:active { transform: scale(0.96); filter: brightness(0.9); }
     #bigKlein:hover { transform: scale(1.02); filter: drop-shadow(0 0 30px rgba(255,255,255,0.1)); }
 
-    /* --- SPECIAL BUTTONS (Casino, Prestige) --- */
-    .special-button {
-      margin-top: 30px; padding: 12px 30px; border-radius: 50px;
+    /* --- CASINO BUTTON --- */
+    #casinoBtn {
+      margin-top: 30px;
+      background: linear-gradient(45deg, #e67e22, #f39c12);
+      border: 2px solid rgba(255,255,255,0.2); color: #fff;
+      padding: 12px 30px; border-radius: 50px;
       font-weight: 900; font-size: 1.2rem; cursor: pointer;
       box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
       display: none; z-index: 25; transition: all 0.2s;
-      letter-spacing: 1px; border: 2px solid rgba(255,255,255,0.2);
+      letter-spacing: 1px;
     }
-    .special-button:hover { transform: translateY(-3px); }
-    
-    #casinoBtn {
-      background: linear-gradient(45deg, #e67e22, #f39c12);
-      box-shadow: 0 0 20px rgba(243, 156, 18, 0.4); color: #fff;
-    }
-    #casinoBtn:hover { box-shadow: 0 0 30px rgba(243, 156, 18, 0.8); }
-
-    #prestigeBtn {
-        background: linear-gradient(45deg, #3498db, #2980b9);
-        box-shadow: 0 0 20px rgba(52, 152, 219, 0.4); color: #fff;
-        margin-top: 15px; /* Adjust spacing if both are visible */
-    }
-    #prestigeBtn:hover { box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); }
-    #prestigeBtn.disabled { opacity: 0.6; cursor: not-allowed; }
+    #casinoBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(243, 156, 18, 0.8); }
 
     /* --- SHOP --- */
     .store-header { 
@@ -163,28 +148,8 @@
     .b-cost.affordable { color: var(--green); }
     .b-count { font-size: 1.8rem; font-weight: 900; color: rgba(255,255,255,0.05); margin-left: auto; }
 
-    /* Buy-Amount buttons for Buildings */
-    .building-row-actions {
-        display: flex; gap: 5px; margin-left: 10px;
-        position: absolute; right: 20px;
-        opacity: 0; /* Hidden by default */
-        transition: opacity 0.2s ease;
-    }
-    .building-row:hover .building-row-actions {
-        opacity: 1;
-    }
-    .buy-amount-btn {
-        background: var(--dark-gray); color: #fff;
-        border: 1px solid #555; padding: 4px 8px; border-radius: 4px;
-        font-size: 0.75rem; cursor: pointer;
-        transition: background 0.1s;
-    }
-    .buy-amount-btn:hover { background: #555; }
-    .buy-amount-btn.active { background: var(--gold); color: #000; font-weight: bold; }
-
-
     /* --- CASINO MODAL --- */
-    #casinoModal, #prestigeModal {
+    #casinoModal {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.92); z-index: 12000;
       display: none; align-items: center; justify-content: center;
@@ -293,53 +258,6 @@
     
     .close-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #666; font-size: 1.5rem; cursor: pointer; }
 
-    /* --- PRESTIGE MODAL --- */
-    .prestige-window {
-        background: #18181b; width: 95%; max-width: 600px;
-        border: 1px solid #333; border-radius: 16px;
-        padding: 0; text-align: center;
-        box-shadow: 0 0 80px rgba(0,0,0,0.8);
-        position: relative; overflow: hidden;
-        animation: zoomIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    }
-    .prestige-header {
-        background: linear-gradient(to bottom, #3498db, #2980b9);
-        padding: 20px; border-bottom: 1px solid #333;
-        display: flex; justify-content: space-between; align-items: center;
-    }
-    .prestige-title { font-family: 'Merriweather', serif; font-size: 1.5rem; color: #fff; font-weight: 900; letter-spacing: 1px; }
-    .prestige-current-points { font-size: 1.1rem; color: #fff; font-weight: bold; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; border: 1px solid #444; }
-
-    .prestige-body { padding: 20px; }
-    .prestige-info { font-size: 1rem; margin-bottom: 20px; line-height: 1.5; color: #ccc; }
-    .prestige-rewards { 
-        background: rgba(0,0,0,0.4); border-radius: 8px; padding: 15px;
-        border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;
-    }
-    .prestige-rewards h3 { color: var(--gold); font-family: 'Merriweather', serif; margin-bottom: 10px; }
-    .prestige-rewards ul { list-style: none; padding: 0; }
-    .prestige-rewards li { margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.95rem; }
-    .prestige-rewards li .icon { font-size: 1.2rem; color: var(--green); }
-    .prestige-rewards li .value { color: #fff; font-weight: bold; }
-
-    .prestige-gain {
-        font-size: 1.2rem; color: var(--gold); font-weight: bold;
-        margin-top: 20px; margin-bottom: 20px;
-        padding: 10px 15px; background: rgba(0,0,0,0.4); border-radius: 8px;
-        border: 1px dashed var(--gold);
-    }
-
-    .prestige-btn-action {
-        background: linear-gradient(45deg, #2ecc71, #27ae60);
-        color: #fff; padding: 15px 40px; border-radius: 10px;
-        font-weight: 900; font-size: 1.3rem; cursor: pointer;
-        border: 2px solid rgba(255,255,255,0.2); transition: all 0.2s;
-        box-shadow: 0 0 30px rgba(46, 204, 113, 0.4);
-    }
-    .prestige-btn-action:hover { transform: translateY(-3px); box-shadow: 0 0 40px rgba(46, 204, 113, 0.8); }
-    .prestige-btn-action:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-
-
     /* Particles & FX */
     .win-particle { position: absolute; width: 10px; height: 10px; pointer-events: none; animation: confetti 1s ease-out forwards; z-index: 1000; }
     @keyframes confetti { 0% {transform: translate(0,0) rotate(0deg); opacity: 1;} 100% {transform: translate(var(--tx), var(--ty)) rotate(720deg); opacity: 0;} }
@@ -377,7 +295,6 @@
       <span id="tt-effect-display" class="tt-effect">Verdoppelt Produktion</span>
       <div id="tt-desc-display">Beschreibung...</div>
       <div id="tt-stats-container" class="tt-stats"></div>
-      <div id="tt-building-info-container" class="tt-building-info"></div> <!-- For Building Tooltip -->
     </div>
   </div>
 
@@ -436,37 +353,6 @@
     </div>
   </div>
 
-  <!-- PRESTIGE MODAL -->
-  <div id="prestigeModal">
-    <div class="prestige-window" id="prestigeWindow">
-        <button class="close-btn" onclick="closePrestige()">×</button>
-        <div class="prestige-header">
-            <div class="prestige-title">✨ PRESTIGE AKTIVIEREN ✨</div>
-            <div class="prestige-current-points"><span id="prestige-current-points-display">0</span> Prestige-Punkte</div>
-        </div>
-        <div class="prestige-body">
-            <div class="prestige-info">
-                Das Aktivieren des Prestige-Systems setzt deinen Fortschritt zurück (Kleinis, Gebäude, Upgrades), belohnt dich aber mit dauerhaften Prestige-Punkten, die deinen zukünftigen Gewinn massiv erhöhen!
-            </div>
-            <div class="prestige-rewards">
-                <h3>Belohnungen für den Neustart:</h3>
-                <ul>
-                    <li><span class="icon">🚀</span>Du erhältst: <span id="prestige-points-gain" class="value">0</span> Prestige-Punkte</li>
-                    <li><span class="icon">⚡</span>Dein globaler CPS-Multiplikator wird erhöht!</li>
-                    <li><span class="icon">⭐</span>Deine Klick-Kraft wird dauerhaft gesteigert!</li>
-                </ul>
-            </div>
-            <div class="prestige-gain">
-                Nächster Prestige-Punkt bei: <span id="prestige-next-threshold-display">100.000.000</span> Kleinis (Total)
-            </div>
-            <button class="prestige-btn-action" id="activatePrestigeBtn" onclick="activatePrestige()">
-                JETZT PRESTIGE AKTIVIEREN!
-            </button>
-        </div>
-    </div>
-  </div>
-
-
   <div class="left-panel" id="clickPanel">
     <!-- VISUAL BACKGROUND AREA -->
     <div id="visual-canvas"></div>
@@ -476,12 +362,8 @@
       <div id="score">0</div>
       <div class="currency-label">KLEINIS</div>
       <div id="cps">0,0 Kleinis / Sekunde</div>
-      <div id="prestige-multiplier-display" style="font-size: 0.9rem; color: #88929e; margin-top: 5px;"></div>
     </div>
-    
-    <button id="casinoBtn" class="special-button" onclick="openCasino()">🎰 OPEN CASINO</button>
-    <button id="prestigeBtn" class="special-button" onclick="openPrestige()">✨ PRESTIGE</button>
-
+    <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
     <div class="buff-container" id="buffArea"></div>
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein" alt="Klick mich!">
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="goldenKlein" alt="GOLD">
@@ -491,19 +373,12 @@
     <div class="store-header">Upgrades</div>
     <div class="upgrades-container" id="upgradeGrid"></div>
     <div class="store-header">Markt</div>
-    <div class="buy-amount-selector" style="text-align: right; padding: 5px 15px; background: var(--panel-right);">
-        <span style="font-size:0.8rem; color:#666; margin-right:10px;">Kaufen:</span>
-        <button class="buy-amount-btn active" data-amount="1" onclick="setBuyAmount(1)">x1</button>
-        <button class="buy-amount-btn" data-amount="10" onclick="setBuyAmount(10)">x10</button>
-        <button class="buy-amount-btn" data-amount="100" onclick="setBuyAmount(100)">x100</button>
-        <button class="buy-amount-btn" data-amount="max" onclick="setBuyAmount('max')">Max</button>
-    </div>
     <div class="buildings-list" id="buildingList"></div>
   </div>
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V7'; // Use your saved key
+    const SAVE_KEY = 'KleinClicker_Precision_V6'; // Use your saved key
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
     
     // NEW BUILDINGS ADDED
@@ -547,16 +422,11 @@
     let game = {
       score: 0, totalScore: 0, clicks: 0, 
       buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
-      casinoHistory: [],
-      prestigePoints: 0, // NEW: Prestige Points
-      prestigeMultiplier: 1, // NEW: Global multiplier from prestige
-      clickPowerBonus: 0 // NEW: Bonus to base click power from prestige
+      casinoHistory: []
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
     let lastTime = performance.now();
     let casinoUnlocked = false;
-    let prestigeUnlocked = false; // NEW
-    let currentBuyAmount = 1; // NEW: For multi-buy options
 
     // Visual State
     let visualElements = [];
@@ -569,7 +439,6 @@
     const ttEffect = document.getElementById('tt-effect-display');
     const ttDesc = document.getElementById('tt-desc-display');
     const ttStats = document.getElementById('tt-stats-container');
-    const ttBuildingInfo = document.getElementById('tt-building-info-container'); // NEW for building tooltips
 
     /* --- INIT --- */
     function init() {
@@ -598,8 +467,6 @@
           tooltipEl.style.top = top + 'px'; tooltipEl.style.left = left + 'px';
         }
       });
-
-      updatePrestigeUI(); // NEW
     }
 
     function gameLoop(now) {
@@ -612,22 +479,16 @@
 
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
       document.getElementById('cps').textContent = formatNum(cps, 1) + " Kleinis / Sekunde";
-      document.getElementById('prestige-multiplier-display').textContent = `Prestige Bonus: x${formatNum(game.prestigeMultiplier, 2)}`;
       
       updateDynamicBackground();
       
-      // Casino Unlock
       if(!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
       else if(casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
-
-      // Prestige Unlock (e.g. at 1 Million total Kleinis)
-      if(!prestigeUnlocked && game.totalScore >= 1000000) { prestigeUnlocked = true; document.getElementById('prestigeBtn').style.display = 'block'; }
-      else if(prestigeUnlocked) document.getElementById('prestigeBtn').style.display = 'block';
 
       updateBuildingStates();
       requestAnimationFrame(gameLoop);
     }
-    function slowLoop() { saveGame(); renderUpgrades(); updatePrestigeUI(); } // Update prestige UI in slow loop too
+    function slowLoop() { saveGame(); renderUpgrades(); }
 
     /* --- VISUALS & BACKGROUND --- */
     function initVisuals() {
@@ -662,7 +523,7 @@
         el.style.left = Math.random() * 90 + '%';
         el.style.top = Math.random() * 90 + '%';
         // Random Size variation
-        el.style.fontSize = (1.5 + Math.random() * 1.5) + 'rem'; /* Slightly larger range */
+        el.style.fontSize = (1 + Math.random()) + 'rem';
         // Random Animation Duration
         el.style.animationDuration = (10 + Math.random() * 20) + 's';
         
@@ -689,18 +550,13 @@
       if(buffs.frenzy.active) m *= buffs.frenzy.multi;
       return m;
     }
-    function getBuildingCPS(index) { 
-        return BUILDINGS[index].baseCps * getBuildingMultiplier(index) * game.prestigeMultiplier; 
-    }
-    function calculateTotalCPS() { 
-        let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); 
-        return cps; 
-    }
+    function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
+    function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
     function getClickPower() {
-      let power = 1 + game.clickPowerBonus + (calculateTotalCPS() * 0.02); // Add prestige click bonus
+      let power = 1 + (calculateTotalCPS() * 0.02);
       UPGRADES.forEach(u => { if(u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
       if(buffs.frenzy.active) power *= buffs.frenzy.multi;
-      return power * game.prestigeMultiplier; // Prestige also affects click power
+      return power;
     }
 
     /* --- CASINO LOGIC --- */
@@ -744,8 +600,7 @@
       for(let i=0; i<count; i++) {
         let type = 'black';
         const r = Math.random();
-        // Force winning color around the target index
-        if(winningColor && i >= 58 && i <= 62 && Math.random() < 0.7) type = winningColor; // make it more likely to hit the target for effect
+        if(winningColor && i === 60) type = winningColor;
         else {
           if(r < 0.06) type = 'green';
           else if(r < 0.53) type = 'red';
@@ -764,8 +619,6 @@
       const bet = getBet();
       if(!bet) return;
 
-      if(game.score < bet) { alert("Nicht genug Kleinis!"); return; }
-
       game.score -= bet;
       updateCasinoUI();
       isSpinning = true;
@@ -773,9 +626,8 @@
 
       const r = Math.random();
       let result = 'black';
-      if(r < 0.05) result = 'green'; // 5% chance
-      else if(r < 0.525) result = 'red'; // 47.5% chance
-      // Otherwise black (47.5% chance)
+      if(r < 0.05) result = 'green';
+      else if(r < 0.525) result = 'red';
 
       generateStrip(80, result);
       
@@ -786,12 +638,12 @@
       
       const cardSize = 74;
       const targetIndex = 60;
-      const centerOfTarget = (targetIndex * cardSize) + (cardSize / 2); // Center of the card
-      const jitter = Math.floor(Math.random() * 40) - 20; // Small random offset around the center
-      const totalTranslate = centerOfTarget + jitter - (strip.offsetWidth / 2); // Adjust so it lands in the middle of the view
+      const centerOfTarget = (targetIndex * cardSize) + 35;
+      const jitter = Math.floor(Math.random() * 50) - 25; 
+      const totalTranslate = centerOfTarget + jitter;
 
       strip.style.transition = 'transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1)'; 
-      strip.style.transform = `translateX(${-totalTranslate}px)`;
+      strip.style.transform = `translateX(-${totalTranslate}px)`;
       
       const marker = document.querySelector('.roulette-marker');
       marker.style.animation = "shake 0.1s infinite";
@@ -826,8 +678,6 @@
         const bet = getBet();
         if(!bet) return;
 
-        if(game.score < bet) { alert("Nicht genug Kleinis!"); return; }
-
         game.score -= bet;
         updateCasinoUI();
         isSpinning = true;
@@ -844,26 +694,22 @@
         const roll = Math.random();
         let forcedWin = null; 
         
-        // Slightly higher chance for wins to keep engagement
-        if (roll < 0.40) { // Increased from 0.30
+        if (roll < 0.30) {
            const typeRoll = Math.random();
-           if(typeRoll < 0.02) forcedWin = '💎'; // ~0.8% overall
-           else if(typeRoll < 0.08) forcedWin = '7️⃣'; // ~2.4% overall
-           else if(typeRoll < 0.25) forcedWin = '🍇'; // ~6.8% overall
-           else if(typeRoll < 0.55) forcedWin = '🍋'; // ~12% overall
-           else forcedWin = '🍒'; // ~18% overall
+           if(typeRoll < 0.02) forcedWin = '💎';
+           else if(typeRoll < 0.1) forcedWin = '7️⃣';
+           else if(typeRoll < 0.3) forcedWin = '🍇';
+           else if(typeRoll < 0.6) forcedWin = '🍋';
+           else forcedWin = '🍒';
         }
 
-        // Fill final symbols, prioritize forced win if any
         for(let i=0; i<3; i++) {
             if(forcedWin) finalSymbols.push(forcedWin);
             else finalSymbols.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
         }
         
-        // Prevent accidental non-forced wins if no forcedWin was chosen
         if(!forcedWin && finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
-             // If a natural win occurs without a forced win, slightly alter last reel to be a near miss
-             finalSymbols[2] = SLOT_SYMBOLS[(SLOT_SYMBOLS.indexOf(finalSymbols[0]) + 1) % SLOT_SYMBOLS.length];
+             finalSymbols[2] = finalSymbols[0] === '🍒' ? '🍋' : '🍒';
         }
 
         [1500, 2000, 2500].forEach((delay, i) => {
@@ -903,7 +749,7 @@
         let bet = parseInt(betInput.value);
         if(isNaN(bet) || bet <= 0) { alert("Bitte Einsatz eingeben!"); return null; }
         if(bet > game.score) { bet = Math.floor(game.score); betInput.value = bet; }
-        if(bet <= 0) { alert("Du hast nicht genug Kleinis!"); return null; }
+        if(bet <= 0) return null;
         return bet;
     }
 
@@ -936,85 +782,13 @@
       }
     }
 
-    /* --- PRESTIGE SYSTEM --- */
-    function getPrestigeThreshold() {
-        // Example: First prestige at 1M, then increases exponentially
-        return 1000000 * Math.pow(10, game.prestigePoints);
-    }
-    function getPrestigePointsGain() {
-        const threshold = getPrestigeThreshold();
-        if (game.totalScore < threshold) return 0;
-        // Example calculation: 1 point for every 'x' total score after threshold
-        // Or simply 1 point per threshold reached
-        return Math.floor(Math.log10(game.totalScore / 1000000)) + 1 - game.prestigePoints;
-    }
-
-    function openPrestige() {
-        document.getElementById('prestigeModal').style.display = 'flex';
-        updatePrestigeUI();
-    }
-    function closePrestige() {
-        document.getElementById('prestigeModal').style.display = 'none';
-    }
-
-    function updatePrestigeUI() {
-        const currentPointsEl = document.getElementById('prestige-current-points-display');
-        const gainEl = document.getElementById('prestige-points-gain');
-        const nextThresholdEl = document.getElementById('prestige-next-threshold-display');
-        const activateBtn = document.getElementById('activatePrestigeBtn');
-        const prestigeBtnOnPanel = document.getElementById('prestigeBtn');
-
-        currentPointsEl.textContent = game.prestigePoints;
-        const potentialGain = getPrestigePointsGain();
-        gainEl.textContent = potentialGain;
-
-        const nextThreshold = getPrestigeThreshold();
-        nextThresholdEl.textContent = formatNum(nextThreshold);
-
-        if (potentialGain > 0) {
-            activateBtn.disabled = false;
-            activateBtn.style.filter = 'none';
-            prestigeBtnOnPanel.classList.remove('disabled');
-        } else {
-            activateBtn.disabled = true;
-            activateBtn.style.filter = 'grayscale(1)';
-            prestigeBtnOnPanel.classList.add('disabled');
-        }
-    }
-
-    function activatePrestige() {
-        if (getPrestigePointsGain() <= 0) {
-            alert("Du hast noch nicht genug Fortschritt für Prestige!");
-            return;
-        }
-
-        const newPoints = getPrestigePointsGain();
-        game.prestigePoints += newPoints;
-        game.prestigeMultiplier = 1 + (game.prestigePoints * 0.1); // Each point adds 10% base multiplier
-        game.clickPowerBonus = game.prestigePoints * 0.5; // Each point adds 0.5 to base click power
-
-        // Reset game state
-        game.score = 0;
-        game.clicks = 0;
-        game.buildings = new Array(BUILDINGS.length).fill(0);
-        game.upgrades = [];
-        game.casinoHistory = [];
-
-        // Visual feedback
-        alert(`PRESTIGE AKTIVIERT! Du hast ${newPoints} Prestige-Punkte erhalten!`);
-        closePrestige();
-        saveGame();
-        location.reload(); // Reload to fully apply changes (resets visuals, etc.)
-    }
-
-
     /* --- INTERACTIONS --- */
     const bigKlein = document.getElementById('bigKlein');
     bigKlein.addEventListener('mousedown', (e) => handleInteraction(e.clientX, e.clientY));
     bigKlein.addEventListener('touchstart', (e) => { e.preventDefault(); for(let i=0; i<e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY); });
     function handleInteraction(x, y) {
       const power = getClickPower(); addScore(power); game.clicks++;
-      spawnFloatingText(x, y, `+${formatNum(power, 0)} Kleini${power!=1?'s':''}`); spawnFallingFace(x, y); // Removed decimals for click text
+      spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power!=1?'s':''}`); spawnFallingFace(x, y);
       
       bigKlein.style.transform = "scale(0.94)"; setTimeout(()=> bigKlein.style.transform = "scale(1)", 50);
     }
@@ -1029,8 +803,7 @@
     
     // UPDATED FORMATTER FOR BIG NUMBERS
     function formatNum(num, decimals=0) {
-      if(num < 1000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
-      if(num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: 0 }); // No decimals for thousands
+      if(num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
       if(num < 1000000000) return (num/1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mio";
       if(num < 1000000000000) return (num/1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mrd";
       if(num < 1000000000000000) return (num/1000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Bio"; // Billionen
@@ -1039,197 +812,59 @@
     }
 
     /* --- SHOP --- */
-    function getBuildingCost(i, count = 1) {
-        let cost = 0;
-        let currentOwned = game.buildings[i];
-        for (let j = 0; j < count; j++) {
-            cost += Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15, currentOwned + j));
-        }
-        return cost;
-    }
-
+    function getBuildingCost(i) { return Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15, game.buildings[i])); }
     function buyBuilding(i) {
-      const amountToBuy = currentBuyAmount === 'max' ? calculateMaxBuyAmount(i) : currentBuyAmount;
-      const cost = getBuildingCost(i, amountToBuy);
-      
-      if(game.score >= cost && amountToBuy > 0) { 
+      const cost = getBuildingCost(i);
+      if(game.score >= cost) { 
           game.score -= cost; 
-          game.buildings[i] += amountToBuy; 
+          game.buildings[i]++; 
           updateSingleBuildingUI(i); 
           renderUpgrades();
-          // Spawn multiple visual icons for multiple purchases
-          for(let k=0; k<Math.min(amountToBuy, 5); k++) { // Max 5 icons for a single purchase to prevent spam
-            if(visualElements.length < MAX_VISUALS) spawnVisualIcon(BUILDINGS[i].icon);
-          }
+          // Visual feedback
+          if(visualElements.length < MAX_VISUALS) spawnVisualIcon(BUILDINGS[i].icon);
       }
     }
-
-    function calculateMaxBuyAmount(index) {
-        let amount = 0;
-        let currentCost = getBuildingCost(index, 1);
-        let tempScore = game.score;
-        let currentOwned = game.buildings[index];
-
-        while (tempScore >= currentCost) {
-            tempScore -= currentCost;
-            amount++;
-            currentOwned++;
-            currentCost = Math.floor(BUILDINGS[index].baseCost * Math.pow(1.15, currentOwned));
-        }
-        return amount;
-    }
-
-    function setBuyAmount(amount) {
-        currentBuyAmount = amount;
-        document.querySelectorAll('.buy-amount-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`.buy-amount-btn[data-amount="${amount}"]`).classList.add('active');
-        updateBuildingStates(); // Update costs and affordability immediately
-    }
-
     function buildBuildingUI() {
       const list = document.getElementById('buildingList'); list.innerHTML = '';
       BUILDINGS.forEach((b, i) => {
-        const el = document.createElement('div'); el.className = 'building-row'; el.id = `build-row-${i}`;
-        
-        // Add mouseover/mouseout for tooltip
-        el.onmouseenter = () => showBuildingTooltip(b, i); 
-        el.onmouseleave = () => hideTooltip(); 
-        
-        el.onclick = (event) => {
-            // Only trigger buy if not clicking a child button
-            if (!event.target.closest('.buy-amount-btn')) {
-                buyBuilding(i);
-            }
-        };
-
-        el.innerHTML = `
-            <div class="b-icon">${b.icon}</div>
-            <div class="b-info">
-                <div class="b-name">${b.name}</div>
-                <div class="b-cps">Prod: <span id="b-current-cps-${i}">0</span>/s</div>
-                <div class="b-cost" id="cost-${i}">0 Kleinis</div>
-            </div>
-            <div class="building-row-actions">
-                <button class="buy-amount-btn" onclick="event.stopPropagation(); buyBuildingSpecific(event, ${i}, 1)">+1</button>
-                <button class="buy-amount-btn" onclick="event.stopPropagation(); buyBuildingSpecific(event, ${i}, 10)">+10</button>
-                <button class="buy-amount-btn" onclick="event.stopPropagation(); buyBuildingSpecific(event, ${i}, 100)">+100</button>
-            </div>
-            <div class="b-count" id="count-${i}">0</div>
-        `;
+        const el = document.createElement('div'); el.className = 'building-row'; el.id = `build-row-${i}`; el.onclick = () => buyBuilding(i);
+        el.innerHTML = `<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div><div class="b-cost" id="cost-${i}">0 Kleinis</div></div><div class="b-count" id="count-${i}">0</div>`;
         list.appendChild(el); updateSingleBuildingUI(i);
       });
     }
-
-    // New function to buy specific amounts directly from buttons
-    function buyBuildingSpecific(event, index, amount) {
-        // Temporarily set buy amount to execute buyBuilding with specific amount
-        const originalBuyAmount = currentBuyAmount;
-        currentBuyAmount = amount;
-        buyBuilding(index);
-        currentBuyAmount = originalBuyAmount; // Reset to original
-        updateBuildingStates(); // Re-render states with original buy amount selected
-    }
-
-
     function updateSingleBuildingUI(i) {
       document.getElementById(`count-${i}`).textContent = game.buildings[i];
-      document.getElementById(`b-current-cps-${i}`).textContent = formatNum(getBuildingCPS(i) * game.buildings[i], 1);
-      
-      const amountToDisplayCost = currentBuyAmount === 'max' ? calculateMaxBuyAmount(i) : currentBuyAmount;
-      const costForDisplay = getBuildingCost(i, amountToDisplayCost);
-      document.getElementById(`cost-${i}`).textContent = formatNum(costForDisplay) + " Kleinis";
+      document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i)) + " Kleinis";
     }
     function updateBuildingStates() {
       BUILDINGS.forEach((b, i) => {
-        const row = document.getElementById(`build-row-${i}`); 
-        const costEl = document.getElementById(`cost-${i}`);
-        
-        const amountToBuy = currentBuyAmount === 'max' ? calculateMaxBuyAmount(i) : currentBuyAmount;
-        const cost = getBuildingCost(i, amountToBuy);
-
-        if(game.score >= cost && amountToBuy > 0) { 
-            row.classList.add('can-afford'); 
-            costEl.classList.add('affordable'); 
-        } else { 
-            row.classList.remove('can-afford'); 
-            costEl.classList.remove('affordable'); 
-        }
-        updateSingleBuildingUI(i); // Update count and cost for current buy amount
+        const row = document.getElementById(`build-row-${i}`); const costEl = document.getElementById(`cost-${i}`);
+        if(game.score >= getBuildingCost(i)) { row.classList.add('can-afford'); costEl.classList.add('affordable'); }
+        else { row.classList.remove('can-afford'); costEl.classList.remove('affordable'); }
       });
     }
 
     /* --- UPGRADES --- */
     function buyUpgrade(uId) {
       const u = UPGRADES.find(x => x.id === uId);
-      if(game.score >= u.cost) { 
-          game.score -= u.cost; 
-          game.upgrades.push(uId); 
-          renderUpgrades(); 
-          hideTooltip(); 
-          // Re-init visuals if upgrade affects them (e.g., adds new icon)
-          initVisuals(); 
-      }
+      if(game.score >= u.cost) { game.score -= u.cost; game.upgrades.push(uId); renderUpgrades(); hideTooltip(); }
     }
-    
-    function showTooltip(item) { // General tooltip for upgrades and eventually other things
-      ttName.textContent = item.name; 
-      ttPrice.textContent = formatNum(item.cost) + " Kleinis";
-      ttPrice.className = game.score >= item.cost ? 'tt-price affordable' : 'tt-price expensive';
-      ttEffect.textContent = "Effekt: " + item.text; 
-      ttDesc.textContent = item.desc;
-      ttBuildingInfo.innerHTML = ''; // Clear building specific info
-      
+    function showTooltip(u) {
+      ttName.textContent = u.name; ttPrice.textContent = formatNum(u.cost) + " Kleinis";
+      ttPrice.className = game.score >= u.cost ? 'tt-price affordable' : 'tt-price expensive';
+      ttEffect.textContent = "Effekt: " + u.text; ttDesc.textContent = u.desc;
       let statsHTML = '';
-      if(item.type === 'build') {
-          const bIdx = item.target; const count = game.buildings[bIdx];
+      if(u.type === 'build') {
+          const bIdx = u.target; const count = game.buildings[bIdx];
           const currentMulti = getBuildingMultiplier(bIdx);
           const base = BUILDINGS[bIdx].baseCps;
-          const currentSingleCPS = base * currentMulti * game.prestigeMultiplier;
-          const newSingleCPS = currentSingleCPS * item.multi;
+          const currentSingleCPS = base * currentMulti;
+          const newSingleCPS = currentSingleCPS * u.multi;
           const totalGain = (newSingleCPS - currentSingleCPS) * count;
-          statsHTML = `
-            <div class="stat-line"><span>Einzeln (pro Einheit):</span><span>${formatNum(currentSingleCPS, 1)}/s ➜ <span style="color:#2ecc71">${formatNum(newSingleCPS, 1)}/s</span></span></div>
-            <div class="stat-highlight">+${formatNum(totalGain, 1)} CPS Gesamt</div>`;
-      } else if (item.type === 'click') { 
-          // For click upgrades, the effect text is usually enough
-          statsHTML = `<div class="stat-highlight">Klickstärke wird verdoppelt!</div>`; 
-      }
-      ttStats.innerHTML = statsHTML; 
-      tooltipEl.style.display = 'block';
+          statsHTML = `<div class="stat-line"><span>Einzeln:</span><span>${formatNum(currentSingleCPS, 1)} ➜ <span style="color:#2ecc71">${formatNum(newSingleCPS, 1)}</span></span></div><div class="stat-highlight">+${formatNum(totalGain, 1)} CPS Gesamt</div>`;
+      } else { statsHTML = `<div class="stat-highlight">Klickstärke wird verdoppelt!</div>`; }
+      ttStats.innerHTML = statsHTML; tooltipEl.style.display = 'block';
     }
-
-    // NEW: Specific Tooltip for Buildings
-    function showBuildingTooltip(building, index) {
-        ttName.textContent = building.name;
-        
-        const amountToBuy = currentBuyAmount === 'max' ? calculateMaxBuyAmount(index) : currentBuyAmount;
-        const cost = getBuildingCost(index, amountToBuy);
-
-        ttPrice.textContent = formatNum(cost) + " Kleinis";
-        ttPrice.className = game.score >= cost ? 'tt-price affordable' : 'tt-price expensive';
-        
-        ttEffect.textContent = `Kaufe ${amountToBuy}x "${building.name}"`;
-        ttDesc.textContent = `Produziert Kleinis pro Sekunde. Mit jedem Kauf wird der Preis teurer.`;
-
-        let currentBuildingCPS = getBuildingCPS(index);
-        let totalCurrentCPS = currentBuildingCPS * game.buildings[index];
-        let totalCPSAfterBuy = currentBuildingCPS * (game.buildings[index] + amountToBuy);
-        let cpsGain = totalCPSAfterBuy - totalCurrentCPS;
-
-        ttStats.innerHTML = `
-            <div class="stat-line"><span>Basis Produktion (1x):</span> <span class="current-cps">${formatNum(building.baseCps, 1)}/s</span></div>
-            <div class="stat-line"><span>Produktion pro Einheit (aktuell):</span> <span class="current-cps">${formatNum(currentBuildingCPS, 1)}/s</span></div>
-            <div class="stat-highlight">CPS Zuwachs bei Kauf: +${formatNum(cpsGain, 1)}/s</div>
-        `;
-        ttBuildingInfo.innerHTML = `
-            <span>Du besitzt: <b>${game.buildings[index]}</b></span>
-            <span>Gesamtproduktion: <b class="current-cps">${formatNum(totalCurrentCPS, 1)}/s</b></span>
-        `;
-        
-        tooltipEl.style.display = 'block';
-    }
-
-
     function hideTooltip() { tooltipEl.style.display = 'none'; }
     function renderUpgrades() {
       const container = document.getElementById('upgradeGrid'); container.innerHTML = '';
@@ -1249,36 +884,14 @@
     }
 
     /* --- GOLDEN --- */
-    function updateBuffs(dt) { 
-        if(buffs.frenzy.active) { 
-            buffs.frenzy.time -= dt; 
-            if(buffs.frenzy.time <= 0) { 
-                buffs.frenzy.active = false; 
-                renderBuffs(); 
-            } else {
-                // Update buff display timer
-                const buffIcon = document.querySelector('.buff-icon');
-                if (buffIcon) {
-                    buffIcon.textContent = `🔥 ${Math.ceil(buffs.frenzy.time)}s`;
-                }
-            }
-        } 
-    }
-    function renderBuffs() { 
-        const buffArea = document.getElementById('buffArea');
-        if (buffs.frenzy.active) {
-            buffArea.innerHTML = `<div class="buff-icon">🔥 ${Math.ceil(buffs.frenzy.time)}s</div>`;
-        } else {
-            buffArea.innerHTML = '';
-        }
-    }
+    function updateBuffs(dt) { if(buffs.frenzy.active) { buffs.frenzy.time -= dt; if(buffs.frenzy.time <= 0) { buffs.frenzy.active = false; renderBuffs(); } } }
+    function renderBuffs() { document.getElementById('buffArea').innerHTML = buffs.frenzy.active ? `<div class="buff-icon">🔥</div>` : ''; }
     function scheduleGolden() { const delay = (Math.random() * 600000) + 600000; setTimeout(spawnGolden, delay); }
     function spawnGolden() {
       const g = document.getElementById('goldenKlein');
       const maxX = document.getElementById('clickPanel').offsetWidth - 80; const maxY = document.getElementById('clickPanel').offsetHeight - 80;
       g.style.left = Math.random() * maxX + 'px'; g.style.top = Math.random() * maxY + 'px'; g.style.display = 'block';
-      // Make it disappear faster after appearing
-      setTimeout(() => { if(g.style.display === 'block') { g.style.display = 'none'; scheduleGolden(); } }, 7000); // reduced from 10s to 7s
+      setTimeout(() => { if(g.style.display === 'block') { g.style.display = 'none'; scheduleGolden(); } }, 10000);
     }
     document.getElementById('goldenKlein').onmousedown = function(e) {
       e.stopPropagation(); this.style.display = 'none'; buffs.frenzy.active = true; buffs.frenzy.time = 30; renderBuffs();
@@ -1287,31 +900,15 @@
 
     /* --- SAVE --- */
     function saveGame() {
-      const data = { 
-        score: game.score, 
-        totalScore: game.totalScore, 
-        clicks: game.clicks, 
-        buildings: game.buildings, 
-        upgrades: game.upgrades, 
-        casinoHistory: game.casinoHistory,
-        prestigePoints: game.prestigePoints, // Save new prestige data
-        prestigeMultiplier: game.prestigeMultiplier,
-        clickPowerBonus: game.clickPowerBonus
-      };
+      const data = { score: game.score, totalScore: game.totalScore, clicks: game.clicks, buildings: game.buildings, upgrades: game.upgrades, casinoHistory: game.casinoHistory };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
     function loadGame() {
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
       if(saved) {
-        game.score = saved.score || 0; 
-        game.totalScore = saved.totalScore || 0; 
-        game.clicks = saved.clicks || 0;
+        game.score = saved.score || 0; game.totalScore = saved.totalScore || 0; game.clicks = saved.clicks || 0;
         if(saved.buildings) game.buildings = saved.buildings;
-        game.upgrades = saved.upgrades || []; 
-        game.casinoHistory = saved.casinoHistory || [];
-        game.prestigePoints = saved.prestigePoints || 0; // Load new prestige data
-        game.prestigeMultiplier = saved.prestigeMultiplier || 1;
-        game.clickPowerBonus = saved.clickPowerBonus || 0;
+        game.upgrades = saved.upgrades || []; game.casinoHistory = saved.casinoHistory || [];
       }
     }
     init();
