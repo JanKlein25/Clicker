@@ -24,7 +24,6 @@
       --tooltip-bg: rgba(10, 10, 15, 0.98);
       --purple: #9b59b6;
       --blue: #3498db;
-      /* NEU für Prestige */
     }
 
     * {
@@ -1316,10 +1315,25 @@
       <div style="font-size:0.7rem; font-weight:normal;">Prestige verfügbar</div>
     </button>
 
-    <!-- PRESTIGE BADGE (NEU) -->
+    <!-- PRESTIGE BADGE (ERWEITERT) -->
     <div id="prestige-badge"
-      style="display:none; margin-top:10px; color:#3498db; font-weight:bold; background:rgba(0,0,0,0.5); padding:5px 15px; border-radius:20px; border:1px solid #3498db;">
-      ⭐ Rang: <span id="prestige-level-display">0</span> (Bonus: +<span id="prestige-bonus-display">0</span>%)
+      style="display:none; margin-top:10px; width: 80%; max-width:300px; color:#3498db; background:rgba(0,0,0,0.6); padding:10px; border-radius:12px; border:1px solid #3498db; text-align:center; z-index: 20;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+        <span style="font-weight:bold;">⭐ Rang <span id="prestige-level-display">0</span></span>
+        <span style="font-size:0.8rem; color:#2ecc71;">+<span id="prestige-bonus-display">0</span>% Bonus</span>
+      </div>
+
+      <!-- Fortschrittsbalken Container -->
+      <div
+        style="width:100%; height:8px; background:#222; border-radius:4px; overflow:hidden; border:1px solid rgba(52, 152, 219, 0.3);">
+        <div id="prestige-progress-bar"
+          style="width:0%; height:100%; background:linear-gradient(90deg, #3498db, #2980b9); transition: width 0.5s;">
+        </div>
+      </div>
+
+      <div style="font-size:0.7rem; color:#ccc; margin-top:5px;">
+        Nächster Rang in: <span id="prestige-next-req" style="color:#fff; font-weight:bold;">0</span>
+      </div>
     </div>
 
     <div class="buff-container" id="buffArea"></div>
@@ -1517,7 +1531,7 @@
 
       updateBuildingStates();
 
-      checkPrestigeUnlock(); // NEU: Check ob Prestige verfügbar
+      checkPrestigeUnlock(); // Check ob Prestige verfügbar (und Fortschritt anzeigen)
 
       requestAnimationFrame(gameLoop);
     }
@@ -2084,25 +2098,59 @@
     }
 
     function checkPrestigeUnlock() {
+      // 1. Berechne aktuellen potenziellen Rang basierend auf Total Score
       const potential = calculatePotentialPrestige();
-      const gain = potential - game.prestige;
 
+      // 2. Button Logik (Zeigen wenn wir aufsteigen können)
+      const gain = potential - game.prestige;
       const btn = document.getElementById('prestigeBtn');
 
       if (gain > 0) {
         btn.style.display = 'block';
         btn.classList.add('win-pulse');
+        // Button Text updaten damit man sieht was man kriegt
+        btn.innerHTML = `🚀 AUFSTEIGEN (+${gain} Level)`;
       } else {
         btn.style.display = 'none';
       }
 
-      // Badge anzeigen wenn man schon Prestige hat
+      // 3. Badge & Fortschrittsbalken Logik
       const badge = document.getElementById('prestige-badge');
-      if (game.prestige > 0) {
+
+      // Wir zeigen das Badge an, sobald man entweder Prestige hat ODER nah am ersten Level ist (> 100k Score)
+      if (game.prestige > 0 || game.totalScore > 100000) {
         badge.style.display = 'block';
+
+        // Welcher Rang ist das nächste Ziel?
+        const currentProgressRank = Math.max(game.prestige, potential);
+        const nextTargetRank = currentProgressRank + 1;
+
+        // Formel umkehren: Wie viel Score braucht man für Rang X? -> X^3 * 1.000.000
+        const scoreNeededForNext = Math.pow(nextTargetRank, 3) * 1000000;
+        const scoreForCurrent = Math.pow(currentProgressRank, 3) * 1000000;
+
+        const remaining = scoreNeededForNext - game.totalScore;
+
+        // Prozentberechnung für den Balken (relativ zum aktuellen Level)
+        const totalDistance = scoreNeededForNext - scoreForCurrent;
+        const coveredDistance = game.totalScore - scoreForCurrent;
+        let percent = (coveredDistance / totalDistance) * 100;
+        if (percent < 0) percent = 0; // Schutz
+        if (percent > 100) percent = 100;
+
+        // UI Updates
         document.getElementById('prestige-level-display').textContent = formatNum(game.prestige);
-        // +10% pro Level
         document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 10);
+
+        // Balken & Text
+        document.getElementById('prestige-progress-bar').style.width = percent + "%";
+
+        if (remaining > 0) {
+          document.getElementById('prestige-next-req').textContent = formatNum(remaining) + " Kleinis";
+        } else {
+          // Falls man genau auf der Schwelle ist oder drüber (bevor Button geklickt wird)
+          document.getElementById('prestige-next-req').textContent = "Bereit zum Aufstieg!";
+        }
       }
     }
 
