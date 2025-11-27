@@ -116,7 +116,7 @@
     }
     #casinoBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(243, 156, 18, 0.8); }
 
-    /* --- CLICK UPGRADE SECTION (NEW) --- */
+    /* --- CLICK UPGRADE SECTION --- */
     .click-booster {
       padding: 15px; background: linear-gradient(135deg, #18181b, #0f0f12);
       border-bottom: 2px solid #000;
@@ -417,10 +417,10 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V6'; // Updated Key
+    const SAVE_KEY = 'KleinClicker_Precision_V6'; 
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
     
-    // NEW BUILDINGS ADDED
+    // BUILDINGS
     const BUILDINGS = [
       { id: 0, name: 'Maxis Zeigefinger', baseCost: 15,            baseCps: 0.1,         icon: '👆' },
       { id: 1, name: 'Magdas Oma',    baseCost: 100,           baseCps: 1,           icon: '👵' },
@@ -429,14 +429,14 @@
       { id: 4, name: 'Jans Strandkorbfabrik',       baseCost: 130000,        baseCps: 260,         icon: '🏭' },
       { id: 5, name: 'Tills Tresor',         baseCost: 1400000,       baseCps: 1400,        icon: '🏦' },
       { id: 6, name: 'Nicos Sekten-Tempel',       baseCost: 20000000,      baseCps: 7800,        icon: '🏛️' },
-      { id: 7, name: 'Maxis Klon-Labor',   baseCost: 330000000,     baseCps: 45000,       icon: '🧬' }, // 330 Mio
-      { id: 8, name: 'Magdas Mars-Rakete', baseCost: 5100000000,    baseCps: 280000,      icon: '🚀' }, // 5.1 Mrd
-      { id: 9, name: 'Cedrics Dimensionstor',       baseCost: 75000000000,   baseCps: 1600000,     icon: '🌀' }, // 75 Mrd
-      { id: 10, name: 'Maltes Zeitmaschine',baseCost: 900000000000,  baseCps: 12000000,    icon: '⏳' }, // 900 Mrd
-      { id: 11, name: 'Franjas feuchtes Universum',baseCost: 15000000000000,baseCps: 150000000,   icon: '🌌' }  // 15 Bio
+      { id: 7, name: 'Maxis Klon-Labor',   baseCost: 330000000,     baseCps: 45000,       icon: '🧬' }, 
+      { id: 8, name: 'Magdas Mars-Rakete', baseCost: 5100000000,    baseCps: 280000,      icon: '🚀' }, 
+      { id: 9, name: 'Cedrics Dimensionstor',       baseCost: 75000000000,   baseCps: 1600000,     icon: '🌀' }, 
+      { id: 10, name: 'Maltes Zeitmaschine',baseCost: 900000000000,  baseCps: 12000000,    icon: '⏳' }, 
+      { id: 11, name: 'Franjas feuchtes Universum',baseCost: 15000000000000,baseCps: 150000000,   icon: '🌌' } 
     ];
 
-    // UPDATED UPGRADES
+    // UPGRADES
     const UPGRADES = [
       { id: 'u_click_1', name: 'Plastik Maus', cost: 500,    trigger: {type:'clicks', val:100}, icon:'🖱️', desc:'Die billigste Maus auf dem Markt.', type:'click', multi:2, text:'Klickstärke x2' },
       { id: 'u_click_2', name: 'Gamer Maus',   cost: 50000,  trigger: {type:'clicks', val:1000},icon:'🎮', desc:'Mit RGB Beleuchtung für mehr FPS.', type:'click', multi:2, text:'Klickstärke x2' },
@@ -464,12 +464,16 @@
       casinoHistory: []
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
+    
+    // NEW: ACTIVE CPS TRACKING
+    let clickHistory = []; // Stores clicks from the last second
+
     let lastTime = performance.now();
     let casinoUnlocked = false;
 
     // Visual State
     let visualElements = [];
-    const MAX_VISUALS = 30; // Max floating icons to prevent lag
+    const MAX_VISUALS = 30; 
 
     /* --- UI --- */
     const tooltipEl = document.getElementById('global-tooltip');
@@ -513,11 +517,24 @@
       if(dt > 1) dt = 1; lastTime = now;
       updateBuffs(dt);
       
-      const cps = calculateTotalCPS();
-      if(cps > 0) addScore(cps * dt);
+      // 1. Calculate Passive CPS
+      const passiveCps = calculateTotalCPS();
+      
+      // 2. Calculate Active CPS (Rolling Average of last 1000ms)
+      // Filter out clicks older than 1 second
+      clickHistory = clickHistory.filter(c => now - c.time < 1000);
+      // Sum up the value of remaining clicks
+      const activeClickCPS = clickHistory.reduce((sum, c) => sum + c.val, 0);
+
+      // 3. Add Passive Score (Active score is added instantly on click)
+      if(passiveCps > 0) addScore(passiveCps * dt);
+
+      // 4. Update Displays
+      const displayCps = passiveCps + activeClickCPS;
 
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
-      document.getElementById('cps').textContent = formatNum(cps, 1) + " Kleinis / Sekunde";
+      // Display the combined Dynamic CPS
+      document.getElementById('cps').textContent = formatNum(displayCps, 1) + " Kleinis / Sekunde";
       
       updateDynamicBackground();
       updateClickUI();
@@ -607,10 +624,7 @@
     }
 
     function getClickLevelCost() {
-        // !!! BALANCING UPDATE !!!
-        // Kosten deutlich erhöht. Basis 500, Exponent 2.5
-        // Level 1 -> 500 * 2.5^1 = 1250
-        // Level 10 -> 500 * 2.5^10 = ~4,7 Mio
+        // High cost for balancing: 500 * 2.5^Level
         return Math.floor(500 * Math.pow(2.5, game.clickLevel));
     }
 
@@ -868,6 +882,10 @@
     bigKlein.addEventListener('touchstart', (e) => { e.preventDefault(); for(let i=0; i<e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY); });
     function handleInteraction(x, y) {
       const power = getClickPower(); addScore(power); game.clicks++;
+      
+      // NEW: TRACK CLICK FOR DYNAMIC CPS
+      clickHistory.push({ time: performance.now(), val: power });
+
       spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power!=1?'s':''}`); spawnFallingFace(x, y);
       
       bigKlein.style.transform = "scale(0.94)"; setTimeout(()=> bigKlein.style.transform = "scale(1)", 50);
