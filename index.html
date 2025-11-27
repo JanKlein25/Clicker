@@ -202,7 +202,6 @@
       letter-spacing: 2px;
       background: linear-gradient(to bottom, #f1c40f, #d35400);
       -webkit-background-clip: text;
-      background-clip: text;
       -webkit-text-fill-color: transparent;
       filter: drop-shadow(0 4px 0px rgba(0, 0, 0, 0.5));
       z-index: 20;
@@ -1247,132 +1246,140 @@
     <div class="buildings-list" id="buildingList"></div>
   </div>
 
-  { id: 6, name: 'Nicos Sekten-Tempel', baseCost: 20000000, baseCps: 7800, icon: '🏛️' },
-  { id: 7, name: 'Maxis Klon-Labor', baseCost: 330000000, baseCps: 45000, icon: '🧬' },
-  { id: 8, name: 'Magdas Mars-Rakete', baseCost: 5100000000, baseCps: 280000, icon: '🚀' },
-  { id: 9, name: 'Cedrics Dimensionstor', baseCost: 75000000000, baseCps: 1600000, icon: '🌀' },
-  { id: 10, name: 'Maltes Zeitmaschine', baseCost: 900000000000, baseCps: 12000000, icon: '⏳' },
-  { id: 11, name: 'Franjas feuchtes Universum', baseCost: 15000000000000, baseCps: 150000000, icon: '🌌' },
-  { id: 12, name: 'Künstliche Intelligenz', baseCost: 250000000000000, baseCps: 1500000000, icon: '🧠' },
-  { id: 13, name: 'Alien Botschaft', baseCost: 4000000000000000, baseCps: 20000000000, icon: '👽' },
-  { id: 14, name: 'Schwarzes Loch', baseCost: 70000000000000000, baseCps: 300000000000, icon: '⚫' },
-  { id: 15, name: 'Multiversum Reaktor', baseCost: 1200000000000000000, baseCps: 4000000000000, icon: '⚛️' },
-  { id: 16, name: 'Realitäts-Hacker', baseCost: 20000000000000000000, baseCps: 60000000000000, icon: '💻' },
-  { id: 17, name: 'Zeit-Paradoxon', baseCost: 350000000000000000000, baseCps: 900000000000000, icon: '⌛' },
-  { id: 18, name: 'Göttlicher Funke', baseCost: 6000000000000000000000000, baseCps: 15000000000000000, icon: '✨' },
-  { id: 19, name: 'Die Matrix', baseCost: 100000000000000000000000000, baseCps: 250000000000000000, icon: '🟢' },
-  { id: 20, name: 'Entwickler Konsole', baseCost: 2000000000000000000000000000000, baseCps: 4000000000000000000, icon:
-  '⌨️' },
-  { id: 21, name: 'Das Nichts', baseCost: 50000000000000000000000000000000, baseCps: 100000000000000000000, icon: '🌌' }
-  ];
+  <script>
+    /* --- CONFIG & ASSETS --- */
+    const SAVE_KEY = 'KleinClicker_Precision_V6';
+    const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
 
-  // UPGRADES
-  const UPGRADES = [
-  { id: 'u_click_1', name: 'Plastik Maus', cost: 500, trigger: { type: 'clicks', val: 100 }, icon: '🖱️', desc: 'Die
-  billigste Maus auf dem Markt.', type: 'click', multi: 2, text: 'Klickstärke x2' },
-  { id: 'u_click_2', name: 'Gamer Maus', cost: 50000, trigger: { type: 'clicks', val: 1000 }, icon: '🎮', desc: 'Mit RGB
-  Beleuchtung für mehr FPS.', type: 'click', multi: 2, text: 'Klickstärke x2' },
+    // BUILDINGS
+    const BUILDINGS = [
+      { id: 0, name: 'Maxis Zeigefinger', baseCost: 15, baseCps: 0.1, icon: '👆' },
+      { id: 1, name: 'Magdas Oma', baseCost: 100, baseCps: 1, icon: '👵' },
+      { id: 2, name: 'Cedrics Acker', baseCost: 1100, baseCps: 8, icon: '🌾' },
+      { id: 3, name: 'Maltes Meme Mine', baseCost: 12000, baseCps: 47, icon: '⛏️' },
+      { id: 4, name: 'Jans Strandkorbfabrik', baseCost: 130000, baseCps: 260, icon: '🏭' },
+      { id: 5, name: 'Tills Tresor', baseCost: 1400000, baseCps: 1400, icon: '🏦' },
+      { id: 6, name: 'Nicos Sekten-Tempel', baseCost: 20000000, baseCps: 7800, icon: '🏛️' },
+      { id: 7, name: 'Maxis Klon-Labor', baseCost: 330000000, baseCps: 45000, icon: '🧬' },
+      { id: 8, name: 'Magdas Mars-Rakete', baseCost: 5100000000, baseCps: 280000, icon: '🚀' },
+      { id: 9, name: 'Cedrics Dimensionstor', baseCost: 75000000000, baseCps: 1600000, icon: '🌀' },
+      { id: 10, name: 'Maltes Zeitmaschine', baseCost: 900000000000, baseCps: 12000000, icon: '⏳' },
+      { id: 11, name: 'Franjas feuchtes Universum', baseCost: 15000000000000, baseCps: 150000000, icon: '🌌' }
+    ];
 
-  { id: 'u_b0_1', name: 'Carpaltunnel', cost: 1000, trigger: { type: 'build', id: 0, val: 10 }, icon: '🩹', desc: 'Mäuse
-  arbeiten trotz Schmerzen weiter.', type: 'build', target: 0, multi: 2, text: 'Maus Produktion x2' },
-  { id: 'u_b0_2', name: 'Makro', cost: 10000, trigger: { type: 'build', id: 0, val: 50 }, icon: '⌨️', desc:
-  'Automatisierte Klick-Skripte.', type: 'build', target: 0, multi: 2, text: 'Maus Produktion x2' },
+    // UPGRADES
+    const UPGRADES = [
+      { id: 'u_click_1', name: 'Plastik Maus', cost: 500, trigger: { type: 'clicks', val: 100 }, icon: '🖱️', desc: 'Die billigste Maus auf dem Markt.', type: 'click', multi: 2, text: 'Klickstärke x2' },
+      { id: 'u_click_2', name: 'Gamer Maus', cost: 50000, trigger: { type: 'clicks', val: 1000 }, icon: '🎮', desc: 'Mit RGB Beleuchtung für mehr FPS.', type: 'click', multi: 2, text: 'Klickstärke x2' },
 
-  { id: 'u_b1_1', name: 'Nudelholz', cost: 5000, trigger: { type: 'build', id: 1, val: 10 }, icon: '🥖', desc: 'Die Omas
-  werden aggressiver.', type: 'build', target: 1, multi: 2, text: 'Oma Produktion x2' },
-  { id: 'u_b1_2', name: 'Lesebrille', cost: 50000, trigger: { type: 'build', id: 1, val: 50 }, icon: '👓', desc: 'Sie
-  sehen die Kleinis jetzt besser.', type: 'build', target: 1, multi: 2, text: 'Oma Produktion x2' },
+      { id: 'u_b0_1', name: 'Carpaltunnel', cost: 1000, trigger: { type: 'build', id: 0, val: 10 }, icon: '🩹', desc: 'Mäuse arbeiten trotz Schmerzen weiter.', type: 'build', target: 0, multi: 2, text: 'Maus Produktion x2' },
+      { id: 'u_b0_2', name: 'Makro', cost: 10000, trigger: { type: 'build', id: 0, val: 50 }, icon: '⌨️', desc: 'Automatisierte Klick-Skripte.', type: 'build', target: 0, multi: 2, text: 'Maus Produktion x2' },
 
-  { id: 'u_b2_1', name: 'Dünger', cost: 150000, trigger: { type: 'build', id: 2, val: 10 }, icon: '💩', desc: '100%
-  biologisch abbaubar.', type: 'build', target: 2, multi: 2, text: 'Feld Produktion x2' },
-  { id: 'u_b3_1', name: 'Dynamit', cost: 1200000, trigger: { type: 'build', id: 3, val: 10 }, icon: '🧨', desc:
-  'Sicherheit ist zweitrangig.', type: 'build', target: 3, multi: 2, text: 'Mine Produktion x2' },
-  { id: 'u_b4_1', name: 'Roboterarm', cost: 15000000, trigger: { type: 'build', id: 4, val: 10 }, icon: '🤖', desc:
-  'Ersetzt menschliche Fehler.', type: 'build', target: 4, multi: 2, text: 'Fabrik Produktion x2' },
-  { id: 'u_b5_1', name: 'Goldtresor', cost: 200000000, trigger: { type: 'build', id: 5, val: 10 }, icon: '🔐', desc:
-  'Noch sicherer als Fort Knox.', type: 'build', target: 5, multi: 2, text: 'Bank Produktion x2' },
+      { id: 'u_b1_1', name: 'Nudelholz', cost: 5000, trigger: { type: 'build', id: 1, val: 10 }, icon: '🥖', desc: 'Die Omas werden aggressiver.', type: 'build', target: 1, multi: 2, text: 'Oma Produktion x2' },
+      { id: 'u_b1_2', name: 'Lesebrille', cost: 50000, trigger: { type: 'build', id: 1, val: 50 }, icon: '👓', desc: 'Sie sehen die Kleinis jetzt besser.', type: 'build', target: 1, multi: 2, text: 'Oma Produktion x2' },
 
-  { id: 'u_b7_1', name: 'Reagenzglas', cost: 5000000000, trigger: { type: 'build', id: 7, val: 10 }, icon: '🧪', desc:
-  'Klonflüssigkeit mit Geschmack.', type: 'build', target: 7, multi: 2, text: 'Labor Produktion x2' },
-  { id: 'u_b8_1', name: 'Mars Ticket', cost: 75000000000, trigger: { type: 'build', id: 8, val: 10 }, icon: '🎟️', desc:
-  'One-Way Ticket für Kleinis.', type: 'build', target: 8, multi: 2, text: 'Raketen Produktion x2' },
-  { id: 'u_b9_1', name: 'Rick\'s Gun', cost: 1500000000000, trigger: { type: 'build', id: 9, val: 10 }, icon: '🔫',
-  desc: 'Wubba Lubba Dub Dub!', type: 'build', target: 9, multi: 2, text: 'Portal Produktion x2' },
-  ];
+      { id: 'u_b2_1', name: 'Dünger', cost: 150000, trigger: { type: 'build', id: 2, val: 10 }, icon: '💩', desc: '100% biologisch abbaubar.', type: 'build', target: 2, multi: 2, text: 'Feld Produktion x2' },
+      { id: 'u_b3_1', name: 'Dynamit', cost: 1200000, trigger: { type: 'build', id: 3, val: 10 }, icon: '🧨', desc: 'Sicherheit ist zweitrangig.', type: 'build', target: 3, multi: 2, text: 'Mine Produktion x2' },
+      { id: 'u_b4_1', name: 'Roboterarm', cost: 15000000, trigger: { type: 'build', id: 4, val: 10 }, icon: '🤖', desc: 'Ersetzt menschliche Fehler.', type: 'build', target: 4, multi: 2, text: 'Fabrik Produktion x2' },
+      { id: 'u_b5_1', name: 'Goldtresor', cost: 200000000, trigger: { type: 'build', id: 5, val: 10 }, icon: '🔐', desc: 'Noch sicherer als Fort Knox.', type: 'build', target: 5, multi: 2, text: 'Bank Produktion x2' },
 
-  /* --- GAME STATE --- */
-  let game = {
-  score: 0, totalScore: 0, clicks: 0, clickLevel: 1,
-  buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
-  casinoHistory: [],
-  playerName: "Spieler" + Math.floor(Math.random() * 1000)
-  };
-  let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
+      { id: 'u_b7_1', name: 'Reagenzglas', cost: 5000000000, trigger: { type: 'build', id: 7, val: 10 }, icon: '🧪', desc: 'Klonflüssigkeit mit Geschmack.', type: 'build', target: 7, multi: 2, text: 'Labor Produktion x2' },
+      { id: 'u_b8_1', name: 'Mars Ticket', cost: 75000000000, trigger: { type: 'build', id: 8, val: 10 }, icon: '🎟️', desc: 'One-Way Ticket für Kleinis.', type: 'build', target: 8, multi: 2, text: 'Raketen Produktion x2' },
+      { id: 'u_b9_1', name: 'Rick\'s Gun', cost: 1500000000000, trigger: { type: 'build', id: 9, val: 10 }, icon: '🔫', desc: 'Wubba Lubba Dub Dub!', type: 'build', target: 9, multi: 2, text: 'Portal Produktion x2' },
+    ];
 
-  // NEW: ACTIVE CPS TRACKING
-  let clickHistory = []; // Stores clicks from the last second
+    /* --- GAME STATE --- */
+    let game = {
+      score: 0, totalScore: 0, clicks: 0, clickLevel: 1,
+      buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
+      casinoHistory: [],
+      playerName: "Spieler" + Math.floor(Math.random() * 1000)
+    };
+    let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
-  let lastTime = performance.now();
-  let casinoUnlocked = false;
+    // NEW: ACTIVE CPS TRACKING
+    let clickHistory = []; // Stores clicks from the last second
 
-  // Visual State
-  let visualElements = [];
-  const MAX_VISUALS = 30;
+    let lastTime = performance.now();
+    let casinoUnlocked = false;
 
-  /* --- FIREBASE CONFIG --- */
-  const firebaseConfig = {
-  apiKey: "AIzaSyA9UzTCyFOxOr6EiGATnkXA_QMQZRcqX0I",
-  authDomain: "kleinclicker.firebaseapp.com",
-  databaseURL: "https://kleinclicker-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "kleinclicker",
-  storageBucket: "kleinclicker.firebasestorage.app",
-  messagingSenderId: "109832699128",
-  appId: "1:109832699128:web:636e6c1687927447d6cf0d",
-  measurementId: "G-JBPB52ZK4J"
-  };
+    // Visual State
+    let visualElements = [];
+    const MAX_VISUALS = 30;
 
-  let db;
-  let dbRef;
+    /* --- FIREBASE CONFIG --- */
+    // TODO: FÜGE HIER DEINE FIREBASE DATEN EIN
+    const firebaseConfig = {
+      apiKey: "AIzaSyA9UzTCyFOxOr6EiGATnkXA_QMQZRcqX0I",
+      authDomain: "kleinclicker.firebaseapp.com",
+      databaseURL: "https://kleinclicker-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "kleinclicker",
+      storageBucket: "kleinclicker.firebasestorage.app",
+      messagingSenderId: "109832699128",
+      appId: "1:109832699128:web:636e6c1687927447d6cf0d",
+      measurementId: "G-JBPB52ZK4J"
+    };
 
-  try {
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.database();
-  dbRef = db.ref('leaderboard');
-  console.log("Firebase initialized");
-  } catch (e) {
-  console.warn("Firebase not configured yet. Leaderboard will be offline.");
-  }
-  /* --- UI --- */
-  const tooltipEl = document.getElementById('global-tooltip');
-  const ttName = document.getElementById('tt-name-display');
-  const ttPrice = document.getElementById('tt-price-display');
-  const ttEffect = document.getElementById('tt-effect-display');
-  const ttDesc = document.getElementById('tt-desc-display');
-  const ttStats = document.getElementById('tt-stats-container');
+    let db;
+    let dbRef;
 
-  /* --- INIT --- */
-  function init() {
-  try {
-  loadGame();
-  // Fix save compatibility if new buildings added
-  if (game.buildings.length < BUILDINGS.length) { const diff=BUILDINGS.length - game.buildings.length; for (let i=0; i <
-    diff; i++) game.buildings.push(0); } } catch (e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY);
-    } buildBuildingUI(); renderUpgrades(); renderHistory(); initVisuals(); requestAnimationFrame(gameLoop);
-    setInterval(slowLoop, 1000); scheduleGolden(); // Ask for name if default if (game.playerName.startsWith("Spieler"))
-    { const newName=prompt("Wie möchtest du auf dem Leaderboard heißen?", game.playerName); if (newName &&
-    newName.trim() !=="" ) { game.playerName=newName.trim().substring(0, 15); saveGame(); } }
-    document.getElementById('my-player-name').textContent=game.playerName; document.addEventListener('mousemove', (e)=>
-    {
-    if (tooltipEl.style.display === 'block') {
-    let top = e.clientY + 10; let left = e.clientX - 330;
-    if (left < 10) left=e.clientX + 10; if (top + tooltipEl.offsetHeight> window.innerHeight) top = window.innerHeight -
-      tooltipEl.offsetHeight - 10;
-      tooltipEl.style.top = top + 'px'; tooltipEl.style.left = left + 'px';
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      dbRef = db.ref('leaderboard');
+      console.log("Firebase initialized");
+    } catch (e) {
+      console.warn("Firebase not configured yet. Leaderboard will be offline.");
+    }
+
+    /* --- UI --- */
+    const tooltipEl = document.getElementById('global-tooltip');
+    const ttName = document.getElementById('tt-name-display');
+    const ttPrice = document.getElementById('tt-price-display');
+    const ttEffect = document.getElementById('tt-effect-display');
+    const ttDesc = document.getElementById('tt-desc-display');
+    const ttStats = document.getElementById('tt-stats-container');
+
+    /* --- INIT --- */
+    function init() {
+      try {
+        loadGame();
+        // Fix save compatibility if new buildings added
+        if (game.buildings.length < BUILDINGS.length) {
+          const diff = BUILDINGS.length - game.buildings.length;
+          for (let i = 0; i < diff; i++) game.buildings.push(0);
+        }
+      } catch (e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
+
+      buildBuildingUI();
+      renderUpgrades();
+      renderHistory();
+      initVisuals();
+      requestAnimationFrame(gameLoop);
+      setInterval(slowLoop, 1000);
+      scheduleGolden();
+
+      // Ask for name if default
+      if (game.playerName.startsWith("Spieler")) {
+        const newName = prompt("Wie möchtest du auf dem Leaderboard heißen?", game.playerName);
+        if (newName && newName.trim() !== "") {
+          game.playerName = newName.trim().substring(0, 15);
+          saveGame();
+        }
       }
+      document.getElementById('my-player-name').textContent = game.playerName;
+
+      document.addEventListener('mousemove', (e) => {
+        if (tooltipEl.style.display === 'block') {
+          let top = e.clientY + 10; let left = e.clientX - 330;
+          if (left < 10) left = e.clientX + 10;
+          if (top + tooltipEl.offsetHeight > window.innerHeight) top = window.innerHeight - tooltipEl.offsetHeight - 10;
+          tooltipEl.style.top = top + 'px'; tooltipEl.style.left = left + 'px';
+        }
       });
-      }
+    }
 
-      function gameLoop(now) {
+    function gameLoop(now) {
       let dt = (now - lastTime) / 1000;
       if (dt > 1) dt = 1; lastTime = now;
       updateBuffs(dt);
@@ -1382,544 +1389,580 @@
 
       // 2. Calculate Active CPS (Rolling Average of last 1000ms)
       // Filter out clicks older than 1 second
-      clickHistory = clickHistory.filter(c => now - c.time < 1000); // Sum up the value of remaining clicks const
-        activeClickCPS=clickHistory.reduce((sum, c)=> sum + c.val, 0);
+      clickHistory = clickHistory.filter(c => now - c.time < 1000);
+      // Sum up the value of remaining clicks
+      const activeClickCPS = clickHistory.reduce((sum, c) => sum + c.val, 0);
 
-        // 3. Add Passive Score (Active score is added instantly on click)
-        if (passiveCps > 0) addScore(passiveCps * dt);
+      // 3. Add Passive Score (Active score is added instantly on click)
+      if (passiveCps > 0) addScore(passiveCps * dt);
 
-        // 4. Update Displays
-        const displayCps = passiveCps + activeClickCPS;
+      // 4. Update Displays
+      const displayCps = passiveCps + activeClickCPS;
 
-        document.getElementById('score').textContent = formatNum(Math.floor(game.score));
-        // Display the combined Dynamic CPS
-        document.getElementById('cps').textContent = formatNum(displayCps, 1) + " Kleinis / Sekunde";
+      document.getElementById('score').textContent = formatNum(Math.floor(game.score));
+      // Display the combined Dynamic CPS
+      document.getElementById('cps').textContent = formatNum(displayCps, 1) + " Kleinis / Sekunde";
 
-        updateDynamicBackground();
+      updateDynamicBackground();
+      updateClickUI();
+
+      if (!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
+      else if (casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
+
+      updateBuildingStates();
+      requestAnimationFrame(gameLoop);
+    }
+    function slowLoop() {
+      saveGame();
+      renderUpgrades();
+      // Sync Score to Firebase
+      if (dbRef) {
+        dbRef.child(game.playerName).set({
+          name: game.playerName,
+          score: Math.floor(game.totalScore),
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).catch(err => console.log("Sync error", err));
+      }
+    }
+
+    /* --- VISUALS & BACKGROUND --- */
+    function initVisuals() {
+      const container = document.getElementById('visual-canvas');
+      container.innerHTML = '';
+      visualElements = [];
+
+      // Spawn existing buildings
+      let totalCreated = 0;
+      // Prioritize expensive buildings visually
+      for (let i = BUILDINGS.length - 1; i >= 0; i--) {
+        if (game.buildings[i] > 0) {
+          // Determine how many icons to show (logarithmic scaling)
+          let count = Math.min(Math.ceil(Math.log2(game.buildings[i] + 1)), 5);
+          for (let k = 0; k < count; k++) {
+            if (totalCreated < MAX_VISUALS) {
+              spawnVisualIcon(BUILDINGS[i].icon);
+              totalCreated++;
+            }
+          }
+        }
+      }
+    }
+
+    function spawnVisualIcon(iconChar) {
+      const container = document.getElementById('visual-canvas');
+      const el = document.createElement('div');
+      el.className = 'bg-icon';
+      el.textContent = iconChar;
+
+      // Random Position
+      el.style.left = Math.random() * 90 + '%';
+      el.style.top = Math.random() * 90 + '%';
+      // Random Size variation
+      el.style.fontSize = (1 + Math.random()) + 'rem';
+      // Random Animation Duration
+      el.style.animationDuration = (10 + Math.random() * 20) + 's';
+
+      container.appendChild(el);
+      visualElements.push(el);
+    }
+
+    function updateDynamicBackground() {
+      const panel = document.getElementById('clickPanel');
+      let s = game.totalScore;
+      // Simple milestones for colors
+      if (s < 10000) { /* Default Blue/Black */ }
+      else if (s < 1000000) { panel.style.background = `radial-gradient(circle at center, #8e44ad 0%, #000000 100%)`; } // Purple
+      else if (s < 1000000000) { panel.style.background = `radial-gradient(circle at center, #d35400 0%, #2d3436 100%)`; } // Orange/Dark
+      else if (s < 1000000000000) { panel.style.background = `radial-gradient(circle at center, #f1c40f 0%, #2c3e50 100%)`; } // Gold
+      else { panel.style.background = `radial-gradient(circle at center, #16a085 0%, #000 100%)`; } // Matrix Green/Space
+    }
+
+    /* --- MATH & CLICK UPGRADES --- */
+    function addScore(amount) { game.score += amount; game.totalScore += amount; }
+    function getBuildingMultiplier(index) {
+      let m = 1;
+      UPGRADES.forEach(u => { if (u.type === 'build' && u.target === index && game.upgrades.includes(u.id)) m *= u.multi; });
+      if (buffs.frenzy.active) m *= buffs.frenzy.multi;
+      return m;
+    }
+    function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
+    function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
+
+    // MODIFIED CLICK FORMULA
+    function getClickPower() {
+      // Base calculation now includes Click Level
+      // Base: 1, Level 1: 3, Level 10: 30... + % of CPS
+      let levelPower = 1 + (game.clickLevel * 2);
+      let cpsPower = calculateTotalCPS() * 0.05; // 5% of CPS added
+      let power = levelPower + cpsPower;
+
+      UPGRADES.forEach(u => { if (u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
+      if (buffs.frenzy.active) power *= buffs.frenzy.multi;
+      return power;
+    }
+
+    function getClickLevelCost() {
+      // High cost for balancing: 500 * 2.5^Level
+      return Math.floor(500 * Math.pow(2.5, game.clickLevel));
+    }
+
+    function buyClickStats() {
+      const cost = getClickLevelCost();
+      if (game.score >= cost) {
+        game.score -= cost;
+        game.clickLevel++;
         updateClickUI();
 
-        if (!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true;
-        document.getElementById('casinoBtn').style.display = 'block'; }
-        else if (casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
+        // Effect
+        const btn = document.getElementById('btn-buy-click');
+        btn.style.transform = "scale(1.1)";
+        setTimeout(() => btn.style.transform = "scale(1)", 100);
+      }
+    }
 
-        updateBuildingStates();
-        requestAnimationFrame(gameLoop);
+    function updateClickUI() {
+      const cost = getClickLevelCost();
+      const power = getClickPower();
+      document.getElementById('click-dmg-display').textContent = formatNum(power, 1);
+      document.getElementById('click-cost-display').textContent = formatNum(cost);
+
+      const btn = document.getElementById('btn-buy-click');
+      if (game.score >= cost) btn.classList.remove('locked');
+      else btn.classList.add('locked');
+    }
+
+    /* --- CASINO LOGIC --- */
+    let isSpinning = false;
+    let currentCasinoMode = 'roulette';
+
+    function openCasino() {
+      document.getElementById('casinoModal').style.display = 'flex';
+      updateCasinoUI();
+      generateStrip(50, null);
+      const s = document.getElementById('rouletteStrip');
+      s.style.transition = 'none'; s.style.transform = 'translateX(0px)';
+    }
+    function closeCasino() { document.getElementById('casinoModal').style.display = 'none'; }
+    function updateCasinoUI() { document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score)); }
+
+    function switchCasinoTab(mode) {
+      if (isSpinning) return;
+      currentCasinoMode = mode;
+      document.getElementById('view-roulette').style.display = mode === 'roulette' ? 'block' : 'none';
+      document.getElementById('view-slots').style.display = mode === 'slots' ? 'block' : 'none';
+
+      document.getElementById('btn-tab-roulette').className = mode === 'roulette' ? 'nav-btn active' : 'nav-btn';
+      document.getElementById('btn-tab-slots').className = mode === 'slots' ? 'nav-btn active' : 'nav-btn';
+    }
+
+    function setBetMultiplier(multi) {
+      const input = document.getElementById('betAmount');
+      if (multi === 'max') input.value = Math.floor(game.score);
+      else {
+        let val = parseInt(input.value) || 0;
+        if (val === 0) val = 100;
+        input.value = Math.floor(val * multi);
+      }
+    }
+
+    /* --- ROULETTE ENGINE --- */
+    function generateStrip(count, winningColor) {
+      const strip = document.getElementById('rouletteStrip');
+      strip.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        let type = 'black';
+        const r = Math.random();
+        if (winningColor && i === 60) type = winningColor;
+        else {
+          if (r < 0.06) type = 'green';
+          else if (r < 0.53) type = 'red';
+          else type = 'black';
         }
-        function slowLoop() {
-        saveGame();
+        const el = document.createElement('div');
+        el.className = `r-card rc-${type}`;
+        if (type === 'green') el.innerHTML = `<img src="${IMG_URL}" class="rc-logo">`;
+        else el.textContent = Math.floor(Math.random() * 7) + (type === 'black' ? 8 : 1);
+        strip.appendChild(el);
+      }
+    }
+
+    function spin(choice) {
+      if (isSpinning) return;
+      const bet = getBet();
+      if (!bet) return;
+
+      game.score -= bet;
+      updateCasinoUI();
+      isSpinning = true;
+      disableButtons(true);
+
+      const r = Math.random();
+      let result = 'black';
+      if (r < 0.05) result = 'green';
+      else if (r < 0.525) result = 'red';
+
+      generateStrip(80, result);
+
+      const strip = document.getElementById('rouletteStrip');
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateX(0px)';
+      strip.offsetHeight;
+
+      const cardSize = 74;
+      const targetIndex = 60;
+      const centerOfTarget = (targetIndex * cardSize) + 35;
+      const jitter = Math.floor(Math.random() * 50) - 25;
+      const totalTranslate = centerOfTarget + jitter;
+
+      strip.style.transition = 'transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1)';
+      strip.style.transform = `translateX(-${totalTranslate}px)`;
+
+      const marker = document.querySelector('.roulette-marker');
+      marker.style.animation = "shake 0.1s infinite";
+      setTimeout(() => marker.style.animation = "none", 4500);
+
+      setTimeout(() => { finishSpin(choice, result, bet); }, 4500);
+    }
+
+    function finishSpin(choice, result, bet) {
+      isSpinning = false;
+      disableButtons(false);
+      game.casinoHistory.unshift(result);
+      if (game.casinoHistory.length > 10) game.casinoHistory.pop();
+      renderHistory();
+
+      let multiplier = 0;
+      if (choice === result) {
+        if (result === 'green') multiplier = 14;
+        else multiplier = 2;
+      }
+
+      if (multiplier > 0) triggerWin(bet * multiplier);
+      updateCasinoUI();
+      saveGame();
+    }
+
+    /* --- SLOTS ENGINE --- */
+    const SLOT_SYMBOLS = ['🍒', '🍋', '🍇', '💎', '7️⃣'];
+
+    function spinSlots() {
+      if (isSpinning) return;
+      const bet = getBet();
+      if (!bet) return;
+
+      game.score -= bet;
+      updateCasinoUI();
+      isSpinning = true;
+      disableButtons(true);
+
+      const reels = [document.getElementById('reel-1'), document.getElementById('reel-2'), document.getElementById('reel-3')];
+      reels.forEach(r => r.classList.add('spinning'));
+
+      let intervals = reels.map(r => setInterval(() => {
+        r.querySelector('span').textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+      }, 50));
+
+      const finalSymbols = [];
+      const roll = Math.random();
+      let forcedWin = null;
+
+      if (roll < 0.30) {
+        const typeRoll = Math.random();
+        if (typeRoll < 0.02) forcedWin = '💎';
+        else if (typeRoll < 0.1) forcedWin = '7️⃣';
+        else if (typeRoll < 0.3) forcedWin = '🍇';
+        else if (typeRoll < 0.6) forcedWin = '🍋';
+        else forcedWin = '🍒';
+      }
+
+      for (let i = 0; i < 3; i++) {
+        if (forcedWin) finalSymbols.push(forcedWin);
+        else finalSymbols.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
+      }
+
+      if (!forcedWin && finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
+        finalSymbols[2] = finalSymbols[0] === '🍒' ? '🍋' : '🍒';
+      }
+
+      [1500, 2000, 2500].forEach((delay, i) => {
+        setTimeout(() => {
+          clearInterval(intervals[i]);
+          reels[i].classList.remove('spinning');
+          reels[i].querySelector('span').textContent = finalSymbols[i];
+          reels[i].style.transform = "scale(1.2)";
+          setTimeout(() => reels[i].style.transform = "scale(1)", 150);
+          if (i === 2) finishSlotSpin(finalSymbols, bet);
+        }, delay);
+      });
+    }
+
+    function finishSlotSpin(symbols, bet) {
+      isSpinning = false;
+      disableButtons(false);
+
+      let multiplier = 0;
+      if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
+        const s = symbols[0];
+        if (s === '🍒') multiplier = 3;
+        else if (s === '🍋') multiplier = 5;
+        else if (s === '🍇') multiplier = 10;
+        else if (s === '7️⃣') multiplier = 25;
+        else if (s === '💎') multiplier = 50;
+      }
+
+      if (multiplier > 0) triggerWin(bet * multiplier);
+      updateCasinoUI();
+      saveGame();
+    }
+
+    /* --- SHARED CASINO FUNCS --- */
+    function getBet() {
+      const betInput = document.getElementById('betAmount');
+      let bet = parseInt(betInput.value);
+      if (isNaN(bet) || bet <= 0) { alert("Bitte Einsatz eingeben!"); return null; }
+      if (bet > game.score) { bet = Math.floor(game.score); betInput.value = bet; }
+      if (bet <= 0) return null;
+      return bet;
+    }
+
+    function triggerWin(amount) {
+      addScore(amount);
+      spawnConfetti();
+      document.getElementById('casinoWindow').classList.add('win-pulse');
+      setTimeout(() => document.getElementById('casinoWindow').classList.remove('win-pulse'), 500);
+    }
+
+    function renderHistory() {
+      const con = document.getElementById('history-container'); con.innerHTML = '';
+      game.casinoHistory.forEach(h => {
+        const d = document.createElement('div'); d.className = `hist-dot hist-${h}`; con.appendChild(d);
+      });
+    }
+
+    function disableButtons(disable) {
+      document.querySelectorAll('.bet-btn, .control-btn, .close-btn, .nav-btn').forEach(b => b.disabled = disable);
+    }
+    function spawnConfetti() {
+      const win = document.getElementById('casinoWindow');
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div'); p.className = 'win-particle';
+        p.style.backgroundColor = ['#f1c40f', '#e74c3c', '#2ecc71', '#3498db'][Math.floor(Math.random() * 4)];
+        p.style.left = '50%'; p.style.top = '50%';
+        p.style.setProperty('--tx', (Math.random() * 400 - 200) + 'px');
+        p.style.setProperty('--ty', (Math.random() * 400 - 200) + 'px');
+        win.appendChild(p); setTimeout(() => p.remove(), 1000);
+      }
+    }
+
+    /* --- INTERACTIONS --- */
+    const bigKlein = document.getElementById('bigKlein');
+    bigKlein.addEventListener('mousedown', (e) => handleInteraction(e.clientX, e.clientY));
+    bigKlein.addEventListener('touchstart', (e) => { e.preventDefault(); for (let i = 0; i < e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY); });
+    function handleInteraction(x, y) {
+      const power = getClickPower(); addScore(power); game.clicks++;
+
+      // NEW: TRACK CLICK FOR DYNAMIC CPS
+      clickHistory.push({ time: performance.now(), val: power });
+
+      spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power != 1 ? 's' : ''}`); spawnFallingFace(x, y);
+
+      bigKlein.style.transform = "scale(0.94)"; setTimeout(() => bigKlein.style.transform = "scale(1)", 50);
+    }
+    function spawnFloatingText(x, y, text) {
+      const el = document.createElement('div'); el.className = 'click-text'; el.textContent = text;
+      el.style.left = (x - 20 + Math.random() * 40) + 'px'; el.style.top = y + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 800);
+    }
+    function spawnFallingFace(x, y) {
+      const img = document.createElement('img'); img.src = IMG_URL; img.className = 'falling-face';
+      img.style.left = (x - 17) + 'px'; img.style.top = (y - 17) + 'px'; document.getElementById('clickPanel').appendChild(img); setTimeout(() => img.remove(), 1200);
+    }
+
+    // UPDATED FORMATTER FOR BIG NUMBERS
+    function formatNum(num, decimals = 0) {
+      if (num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
+      if (num < 1000000000) return (num / 1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mio";
+      if (num < 1000000000000) return (num / 1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mrd";
+      if (num < 1000000000000000) return (num / 1000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Bio"; // Billionen
+      if (num < 1000000000000000000) return (num / 1000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Brd"; // Billiarden
+      return (num / 1000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Trio"; // Trillionen
+    }
+
+    /* --- SHOP --- */
+    function getBuildingCost(i) { return Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15, game.buildings[i])); }
+    function buyBuilding(i) {
+      const cost = getBuildingCost(i);
+      if (game.score >= cost) {
+        game.score -= cost;
+        game.buildings[i]++;
+        updateSingleBuildingUI(i);
         renderUpgrades();
-        // Sync Score to Firebase
-        if (dbRef) {
-        dbRef.child(game.playerName).set({
-        name: game.playerName,
-        score: Math.floor(game.totalScore),
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-        }).catch(err => console.log("Sync error", err));
-        }
-        }
+        // Visual feedback
+        if (visualElements.length < MAX_VISUALS) spawnVisualIcon(BUILDINGS[i].icon);
+      }
+    }
+    function buildBuildingUI() {
+      const list = document.getElementById('buildingList'); list.innerHTML = '';
+      BUILDINGS.forEach((b, i) => {
+        const el = document.createElement('div'); el.className = 'building-row'; el.id = `build-row-${i}`; el.onclick = () => buyBuilding(i);
+        el.innerHTML = `<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div><div class="b-cost" id="cost-${i}">0 Kleinis</div></div><div class="b-count" id="count-${i}">0</div>`;
+        list.appendChild(el); updateSingleBuildingUI(i);
+      });
+    }
+    function updateSingleBuildingUI(i) {
+      document.getElementById(`count-${i}`).textContent = game.buildings[i];
+      document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i)) + " Kleinis";
+    }
+    function updateBuildingStates() {
+      BUILDINGS.forEach((b, i) => {
+        const row = document.getElementById(`build-row-${i}`); const costEl = document.getElementById(`cost-${i}`);
+        if (game.score >= getBuildingCost(i)) { row.classList.add('can-afford'); costEl.classList.add('affordable'); }
+        else { row.classList.remove('can-afford'); costEl.classList.remove('affordable'); }
+      });
+    }
 
-        /* --- VISUALS & BACKGROUND --- */
-        function initVisuals() {
-        const container = document.getElementById('visual-canvas');
-        container.innerHTML = '';
-        visualElements = [];
+    /* --- UPGRADES --- */
+    function buyUpgrade(uId) {
+      const u = UPGRADES.find(x => x.id === uId);
+      if (game.score >= u.cost) { game.score -= u.cost; game.upgrades.push(uId); renderUpgrades(); hideTooltip(); }
+    }
+    function showTooltip(u) {
+      ttName.textContent = u.name; ttPrice.textContent = formatNum(u.cost) + " Kleinis";
+      ttPrice.className = game.score >= u.cost ? 'tt-price affordable' : 'tt-price expensive';
+      ttEffect.textContent = "Effekt: " + u.text; ttDesc.textContent = u.desc;
+      let statsHTML = '';
+      if (u.type === 'build') {
+        const bIdx = u.target; const count = game.buildings[bIdx];
+        const currentMulti = getBuildingMultiplier(bIdx);
+        const base = BUILDINGS[bIdx].baseCps;
+        const currentSingleCPS = base * currentMulti;
+        const newSingleCPS = currentSingleCPS * u.multi;
+        const totalGain = (newSingleCPS - currentSingleCPS) * count;
+        statsHTML = `<div class="stat-line"><span>Einzeln:</span><span>${formatNum(currentSingleCPS, 1)} ➜ <span style="color:#2ecc71">${formatNum(newSingleCPS, 1)}</span></span></div><div class="stat-highlight">+${formatNum(totalGain, 1)} CPS Gesamt</div>`;
+      } else { statsHTML = `<div class="stat-highlight">Klickstärke wird verdoppelt!</div>`; }
+      ttStats.innerHTML = statsHTML; tooltipEl.style.display = 'block';
+    }
+    function hideTooltip() { tooltipEl.style.display = 'none'; }
+    function renderUpgrades() {
+      const container = document.getElementById('upgradeGrid'); container.innerHTML = '';
+      const available = UPGRADES.filter(u => {
+        if (game.upgrades.includes(u.id)) return false;
+        if (u.trigger.type === 'clicks' && game.clicks >= u.trigger.val) return true;
+        if (u.trigger.type === 'build' && game.buildings[u.trigger.id] >= u.trigger.val) return true;
+        return false;
+      });
+      available.forEach(u => {
+        const div = document.createElement('div'); div.className = 'upgrade-crate'; div.innerHTML = u.icon;
+        div.onmouseenter = () => showTooltip(u); div.onmouseleave = () => hideTooltip();
+        if (game.score >= u.cost) { div.onclick = () => buyUpgrade(u.id); }
+        else { div.style.opacity = 0.5; div.style.filter = "grayscale(1)"; }
+        container.appendChild(div);
+      });
+    }
 
-        // Spawn existing buildings
-        let totalCreated = 0;
-        // Prioritize expensive buildings visually
-        for (let i = BUILDINGS.length - 1; i >= 0; i--) {
-        if (game.buildings[i] > 0) {
-        // Determine how many icons to show (logarithmic scaling)
-        let count = Math.min(Math.ceil(Math.log2(game.buildings[i] + 1)), 5);
-        for (let k = 0; k < count; k++) { if (totalCreated < MAX_VISUALS) { spawnVisualIcon(BUILDINGS[i].icon);
-          totalCreated++; } } } } } function spawnVisualIcon(iconChar) { const
-          container=document.getElementById('visual-canvas'); const el=document.createElement('div');
-          el.className='bg-icon' ; el.textContent=iconChar; // Random Position el.style.left=Math.random() * 90 + '%' ;
-          el.style.top=Math.random() * 90 + '%' ; // Random Size variation el.style.fontSize=(1 + Math.random()) + 'rem'
-          ; // Random Animation Duration el.style.animationDuration=(10 + Math.random() * 20) + 's' ;
-          container.appendChild(el); visualElements.push(el); } function updateDynamicBackground() { const
-          panel=document.getElementById('clickPanel'); let s=game.totalScore; // Simple milestones for colors if (s <
-          10000) { /* Default Blue/Black */ } else if (s < 1000000) { panel.style.background=`radial-gradient(circle at
-          center, #8e44ad 0%, #000000 100%)`; } // Purple else if (s < 1000000000) {
-          panel.style.background=`radial-gradient(circle at center, #d35400 0%, #2d3436 100%)`; } // Orange/Dark else if
-          (s < 1000000000000) { panel.style.background=`radial-gradient(circle at center, #f1c40f 0%, #2c3e50 100%)`; }
-          // Gold else { panel.style.background=`radial-gradient(circle at center, #16a085 0%, #000 100%)`; } // Matrix
-          Green/Space } /* --- MATH & CLICK UPGRADES --- */ function addScore(amount) { game.score +=amount;
-          game.totalScore +=amount; } function getBuildingMultiplier(index) { let m=1; UPGRADES.forEach(u=> { if (u.type
-          === 'build' && u.target === index && game.upgrades.includes(u.id)) m *= u.multi; });
-          if (buffs.frenzy.active) m *= buffs.frenzy.multi;
-          return m;
-          }
-          function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
-          function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count *
-          getBuildingCPS(i)); return cps; }
+    /* --- GOLDEN --- */
+    function updateBuffs(dt) { if (buffs.frenzy.active) { buffs.frenzy.time -= dt; if (buffs.frenzy.time <= 0) { buffs.frenzy.active = false; renderBuffs(); } } }
+    function renderBuffs() { document.getElementById('buffArea').innerHTML = buffs.frenzy.active ? `<div class="buff-icon">🔥</div>` : ''; }
+    function scheduleGolden() { const delay = (Math.random() * 600000) + 600000; setTimeout(spawnGolden, delay); }
+    function spawnGolden() {
+      const g = document.getElementById('goldenKlein');
+      const maxX = document.getElementById('clickPanel').offsetWidth - 80; const maxY = document.getElementById('clickPanel').offsetHeight - 80;
+      g.style.left = Math.random() * maxX + 'px'; g.style.top = Math.random() * maxY + 'px'; g.style.display = 'block';
+      setTimeout(() => { if (g.style.display === 'block') { g.style.display = 'none'; scheduleGolden(); } }, 10000);
+    }
+    document.getElementById('goldenKlein').onmousedown = function (e) {
+      e.stopPropagation(); this.style.display = 'none'; buffs.frenzy.active = true; buffs.frenzy.time = 30; renderBuffs();
+      spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7 CPS)"); scheduleGolden();
+    };
 
-          // MODIFIED CLICK FORMULA
-          function getClickPower() {
-          // Base calculation now includes Click Level
-          // Base: 1, Level 1: 3, Level 10: 30... + % of CPS
-          let levelPower = 1 + (game.clickLevel * 2);
-          let cpsPower = calculateTotalCPS() * 0.05; // 5% of CPS added
-          let power = levelPower + cpsPower;
+    /* --- SAVE --- */
+    function saveGame() {
+      const data = {
+        score: game.score,
+        totalScore: game.totalScore,
+        clicks: game.clicks,
+        clickLevel: game.clickLevel, // Save Level
+        buildings: game.buildings,
+        upgrades: game.upgrades,
+        casinoHistory: game.casinoHistory,
+        playerName: game.playerName
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    }
+    function loadGame() {
+      const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+      if (saved) {
+        game.score = saved.score || 0;
+        game.totalScore = saved.totalScore || 0;
+        game.clicks = saved.clicks || 0;
+        game.clickLevel = saved.clickLevel || 1; // Load Level
+        if (saved.buildings) game.buildings = saved.buildings;
+        game.upgrades = saved.upgrades || [];
+        game.casinoHistory = saved.casinoHistory || [];
+        if (saved.playerName) game.playerName = saved.playerName;
+      }
+    }
 
-          UPGRADES.forEach(u => { if (u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
-          if (buffs.frenzy.active) power *= buffs.frenzy.multi;
-          return power;
-          }
+    /* --- LEADERBOARD LOGIC --- */
+    function openLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'flex';
+      fetchLeaderboard();
+    }
 
-          function getClickLevelCost() {
-          // High cost for balancing: 500 * 2.5^Level
-          return Math.floor(500 * Math.pow(2.5, game.clickLevel));
-          }
+    function closeLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'none';
+    }
 
-          function buyClickStats() {
-          const cost = getClickLevelCost();
-          if (game.score >= cost) {
-          game.score -= cost;
-          game.clickLevel++;
-          updateClickUI();
+    function fetchLeaderboard() {
+      const list = document.getElementById('lb-list');
+      if (!dbRef) {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Firebase nicht konfiguriert!<br><span style="font-size:0.8rem; color:#aaa;">Öffne index.html und füge deine Keys ein.</span></div>';
+        return;
+      }
 
-          // Effect
-          const btn = document.getElementById('btn-buy-click');
-          btn.style.transform = "scale(1.1)";
-          setTimeout(() => btn.style.transform = "scale(1)", 100);
-          }
-          }
+      list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Lade...</div>';
 
-          function updateClickUI() {
-          const cost = getClickLevelCost();
-          const power = getClickPower();
-          document.getElementById('click-dmg-display').textContent = formatNum(power, 1);
-          document.getElementById('click-cost-display').textContent = formatNum(cost);
+      // Get top 20 scores
+      dbRef.orderByChild('score').limitToLast(20).once('value').then(snapshot => {
+        const scores = [];
+        snapshot.forEach(child => {
+          scores.push(child.val());
+        });
+        // Firebase returns ascending, so reverse it
+        renderLeaderboard(scores.reverse());
+      }).catch(err => {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Fehler beim Laden :(</div>';
+      });
+    }
 
-          const btn = document.getElementById('btn-buy-click');
-          if (game.score >= cost) btn.classList.remove('locked');
-          else btn.classList.add('locked');
-          }
+    function renderLeaderboard(scores) {
+      const list = document.getElementById('lb-list');
+      list.innerHTML = '';
 
-          /* --- CASINO LOGIC --- */
-          let isSpinning = false;
-          let currentCasinoMode = 'roulette';
+      if (scores.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:20px;">Noch keine Spieler. Sei der Erste!</div>';
+        return;
+      }
 
-          function openCasino() {
-          document.getElementById('casinoModal').style.display = 'flex';
-          updateCasinoUI();
-          generateStrip(50, null);
-          const s = document.getElementById('rouletteStrip');
-          s.style.transition = 'none'; s.style.transform = 'translateX(0px)';
-          }
-          function closeCasino() { document.getElementById('casinoModal').style.display = 'none'; }
-          function updateCasinoUI() { document.getElementById('casino-balance').textContent =
-          formatNum(Math.floor(game.score)); }
+      scores.forEach((s, index) => {
+        const rank = index + 1;
+        let rankClass = 'lb-rank';
+        if (rank === 1) rankClass += ' top-1';
+        if (rank === 2) rankClass += ' top-2';
+        if (rank === 3) rankClass += ' top-3';
 
-          function switchCasinoTab(mode) {
-          if (isSpinning) return;
-          currentCasinoMode = mode;
-          document.getElementById('view-roulette').style.display = mode === 'roulette' ? 'block' : 'none';
-          document.getElementById('view-slots').style.display = mode === 'slots' ? 'block' : 'none';
-
-          document.getElementById('btn-tab-roulette').className = mode === 'roulette' ? 'nav-btn active' : 'nav-btn';
-          document.getElementById('btn-tab-slots').className = mode === 'slots' ? 'nav-btn active' : 'nav-btn';
-          }
-
-          function setBetMultiplier(multi) {
-          const input = document.getElementById('betAmount');
-          if (multi === 'max') input.value = Math.floor(game.score);
-          else {
-          let val = parseInt(input.value) || 0;
-          if (val === 0) val = 100;
-          input.value = Math.floor(val * multi);
-          }
-          }
-
-          /* --- ROULETTE ENGINE --- */
-          function generateStrip(count, winningColor) {
-          const strip = document.getElementById('rouletteStrip');
-          strip.innerHTML = '';
-          for (let i = 0; i < count; i++) { let type='black' ; const r=Math.random(); if (winningColor && i===60)
-            type=winningColor; else { if (r < 0.06) type='green' ; else if (r < 0.53) type='red' ; else type='black' ; }
-            const el=document.createElement('div'); el.className=`r-card rc-${type}`; if (type==='green' )
-            el.innerHTML=`<img src="${IMG_URL}" class="rc-logo">`;
-            else el.textContent = Math.floor(Math.random() * 7) + (type === 'black' ? 8 : 1);
-            strip.appendChild(el);
-            }
-            }
-
-            function spin(choice) {
-            if (isSpinning) return;
-            const bet = getBet();
-            if (!bet) return;
-
-            game.score -= bet;
-            updateCasinoUI();
-            isSpinning = true;
-            disableButtons(true);
-
-            const r = Math.random();
-            let result = 'black';
-            if (r < 0.05) result='green' ; else if (r < 0.525) result='red' ; generateStrip(80, result); const
-              strip=document.getElementById('rouletteStrip'); strip.style.transition='none' ;
-              strip.style.transform='translateX(0px)' ; strip.offsetHeight; const cardSize=74; const targetIndex=60;
-              const centerOfTarget=(targetIndex * cardSize) + 35; const jitter=Math.floor(Math.random() * 50) - 25;
-              const totalTranslate=centerOfTarget + jitter;
-              strip.style.transition='transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1)' ;
-              strip.style.transform=`translateX(-${totalTranslate}px)`; const
-              marker=document.querySelector('.roulette-marker'); marker.style.animation="shake 0.1s infinite" ;
-              setTimeout(()=> marker.style.animation = "none", 4500);
-
-              setTimeout(() => { finishSpin(choice, result, bet); }, 4500);
-              }
-
-              function finishSpin(choice, result, bet) {
-              isSpinning = false;
-              disableButtons(false);
-              game.casinoHistory.unshift(result);
-              if (game.casinoHistory.length > 10) game.casinoHistory.pop();
-              renderHistory();
-
-              let multiplier = 0;
-              if (choice === result) {
-              if (result === 'green') multiplier = 14;
-              else multiplier = 2;
-              }
-
-              if (multiplier > 0) triggerWin(bet * multiplier);
-              updateCasinoUI();
-              saveGame();
-              }
-
-              /* --- SLOTS ENGINE --- */
-              const SLOT_SYMBOLS = ['🍒', '🍋', '🍇', '💎', '7️⃣'];
-
-              function spinSlots() {
-              if (isSpinning) return;
-              const bet = getBet();
-              if (!bet) return;
-
-              game.score -= bet;
-              updateCasinoUI();
-              isSpinning = true;
-              disableButtons(true);
-
-              const reels = [document.getElementById('reel-1'), document.getElementById('reel-2'),
-              document.getElementById('reel-3')];
-              reels.forEach(r => r.classList.add('spinning'));
-
-              let intervals = reels.map(r => setInterval(() => {
-              r.querySelector('span').textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
-              }, 50));
-
-              const finalSymbols = [];
-              const roll = Math.random();
-              let forcedWin = null;
-
-              if (roll < 0.30) { const typeRoll=Math.random(); if (typeRoll < 0.02) forcedWin='💎' ; else if (typeRoll <
-                0.1) forcedWin='7️⃣' ; else if (typeRoll < 0.3) forcedWin='🍇' ; else if (typeRoll < 0.6) forcedWin='🍋'
-                ; else forcedWin='🍒' ; } for (let i=0; i < 3; i++) { if (forcedWin) finalSymbols.push(forcedWin); else
-                finalSymbols.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]); } if (!forcedWin &&
-                finalSymbols[0]===finalSymbols[1] && finalSymbols[1]===finalSymbols[2]) {
-                finalSymbols[2]=finalSymbols[0]==='🍒' ? '🍋' : '🍒' ; } [1500, 2000, 2500].forEach((delay, i)=> {
-                setTimeout(() => {
-                clearInterval(intervals[i]);
-                reels[i].classList.remove('spinning');
-                reels[i].querySelector('span').textContent = finalSymbols[i];
-                reels[i].style.transform = "scale(1.2)";
-                setTimeout(() => reels[i].style.transform = "scale(1)", 150);
-                if (i === 2) finishSlotSpin(finalSymbols, bet);
-                }, delay);
-                });
-                }
-
-                function finishSlotSpin(symbols, bet) {
-                isSpinning = false;
-                disableButtons(false);
-
-                let multiplier = 0;
-                if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
-                const s = symbols[0];
-                if (s === '🍒') multiplier = 3;
-                else if (s === '🍋') multiplier = 5;
-                else if (s === '🍇') multiplier = 10;
-                else if (s === '7️⃣') multiplier = 25;
-                else if (s === '💎') multiplier = 50;
-                }
-
-                if (multiplier > 0) triggerWin(bet * multiplier);
-                updateCasinoUI();
-                saveGame();
-                }
-
-                /* --- SHARED CASINO FUNCS --- */
-                function getBet() {
-                const betInput = document.getElementById('betAmount');
-                let bet = parseInt(betInput.value);
-                if (isNaN(bet) || bet <= 0) { alert("Bitte Einsatz eingeben!"); return null; } if (bet> game.score) {
-                  bet = Math.floor(game.score); betInput.value = bet; }
-                  if (bet <= 0) return null; return bet; } function triggerWin(amount) { addScore(amount);
-                    spawnConfetti(); document.getElementById('casinoWindow').classList.add('win-pulse'); setTimeout(()=>
-                    document.getElementById('casinoWindow').classList.remove('win-pulse'), 500);
-                    }
-
-                    function renderHistory() {
-                    const con = document.getElementById('history-container'); con.innerHTML = '';
-                    game.casinoHistory.forEach(h => {
-                    const d = document.createElement('div'); d.className = `hist-dot hist-${h}`; con.appendChild(d);
-                    });
-                    }
-
-                    function disableButtons(disable) {
-                    document.querySelectorAll('.bet-btn, .control-btn, .close-btn, .nav-btn').forEach(b => b.disabled =
-                    disable);
-                    }
-                    function spawnConfetti() {
-                    const win = document.getElementById('casinoWindow');
-                    for (let i = 0; i < 30; i++) { const p=document.createElement('div'); p.className='win-particle' ;
-                      p.style.backgroundColor=['#f1c40f', '#e74c3c' , '#2ecc71' , '#3498db' ][Math.floor(Math.random() *
-                      4)]; p.style.left='50%' ; p.style.top='50%' ; p.style.setProperty('--tx', (Math.random() * 400 -
-                      200) + 'px' ); p.style.setProperty('--ty', (Math.random() * 400 - 200) + 'px' );
-                      win.appendChild(p); setTimeout(()=> p.remove(), 1000);
-                      }
-                      }
-
-                      /* --- INTERACTIONS --- */
-                      const bigKlein = document.getElementById('bigKlein');
-                      bigKlein.addEventListener('mousedown', (e) => handleInteraction(e.clientX, e.clientY));
-                      bigKlein.addEventListener('touchstart', (e) => { e.preventDefault(); for (let i = 0; i <
-                        e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY); });
-                        function handleInteraction(x, y) { const power=getClickPower(); addScore(power); game.clicks++;
-                        // NEW: TRACK CLICK FOR DYNAMIC CPS clickHistory.push({ time: performance.now(), val: power });
-                        spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power !=1 ? 's' : '' }`);
-                        spawnFallingFace(x, y); bigKlein.style.transform="scale(0.94)" ; setTimeout(()=>
-                        bigKlein.style.transform = "scale(1)", 50);
-                        }
-                        function spawnFloatingText(x, y, text) {
-                        const el = document.createElement('div'); el.className = 'click-text'; el.textContent = text;
-                        el.style.left = (x - 20 + Math.random() * 40) + 'px'; el.style.top = y + 'px';
-                        document.body.appendChild(el); setTimeout(() => el.remove(), 800);
-                        }
-                        function spawnFallingFace(x, y) {
-                        const img = document.createElement('img'); img.src = IMG_URL; img.className = 'falling-face';
-                        img.style.left = (x - 17) + 'px'; img.style.top = (y - 17) + 'px';
-                        document.getElementById('clickPanel').appendChild(img); setTimeout(() => img.remove(), 1200);
-                        }
-
-                        // UPDATED FORMATTER FOR BIG NUMBERS
-                        function formatNum(num, decimals = 0) {
-                        if (num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals }); if
-                          (num < 1000000000) return (num / 1000000).toLocaleString('de-DE', { maximumFractionDigits: 2
-                          }) + " Mio" ; if (num < 1000000000000) return (num / 1000000000).toLocaleString('de-DE', {
-                          maximumFractionDigits: 2 }) + " Mrd" ; if (num < 1000000000000000) return (num /
-                          1000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Bio" ; // Billionen
-                          if (num < 1000000000000000000) return (num / 1000000000000000).toLocaleString('de-DE', {
-                          maximumFractionDigits: 2 }) + " Brd" ; // Billiarden if (num < 1000000000000000000000) return
-                          (num / 1000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Trio" ;
-                          // Trillionen if (num < 1000000000000000000000000) return (num /
-                          1000000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Trd" ; //
-                          Trilliarden if (num < 1000000000000000000000000000) return (num /
-                          1000000000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Quad" ;
-                          // Quadrillionen if (num < 1000000000000000000000000000000) return (num /
-                          1000000000000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Quard"
-                          ; // Quadrilliarden return (num / 1000000000000000000000000000000).toLocaleString('de-DE', {
-                          maximumFractionDigits: 2 }) + " Quint" ; // Quintillionen } /* --- SHOP --- */ function
-                          getBuildingCost(i) { return Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15,
-                          game.buildings[i])); } function buyBuilding(i) { const cost=getBuildingCost(i); if
-                          (game.score>= cost) {
-                          game.score -= cost;
-                          game.buildings[i]++;
-                          updateSingleBuildingUI(i);
-                          renderUpgrades();
-                          // Visual feedback
-                          if (visualElements.length < MAX_VISUALS) spawnVisualIcon(BUILDINGS[i].icon); } } function
-                            buildBuildingUI() { const list=document.getElementById('buildingList'); list.innerHTML='' ;
-                            BUILDINGS.forEach((b, i)=> {
-                            const el = document.createElement('div'); el.className = 'building-row'; el.id =
-                            `build-row-${i}`; el.onclick = () =>
-                            buyBuilding(i);
-                            el.innerHTML = `<div class="b-icon">${b.icon}</div>
-                            <div class="b-info">
-                              <div class="b-name">${b.name}</div>
-                              <div class="b-cps">Prod: ${formatNum(b.baseCps, 1)}/s</div>
-                              <div class="b-cost" id="cost-${i}">0 Kleinis</div>
-                            </div>
-                            <div class="b-count" id="count-${i}">0</div>`;
-                            list.appendChild(el); updateSingleBuildingUI(i);
-                            });
-                            }
-                            function updateSingleBuildingUI(i) {
-                            document.getElementById(`count-${i}`).textContent = game.buildings[i];
-                            document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i)) + "
-                            Kleinis";
-                            }
-                            function updateBuildingStates() {
-                            BUILDINGS.forEach((b, i) => {
-                            const row = document.getElementById(`build-row-${i}`); const costEl =
-                            document.getElementById(`cost-${i}`);
-                            if (game.score >= getBuildingCost(i)) { row.classList.add('can-afford');
-                            costEl.classList.add('affordable'); }
-                            else { row.classList.remove('can-afford'); costEl.classList.remove('affordable'); }
-                            });
-                            }
-
-                            /* --- UPGRADES --- */
-                            function buyUpgrade(uId) {
-                            const u = UPGRADES.find(x => x.id === uId);
-                            if (game.score >= u.cost) { game.score -= u.cost; game.upgrades.push(uId); renderUpgrades();
-                            hideTooltip(); }
-                            }
-                            function showTooltip(u) {
-                            ttName.textContent = u.name; ttPrice.textContent = formatNum(u.cost) + " Kleinis";
-                            ttPrice.className = game.score >= u.cost ? 'tt-price affordable' : 'tt-price expensive';
-                            ttEffect.textContent = "Effekt: " + u.text; ttDesc.textContent = u.desc;
-                            let statsHTML = '';
-                            if (u.type === 'build') {
-                            const bIdx = u.target; const count = game.buildings[bIdx];
-                            const currentMulti = getBuildingMultiplier(bIdx);
-                            const base = BUILDINGS[bIdx].baseCps;
-                            const currentSingleCPS = base * currentMulti;
-                            const newSingleCPS = currentSingleCPS * u.multi;
-                            const totalGain = (newSingleCPS - currentSingleCPS) * count;
-                            statsHTML = `<div class="stat-line"><span>Einzeln:</span><span>${formatNum(currentSingleCPS,
-                                1)} ➜ <span style="color:#2ecc71">${formatNum(newSingleCPS, 1)}</span></span></div>
-                            <div class="stat-highlight">+${formatNum(totalGain, 1)} CPS Gesamt</div>`;
-                            } else { statsHTML = `<div class="stat-highlight">Klickstärke wird verdoppelt!</div>`; }
-                            ttStats.innerHTML = statsHTML; tooltipEl.style.display = 'block';
-                            }
-                            function hideTooltip() { tooltipEl.style.display = 'none'; }
-                            function renderUpgrades() {
-                            const container = document.getElementById('upgradeGrid'); container.innerHTML = '';
-                            const available = UPGRADES.filter(u => {
-                            if (game.upgrades.includes(u.id)) return false;
-                            if (u.trigger.type === 'clicks' && game.clicks >= u.trigger.val) return true;
-                            if (u.trigger.type === 'build' && game.buildings[u.trigger.id] >= u.trigger.val) return
-                            true;
-                            return false;
-                            });
-                            available.forEach(u => {
-                            const div = document.createElement('div'); div.className = 'upgrade-crate'; div.innerHTML =
-                            u.icon;
-                            div.onmouseenter = () => showTooltip(u); div.onmouseleave = () => hideTooltip();
-                            if (game.score >= u.cost) { div.onclick = () => buyUpgrade(u.id); }
-                            else { div.style.opacity = 0.5; div.style.filter = "grayscale(1)"; }
-                            container.appendChild(div);
-                            });
-                            }
-
-                            /* --- GOLDEN --- */
-                            function updateBuffs(dt) { if (buffs.frenzy.active) { buffs.frenzy.time -= dt; if
-                            (buffs.frenzy.time <= 0) { buffs.frenzy.active=false; renderBuffs(); } } } function
-                              renderBuffs() { document.getElementById('buffArea').innerHTML=buffs.frenzy.active ? `<div
-                              class="buff-icon">🔥</div>` : ''; }
-                              function scheduleGolden() { const delay = (Math.random() * 600000) + 600000;
-                              setTimeout(spawnGolden, delay); }
-                              function spawnGolden() {
-                              const g = document.getElementById('goldenKlein');
-                              const maxX = document.getElementById('clickPanel').offsetWidth - 80; const maxY =
-                              document.getElementById('clickPanel').offsetHeight - 80;
-                              g.style.left = Math.random() * maxX + 'px'; g.style.top = Math.random() * maxY + 'px';
-                              g.style.display = 'block';
-                              setTimeout(() => { if (g.style.display === 'block') { g.style.display = 'none';
-                              scheduleGolden(); } }, 10000);
-                              }
-                              document.getElementById('goldenKlein').onmousedown = function (e) {
-                              e.stopPropagation(); this.style.display = 'none'; buffs.frenzy.active = true;
-                              buffs.frenzy.time = 30; renderBuffs();
-                              spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7
-                              CPS)"); scheduleGolden();
-                              };
-
-                              /* --- SAVE --- */
-                              function saveGame() {
-                              const data = {
-                              score: game.score,
-                              totalScore: game.totalScore,
-                              clicks: game.clicks,
-                              clickLevel: game.clickLevel, // Save Level
-                              buildings: game.buildings,
-                              upgrades: game.upgrades,
-                              casinoHistory: game.casinoHistory,
-                              playerName: game.playerName
-                              };
-                              localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-                              }
-                              function loadGame() {
-                              const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-                              if (saved) {
-                              game.score = saved.score || 0;
-                              game.totalScore = saved.totalScore || 0;
-                              game.clicks = saved.clicks || 0;
-                              game.clickLevel = saved.clickLevel || 1; // Load Level
-                              if (saved.buildings) game.buildings = saved.buildings;
-                              game.upgrades = saved.upgrades || [];
-                              game.casinoHistory = saved.casinoHistory || [];
-                              if (saved.playerName) game.playerName = saved.playerName;
-                              }
-                              }
-
-                              /* --- LEADERBOARD LOGIC --- */
-                              function openLeaderboard() {
-                              document.getElementById('leaderboardModal').style.display = 'flex';
-                              fetchLeaderboard();
-                              }
-
-                              function closeLeaderboard() {
-                              document.getElementById('leaderboardModal').style.display = 'none';
-                              }
-
-                              function fetchLeaderboard() {
-                              const list = document.getElementById('lb-list');
-                              if (!dbRef) {
-                              list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Firebase
-                                nicht konfiguriert!<br><span style="font-size:0.8rem; color:#aaa;">Öffne index.html und
-                                  füge deine Keys ein.</span></div>';
-                              return;
-                              }
-
-                              list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Lade...</div>
-                              ';
-
-                              // Get top 20 scores
-                              dbRef.orderByChild('score').limitToLast(20).once('value').then(snapshot => {
-                              const scores = [];
-                              snapshot.forEach(child => {
-                              scores.push(child.val());
-                              });
-                              // Firebase returns ascending, so reverse it
-                              renderLeaderboard(scores.reverse());
-                              }).catch(err => {
-                              list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Fehler beim
-                                Laden :(</div>';
-                              });
-                              }
-
-                              function renderLeaderboard(scores) {
-                              const list = document.getElementById('lb-list');
-                              list.innerHTML = '';
-
-                              if (scores.length === 0) {
-                              list.innerHTML = '<div style="text-align:center; padding:20px;">Noch keine Spieler. Sei
-                                der Erste!</div>';
-                              return;
-                              }
-
-                              scores.forEach((s, index) => {
-                              const rank = index + 1;
-                              let rankClass = 'lb-rank';
-                              if (rank === 1) rankClass += ' top-1';
-                              if (rank === 2) rankClass += ' top-2';
-                              if (rank === 3) rankClass += ' top-3';
-
-                              const el = document.createElement('div');
-                              el.className = 'lb-entry';
-                              el.innerHTML = `
-                              <div class="${rankClass}">#${rank}</div>
-                              <div class="lb-name">${s.name}</div>
-                              <div class="lb-score">${formatNum(s.score)}</div>
-                              `;
-                              list.appendChild(el);
-                              });
-                              }
-                              init();
-                              </script>
+        const el = document.createElement('div');
+        el.className = 'lb-entry';
+        el.innerHTML = `
+          <div class="${rankClass}">#${rank}</div>
+          <div class="lb-name">${s.name}</div>
+          <div class="lb-score">${formatNum(s.score)}</div>
+        `;
+        list.appendChild(el);
+      });
+    }
+    init();
+  </script>
 </body>
 
 </html>
+```
