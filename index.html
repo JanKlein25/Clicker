@@ -2,6 +2,11 @@
 
 <!DOCTYPE html>
 <html lang="de">
+```html
+<!-- START OF FILE index.html -->
+
+<!DOCTYPE html>
+<html lang="de">
 
 <head>
   <meta charset="UTF-8" />
@@ -10,6 +15,9 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap"
     rel="stylesheet">
+  <!-- FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
   <style>
     :root {
@@ -585,6 +593,132 @@
       color: #fff;
     }
 
+    /* --- LEADERBOARD MODAL --- */
+    #leaderboardModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 12000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .lb-window {
+      background: #18181b;
+      width: 95%;
+      max-width: 500px;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 0 80px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      max-height: 80vh;
+    }
+
+    .lb-header {
+      background: linear-gradient(to bottom, #2d3436, #1e272e);
+      padding: 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .lb-title {
+      font-family: 'Merriweather', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .lb-list {
+      padding: 10px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .lb-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .lb-entry:last-child {
+      border-bottom: none;
+    }
+
+    .lb-rank {
+      width: 30px;
+      font-weight: bold;
+      color: #666;
+    }
+
+    .lb-rank.top-1 {
+      color: var(--gold);
+      font-size: 1.2rem;
+    }
+
+    .lb-rank.top-2 {
+      color: #bdc3c7;
+      font-size: 1.1rem;
+    }
+
+    .lb-rank.top-3 {
+      color: #cd7f32;
+      font-size: 1.1rem;
+    }
+
+    .lb-name {
+      flex: 1;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .lb-score {
+      color: var(--green);
+      font-weight: bold;
+    }
+
+    .lb-footer {
+      padding: 15px;
+      border-top: 1px solid #333;
+      text-align: center;
+      color: #666;
+      font-size: 0.8rem;
+    }
+
+    #leaderboardBtn {
+      margin-top: 15px;
+      background: linear-gradient(45deg, #8e44ad, #9b59b6);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(142, 68, 173, 0.4);
+      transition: all 0.2s;
+      letter-spacing: 1px;
+      z-index: 25;
+    }
+
+    #leaderboardBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(142, 68, 173, 0.8);
+    }
+
     /* ROULETTE TICKER */
     .roulette-container {
       width: 100%;
@@ -1064,6 +1198,22 @@
     </div>
   </div>
 
+  <!-- LEADERBOARD MODAL -->
+  <div id="leaderboardModal">
+    <div class="lb-window">
+      <button class="close-btn" onclick="closeLeaderboard()">×</button>
+      <div class="lb-header">
+        <div class="lb-title">🏆 TOP SPIELER</div>
+      </div>
+      <div class="lb-list" id="lb-list">
+        <div style="text-align:center; padding:20px; color:#666;">Lade Daten...</div>
+      </div>
+      <div class="lb-footer">
+        Dein Name: <span id="my-player-name" style="color:#fff; font-weight:bold;">Unbekannt</span>
+      </div>
+    </div>
+  </div>
+
   <div class="left-panel" id="clickPanel">
     <!-- VISUAL BACKGROUND AREA -->
     <div id="visual-canvas"></div>
@@ -1075,6 +1225,7 @@
       <div id="cps">0,0 Kleinis / Sekunde</div>
     </div>
     <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
+    <button id="leaderboardBtn" onclick="openLeaderboard()">🏆 LEADERBOARD</button>
     <div class="buff-container" id="buffArea"></div>
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein"
       alt="Klick mich!">
@@ -1151,7 +1302,8 @@
     let game = {
       score: 0, totalScore: 0, clicks: 0, clickLevel: 1,
       buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
-      casinoHistory: []
+      casinoHistory: [],
+      playerName: "Spieler" + Math.floor(Math.random() * 1000)
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
@@ -1164,6 +1316,31 @@
     // Visual State
     let visualElements = [];
     const MAX_VISUALS = 30;
+
+    /* --- FIREBASE CONFIG --- */
+    // TODO: FÜGE HIER DEINE FIREBASE DATEN EIN
+    const firebaseConfig = {
+      apiKey: "AIzaSyA9UzTCyFOxOr6EiGATnkXA_QMQZRcqX0I",
+      authDomain: "kleinclicker.firebaseapp.com",
+      databaseURL: "https://kleinclicker-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "kleinclicker",
+      storageBucket: "kleinclicker.firebasestorage.app",
+      messagingSenderId: "109832699128",
+      appId: "1:109832699128:web:636e6c1687927447d6cf0d",
+      measurementId: "G-JBPB52ZK4J"
+    };
+
+    let db;
+    let dbRef;
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      dbRef = db.ref('leaderboard');
+      console.log("Firebase initialized");
+    } catch (e) {
+      console.warn("Firebase not configured yet. Leaderboard will be offline.");
+    }
 
     /* --- UI --- */
     const tooltipEl = document.getElementById('global-tooltip');
@@ -1191,6 +1368,16 @@
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000);
       scheduleGolden();
+
+      // Ask for name if default
+      if (game.playerName.startsWith("Spieler")) {
+        const newName = prompt("Wie möchtest du auf dem Leaderboard heißen?", game.playerName);
+        if (newName && newName.trim() !== "") {
+          game.playerName = newName.trim().substring(0, 15);
+          saveGame();
+        }
+      }
+      document.getElementById('my-player-name').textContent = game.playerName;
 
       document.addEventListener('mousemove', (e) => {
         if (tooltipEl.style.display === 'block') {
@@ -1235,7 +1422,18 @@
       updateBuildingStates();
       requestAnimationFrame(gameLoop);
     }
-    function slowLoop() { saveGame(); renderUpgrades(); }
+    function slowLoop() {
+      saveGame();
+      renderUpgrades();
+      // Sync Score to Firebase
+      if (dbRef) {
+        dbRef.child(game.playerName).set({
+          name: game.playerName,
+          score: Math.floor(game.totalScore),
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).catch(err => console.log("Sync error", err));
+      }
+    }
 
     /* --- VISUALS & BACKGROUND --- */
     function initVisuals() {
@@ -1695,7 +1893,8 @@
         clickLevel: game.clickLevel, // Save Level
         buildings: game.buildings,
         upgrades: game.upgrades,
-        casinoHistory: game.casinoHistory
+        casinoHistory: game.casinoHistory,
+        playerName: game.playerName
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
@@ -1709,10 +1908,71 @@
         if (saved.buildings) game.buildings = saved.buildings;
         game.upgrades = saved.upgrades || [];
         game.casinoHistory = saved.casinoHistory || [];
+        if (saved.playerName) game.playerName = saved.playerName;
       }
+    }
+
+    /* --- LEADERBOARD LOGIC --- */
+    function openLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'flex';
+      fetchLeaderboard();
+    }
+
+    function closeLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'none';
+    }
+
+    function fetchLeaderboard() {
+      const list = document.getElementById('lb-list');
+      if (!dbRef) {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Firebase nicht konfiguriert!<br><span style="font-size:0.8rem; color:#aaa;">Öffne index.html und füge deine Keys ein.</span></div>';
+        return;
+      }
+
+      list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Lade...</div>';
+
+      // Get top 20 scores
+      dbRef.orderByChild('score').limitToLast(20).once('value').then(snapshot => {
+        const scores = [];
+        snapshot.forEach(child => {
+          scores.push(child.val());
+        });
+        // Firebase returns ascending, so reverse it
+        renderLeaderboard(scores.reverse());
+      }).catch(err => {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Fehler beim Laden :(</div>';
+      });
+    }
+
+    function renderLeaderboard(scores) {
+      const list = document.getElementById('lb-list');
+      list.innerHTML = '';
+
+      if (scores.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:20px;">Noch keine Spieler. Sei der Erste!</div>';
+        return;
+      }
+
+      scores.forEach((s, index) => {
+        const rank = index + 1;
+        let rankClass = 'lb-rank';
+        if (rank === 1) rankClass += ' top-1';
+        if (rank === 2) rankClass += ' top-2';
+        if (rank === 3) rankClass += ' top-3';
+
+        const el = document.createElement('div');
+        el.className = 'lb-entry';
+        el.innerHTML = `
+          <div class="${rankClass}">#${rank}</div>
+          <div class="lb-name">${s.name}</div>
+          <div class="lb-score">${formatNum(s.score)}</div>
+        `;
+        list.appendChild(el);
+      });
     }
     init();
   </script>
 </body>
 
 </html>
+```
