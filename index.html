@@ -18,6 +18,7 @@
       --red: #e74c3c;
       --text-main: #ecf0f1;
       --tooltip-bg: rgba(10, 10, 15, 0.98);
+      --purple: #9b59b6;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
@@ -29,7 +30,6 @@
       height: 100vh;
       overflow: hidden;
       display: flex;
-      /* Zurück zum Standard-Layout (Links/Rechts) ohne Ticker */
       flex-direction: row; 
     }
 
@@ -53,7 +53,6 @@
     /* --- LAYOUT --- */
     .left-panel {
       flex: 1; 
-      /* Dynamic Background Logic handled in JS */
       background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
       transition: background 2s ease;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -116,6 +115,30 @@
       letter-spacing: 1px;
     }
     #casinoBtn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(243, 156, 18, 0.8); }
+
+    /* --- CLICK UPGRADE SECTION (NEW) --- */
+    .click-booster {
+      padding: 15px; background: linear-gradient(135deg, #18181b, #0f0f12);
+      border-bottom: 2px solid #000;
+    }
+    .cb-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 12px; display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .cb-info { flex: 1; }
+    .cb-title { color: var(--gold); font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+    .cb-stat { color: #ccc; font-size: 0.8rem; }
+    .cb-btn {
+      background: linear-gradient(to bottom, #2ecc71, #27ae60);
+      border: 1px solid #2ecc71; color: #fff; padding: 8px 15px; border-radius: 6px;
+      font-weight: bold; cursor: pointer; text-align: right; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+      transition: transform 0.1s; min-width: 100px;
+    }
+    .cb-btn:hover { filter: brightness(1.1); }
+    .cb-btn:active { transform: scale(0.95); }
+    .cb-btn.locked { background: #333; border-color: #444; color: #777; cursor: not-allowed; box-shadow: none; }
+    .cb-cost { font-size: 0.8rem; display: block; opacity: 0.9; }
 
     /* --- SHOP --- */
     .store-header { 
@@ -372,13 +395,29 @@
   <div class="right-panel">
     <div class="store-header">Upgrades</div>
     <div class="upgrades-container" id="upgradeGrid"></div>
+    
+    <!-- NEW CLICKER UPGRADE SECTION -->
+    <div class="store-header">Clicker Zentrale</div>
+    <div class="click-booster" id="clickBooster">
+        <div class="cb-card">
+            <div class="cb-info">
+                <div class="cb-title">Maus Training</div>
+                <div class="cb-stat">Kraft: <span id="click-dmg-display" style="color:var(--gold); font-weight:bold;">1</span></div>
+            </div>
+            <button class="cb-btn" id="btn-buy-click" onclick="buyClickStats()">
+                <div style="font-size:0.7rem; text-transform:uppercase;">Level Up</div>
+                <span id="click-cost-display" class="cb-cost">100</span>
+            </button>
+        </div>
+    </div>
+
     <div class="store-header">Markt</div>
     <div class="buildings-list" id="buildingList"></div>
   </div>
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V6'; // Use your saved key
+    const SAVE_KEY = 'KleinClicker_Precision_V6'; // Updated Key
     const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
     
     // NEW BUILDINGS ADDED
@@ -420,7 +459,7 @@
 
     /* --- GAME STATE --- */
     let game = {
-      score: 0, totalScore: 0, clicks: 0, 
+      score: 0, totalScore: 0, clicks: 0, clickLevel: 1,
       buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
       casinoHistory: []
     };
@@ -481,6 +520,7 @@
       document.getElementById('cps').textContent = formatNum(cps, 1) + " Kleinis / Sekunde";
       
       updateDynamicBackground();
+      updateClickUI();
       
       if(!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
       else if(casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
@@ -542,7 +582,7 @@
         else { panel.style.background = `radial-gradient(circle at center, #16a085 0%, #000 100%)`; } // Matrix Green/Space
     }
 
-    /* --- MATH --- */
+    /* --- MATH & CLICK UPGRADES --- */
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
     function getBuildingMultiplier(index) {
       let m = 1;
@@ -552,11 +592,51 @@
     }
     function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
     function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
+    
+    // MODIFIED CLICK FORMULA
     function getClickPower() {
-      let power = 1 + (calculateTotalCPS() * 0.02);
+      // Base calculation now includes Click Level
+      // Base: 1, Level 1: 3, Level 10: 30... + % of CPS
+      let levelPower = 1 + (game.clickLevel * 2); 
+      let cpsPower = calculateTotalCPS() * 0.05; // 5% of CPS added
+      let power = levelPower + cpsPower;
+
       UPGRADES.forEach(u => { if(u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
       if(buffs.frenzy.active) power *= buffs.frenzy.multi;
       return power;
+    }
+
+    function getClickLevelCost() {
+        // !!! BALANCING UPDATE !!!
+        // Kosten deutlich erhöht. Basis 500, Exponent 2.5
+        // Level 1 -> 500 * 2.5^1 = 1250
+        // Level 10 -> 500 * 2.5^10 = ~4,7 Mio
+        return Math.floor(500 * Math.pow(2.5, game.clickLevel));
+    }
+
+    function buyClickStats() {
+        const cost = getClickLevelCost();
+        if(game.score >= cost) {
+            game.score -= cost;
+            game.clickLevel++;
+            updateClickUI();
+            
+            // Effect
+            const btn = document.getElementById('btn-buy-click');
+            btn.style.transform = "scale(1.1)";
+            setTimeout(() => btn.style.transform = "scale(1)", 100);
+        }
+    }
+
+    function updateClickUI() {
+        const cost = getClickLevelCost();
+        const power = getClickPower();
+        document.getElementById('click-dmg-display').textContent = formatNum(power, 1);
+        document.getElementById('click-cost-display').textContent = formatNum(cost);
+        
+        const btn = document.getElementById('btn-buy-click');
+        if(game.score >= cost) btn.classList.remove('locked');
+        else btn.classList.add('locked');
     }
 
     /* --- CASINO LOGIC --- */
@@ -900,15 +980,27 @@
 
     /* --- SAVE --- */
     function saveGame() {
-      const data = { score: game.score, totalScore: game.totalScore, clicks: game.clicks, buildings: game.buildings, upgrades: game.upgrades, casinoHistory: game.casinoHistory };
+      const data = { 
+          score: game.score, 
+          totalScore: game.totalScore, 
+          clicks: game.clicks, 
+          clickLevel: game.clickLevel, // Save Level
+          buildings: game.buildings, 
+          upgrades: game.upgrades, 
+          casinoHistory: game.casinoHistory 
+      };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
     function loadGame() {
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
       if(saved) {
-        game.score = saved.score || 0; game.totalScore = saved.totalScore || 0; game.clicks = saved.clicks || 0;
+        game.score = saved.score || 0; 
+        game.totalScore = saved.totalScore || 0; 
+        game.clicks = saved.clicks || 0;
+        game.clickLevel = saved.clickLevel || 1; // Load Level
         if(saved.buildings) game.buildings = saved.buildings;
-        game.upgrades = saved.upgrades || []; game.casinoHistory = saved.casinoHistory || [];
+        game.upgrades = saved.upgrades || []; 
+        game.casinoHistory = saved.casinoHistory || [];
       }
     }
     init();
