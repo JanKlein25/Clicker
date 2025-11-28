@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker V2</title>
+  <title>KleinClicker</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap"
     rel="stylesheet">
@@ -1615,20 +1615,18 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V6'; // KORRIGIERT: Dein alter Speicherstand ist wieder da!
+    const SAVE_KEY = 'KleinClicker_Precision_V6'; // Version Bumped
     const DEFAULT_IMG = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
 
     // SKINS DATA (Rarities: common, rare, epic, legendary)
+    // NOTE: Using CSS Filters for simulation. Replace urls with real ones if you have them.
     const SKINS = [
       { id: 'default', name: 'Original Klein', rarity: 'common', url: DEFAULT_IMG, filter: '' },
-
-      // --- HIER DEINE FREUNDE EINFÜGEN ---
-      // Ersetze 'DEFAULT_IMG' mit der Bild-URL deines Freundes in Anführungszeichen.
-
-      { id: 'friend_common', name: 'Freund 1 (Common)', rarity: 'common', url: DEFAULT_IMG, filter: '' },
-      { id: 'friend_rare', name: 'Freund 2 (Rare)', rarity: 'rare', url: DEFAULT_IMG, filter: '' },
-      { id: 'friend_epic', name: 'Freund 3 (Epic)', rarity: 'epic', url: DEFAULT_IMG, filter: '' },
-      { id: 'friend_legendary', name: 'Freund 4 (Legendary)', rarity: 'legendary', url: DEFAULT_IMG, filter: '' },
+      { id: 'sepia', name: 'Retro Klein', rarity: 'common', url: DEFAULT_IMG, filter: 'sepia(1)' },
+      { id: 'dark', name: 'Night Klein', rarity: 'rare', url: DEFAULT_IMG, filter: 'invert(1) hue-rotate(180deg)' },
+      { id: 'radioactive', name: 'Zombie Klein', rarity: 'rare', url: DEFAULT_IMG, filter: 'hue-rotate(90deg) brightness(1.2)' },
+      { id: 'frozen', name: 'Ice Klein', rarity: 'epic', url: DEFAULT_IMG, filter: 'hue-rotate(200deg) brightness(1.5) drop-shadow(0 0 10px cyan)' },
+      { id: 'golden', name: 'Prestige Klein', rarity: 'legendary', url: DEFAULT_IMG, filter: 'sepia(1) saturate(5) brightness(1.2) drop-shadow(0 0 15px gold)' },
     ];
 
     // BUILDINGS
