@@ -24,6 +24,12 @@
       --tooltip-bg: rgba(10, 10, 15, 0.98);
       --purple: #9b59b6;
       --blue: #3498db;
+      /* Rarity Colors */
+      --rarity-common: #b0c3d9;
+      --rarity-rare: #4b69ff;
+      --rarity-epic: #8847ff;
+      --rarity-legendary: #d32ce6;
+      --rarity-mythic: #eb4b4b;
     }
 
     * {
@@ -1138,6 +1144,205 @@
       }
     }
 
+    /* --- SKINS & INVENTORY STYLES (NEW) --- */
+    #skinsBtn {
+      margin-top: 15px;
+      background: linear-gradient(45deg, #1abc9c, #16a085);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(26, 188, 156, 0.4);
+      transition: all 0.2s;
+      letter-spacing: 1px;
+      z-index: 25;
+      display: none;
+      /* Visible after first prestige or unlock */
+    }
+
+    #skinsBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(26, 188, 156, 0.8);
+    }
+
+    #skinModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 14000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .skin-window {
+      background: #18181b;
+      width: 95%;
+      max-width: 700px;
+      border: 1px solid #444;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      max-height: 90vh;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .skin-header {
+      background: linear-gradient(to right, #2c3e50, #000);
+      padding: 15px 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .case-area {
+      padding: 20px;
+      background: #111;
+      border-bottom: 2px solid #222;
+      text-align: center;
+    }
+
+    .case-spinner {
+      height: 120px;
+      background: #000;
+      border: 4px solid #333;
+      margin: 20px auto;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px #000;
+      width: 100%;
+    }
+
+    .case-strip {
+      display: flex;
+      height: 100%;
+      align-items: center;
+      position: absolute;
+      left: 50%;
+    }
+
+    .case-item {
+      width: 90px;
+      height: 90px;
+      margin-right: 4px;
+      border-radius: 6px;
+      background: #222;
+      border-bottom: 3px solid rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .case-item img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    /* Rarity Borders */
+    .rarity-common {
+      border: 2px solid var(--rarity-common);
+      box-shadow: 0 0 5px var(--rarity-common);
+    }
+
+    .rarity-rare {
+      border: 2px solid var(--rarity-rare);
+      box-shadow: 0 0 10px var(--rarity-rare);
+    }
+
+    .rarity-epic {
+      border: 2px solid var(--rarity-epic);
+      box-shadow: 0 0 15px var(--rarity-epic);
+    }
+
+    .rarity-legendary {
+      border: 2px solid var(--rarity-legendary);
+      box-shadow: 0 0 20px var(--rarity-legendary);
+    }
+
+    .open-case-btn {
+      background: linear-gradient(45deg, #f1c40f, #d35400);
+      border: none;
+      padding: 12px 30px;
+      font-weight: 900;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #b33900;
+      transition: transform 0.1s;
+    }
+
+    .open-case-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #b33900;
+    }
+
+    .open-case-btn:disabled {
+      filter: grayscale(1);
+      cursor: not-allowed;
+    }
+
+    .inventory-grid {
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      overflow-y: auto;
+      background: #18181b;
+    }
+
+    .inv-slot {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #333;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .inv-slot:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #666;
+    }
+
+    .inv-slot.equipped {
+      border: 2px solid var(--green);
+      background: rgba(46, 204, 113, 0.1);
+    }
+
+    .inv-slot img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+
+    .count-badge {
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      font-size: 0.7rem;
+      color: #aaa;
+    }
+
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -1179,6 +1384,38 @@
     </div>
   </div>
 
+  <!-- SKIN / INVENTORY MODAL (NEU) -->
+  <div id="skinModal">
+    <div class="skin-window">
+      <div class="skin-header">
+        <div style="font-weight:900; color:var(--text-main);">🎒 INVENTAR & KISTEN</div>
+        <button class="close-btn" onclick="closeSkins()" style="position:static;">×</button>
+      </div>
+
+      <!-- CASE OPENING SECTION -->
+      <div class="case-area">
+        <div style="color:#aaa; font-size:0.9rem; margin-bottom:10px;">
+          Du hast <span id="case-count" style="color:var(--gold); font-weight:bold; font-size:1.2rem;">0</span> Kisten
+        </div>
+
+        <div class="case-spinner">
+          <div class="roulette-marker"></div>
+          <div class="case-strip" id="caseStrip"></div>
+        </div>
+
+        <button class="open-case-btn" id="btnOpenCase" onclick="openCase()">KISTE ÖFFNEN</button>
+        <div style="margin-top:10px; font-size:0.75rem; color:#555;">
+          Erhalte 1 Kiste pro Prestige-Level!
+        </div>
+      </div>
+
+      <!-- INVENTORY GRID -->
+      <div class="inventory-grid" id="inventoryGrid">
+        <!-- Skins filled by JS -->
+      </div>
+    </div>
+  </div>
+
   <!-- PRESTIGE MODAL (NEU) -->
   <div id="prestigeModal">
     <div class="lb-window" style="border-color: #3498db; box-shadow: 0 0 80px rgba(52, 152, 219, 0.4);">
@@ -1192,7 +1429,7 @@
         </div>
         <div style="color:#ccc; margin-bottom:20px;">
           Du setzt alle Gebäude, Upgrades und dein aktuelles Geld zurück.<br>
-          Du behältst deine Statistiken, Erfolge und Leaderboard-Platzierung.
+          Du behältst deine Statistiken, Skins, Erfolge und Leaderboard-Platzierung.
         </div>
 
         <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; margin-bottom:20px;">
@@ -1201,8 +1438,12 @@
           <div style="font-size:1.5rem; margin:10px 0;">⬇️</div>
           <div>Mögliches Neues Level: <span id="modal-new-prestige"
               style="color:#2ecc71; font-weight:bold; font-size:1.3rem;">0</span></div>
-          <div style="color:#2ecc71; font-size:0.9rem; margin-top:5px;">(+<span id="modal-gain-prestige">0</span> Level
-            dazu)</div>
+          <div style="color:#2ecc71; font-size:0.9rem; margin-top:5px;">
+            (+<span id="modal-gain-prestige">0</span> Level dazu)
+          </div>
+          <div style="color:var(--gold); font-weight:bold; margin-top:10px;">
+            🎁 +<span id="modal-gain-cases">0</span> Kisten
+          </div>
         </div>
 
         <button onclick="doPrestige()" id="confirmPrestigeBtn" style="
@@ -1306,7 +1547,11 @@
       <div class="currency-label">KLEINIS</div>
       <div id="cps">0,0 Kleinis / Sekunde</div>
     </div>
-    <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+      <button id="casinoBtn" onclick="openCasino()">🎰 OPEN CASINO</button>
+      <button id="skinsBtn" onclick="openSkins()">🎒 SKINS</button>
+    </div>
     <button id="leaderboardBtn" onclick="openLeaderboard()">🏆 LEADERBOARD</button>
 
     <!-- PRESTIGE BUTTON (NEU) -->
@@ -1316,6 +1561,7 @@
     </button>
 
     <div class="buff-container" id="buffArea"></div>
+    <!-- MAIN IMAGE -->
     <img src="https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png" id="bigKlein"
       alt="Klick mich!">
 
@@ -1369,8 +1615,19 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V6';
-    const IMG_URL = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
+    const SAVE_KEY = 'KleinClicker_Precision_V7_Skins'; // Version Bumped
+    const DEFAULT_IMG = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
+
+    // SKINS DATA (Rarities: common, rare, epic, legendary)
+    // NOTE: Using CSS Filters for simulation. Replace urls with real ones if you have them.
+    const SKINS = [
+      { id: 'default', name: 'Original Klein', rarity: 'common', url: DEFAULT_IMG, filter: '' },
+      { id: 'sepia', name: 'Retro Klein', rarity: 'common', url: DEFAULT_IMG, filter: 'sepia(1)' },
+      { id: 'dark', name: 'Night Klein', rarity: 'rare', url: DEFAULT_IMG, filter: 'invert(1) hue-rotate(180deg)' },
+      { id: 'radioactive', name: 'Zombie Klein', rarity: 'rare', url: DEFAULT_IMG, filter: 'hue-rotate(90deg) brightness(1.2)' },
+      { id: 'frozen', name: 'Ice Klein', rarity: 'epic', url: DEFAULT_IMG, filter: 'hue-rotate(200deg) brightness(1.5) drop-shadow(0 0 10px cyan)' },
+      { id: 'golden', name: 'Prestige Klein', rarity: 'legendary', url: DEFAULT_IMG, filter: 'sepia(1) saturate(5) brightness(1.2) drop-shadow(0 0 15px gold)' },
+    ];
 
     // BUILDINGS
     const BUILDINGS = [
@@ -1415,7 +1672,11 @@
       buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
       casinoHistory: [],
       playerName: "Spieler" + Math.floor(Math.random() * 1000),
-      prestige: 0
+      prestige: 0,
+      // NEW SKINS STATE
+      cases: 0,
+      skinsOwned: ['default'],
+      equippedSkin: 'default'
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
@@ -1471,6 +1732,9 @@
         }
       } catch (e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
 
+      // Apply initial skin
+      equipSkin(game.equippedSkin, true);
+
       buildBuildingUI();
       renderUpgrades();
       renderHistory();
@@ -1517,8 +1781,15 @@
       updateDynamicBackground();
       updateClickUI();
 
-      if (!casinoUnlocked && game.totalScore >= 1000) { casinoUnlocked = true; document.getElementById('casinoBtn').style.display = 'block'; }
-      else if (casinoUnlocked) document.getElementById('casinoBtn').style.display = 'block';
+      if (!casinoUnlocked && game.totalScore >= 1000) {
+        casinoUnlocked = true;
+        document.getElementById('casinoBtn').style.display = 'block';
+        document.getElementById('skinsBtn').style.display = 'block';
+      }
+      else if (casinoUnlocked) {
+        document.getElementById('casinoBtn').style.display = 'block';
+        document.getElementById('skinsBtn').style.display = 'block';
+      }
 
       updateBuildingStates();
       checkPrestigeUnlock();
@@ -1693,7 +1964,7 @@
         }
         const el = document.createElement('div');
         el.className = `r-card rc-${type}`;
-        if (type === 'green') el.innerHTML = `<img src="${IMG_URL}" class="rc-logo">`;
+        if (type === 'green') el.innerHTML = `<img src="${DEFAULT_IMG}" class="rc-logo">`;
         else el.textContent = Math.floor(Math.random() * 7) + (type === 'black' ? 8 : 1);
         strip.appendChild(el);
       }
@@ -1853,7 +2124,7 @@
     }
 
     function disableButtons(disable) {
-      document.querySelectorAll('.bet-btn, .control-btn, .close-btn, .nav-btn').forEach(b => b.disabled = disable);
+      document.querySelectorAll('.bet-btn, .control-btn, .close-btn, .nav-btn, .open-case-btn').forEach(b => b.disabled = disable);
     }
     function spawnConfetti() {
       const win = document.getElementById('casinoWindow');
@@ -1864,6 +2135,142 @@
         p.style.setProperty('--tx', (Math.random() * 400 - 200) + 'px');
         p.style.setProperty('--ty', (Math.random() * 400 - 200) + 'px');
         win.appendChild(p); setTimeout(() => p.remove(), 1000);
+      }
+    }
+
+    /* --- SKINS SYSTEM (NEW) --- */
+    function openSkins() {
+      document.getElementById('skinModal').style.display = 'flex';
+      renderInventory();
+      document.getElementById('case-count').textContent = game.cases;
+
+      // Reset Strip Visual
+      const strip = document.getElementById('caseStrip');
+      strip.innerHTML = '';
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateX(0px)';
+
+      // Populate placeholder strip
+      for (let i = 0; i < 5; i++) {
+        const ph = SKINS[Math.floor(Math.random() * SKINS.length)];
+        const el = document.createElement('div');
+        el.className = `case-item rarity-${ph.rarity}`;
+        el.innerHTML = `<img src="${ph.url}" style="filter:${ph.filter}">`;
+        strip.appendChild(el);
+      }
+    }
+
+    function closeSkins() {
+      document.getElementById('skinModal').style.display = 'none';
+    }
+
+    function renderInventory() {
+      const grid = document.getElementById('inventoryGrid');
+      grid.innerHTML = '';
+
+      // Count duplicates
+      let inventoryCount = {};
+      game.skinsOwned.forEach(id => {
+        inventoryCount[id] = (inventoryCount[id] || 0) + 1;
+      });
+
+      // Render unique items with counts
+      Object.keys(inventoryCount).forEach(skinId => {
+        const skin = SKINS.find(s => s.id === skinId);
+        if (!skin) return;
+
+        const el = document.createElement('div');
+        el.className = 'inv-slot rarity-' + skin.rarity;
+        if (game.equippedSkin === skinId) el.classList.add('equipped');
+
+        el.innerHTML = `
+          <img src="${skin.url}" style="filter:${skin.filter}">
+          ${inventoryCount[skinId] > 1 ? `<div class="count-badge">x${inventoryCount[skinId]}</div>` : ''}
+        `;
+        el.onclick = () => equipSkin(skinId);
+        grid.appendChild(el);
+      });
+    }
+
+    function equipSkin(id, mute = false) {
+      const skin = SKINS.find(s => s.id === id);
+      if (skin && game.skinsOwned.includes(id)) {
+        game.equippedSkin = id;
+
+        // Update Main Image
+        const big = document.getElementById('bigKlein');
+        big.src = skin.url;
+        big.style.filter = `drop-shadow(0 30px 60px rgba(0,0,0,0.5)) ${skin.filter}`;
+
+        // Update Inventory UI if open
+        if (document.getElementById('skinModal').style.display === 'flex') {
+          renderInventory();
+        }
+        if (!mute) saveGame();
+      }
+    }
+
+    function openCase() {
+      if (game.cases <= 0 || isSpinning) return;
+      game.cases--;
+      document.getElementById('case-count').textContent = game.cases;
+
+      isSpinning = true;
+      disableButtons(true);
+
+      // Determine Result based on Rarity Weights
+      // Common: 60%, Rare: 30%, Epic: 8%, Legendary: 2%
+      const roll = Math.random();
+      let rarity = 'common';
+      if (roll > 0.98) rarity = 'legendary';
+      else if (roll > 0.90) rarity = 'epic';
+      else if (roll > 0.60) rarity = 'rare';
+
+      // Filter skins by chosen rarity
+      const pool = SKINS.filter(s => s.rarity === rarity);
+      const wonSkin = pool[Math.floor(Math.random() * pool.length)];
+
+      generateCaseStrip(60, wonSkin);
+
+      // Animate
+      const strip = document.getElementById('caseStrip');
+      strip.offsetHeight; // Force reflow
+
+      const itemWidth = 94; // 90px + 4px margin
+      const targetIndex = 45;
+      const center = (targetIndex * itemWidth) + 45 - (strip.parentElement.offsetWidth / 2);
+      const jitter = Math.floor(Math.random() * 40) - 20;
+
+      strip.style.transition = 'transform 5s cubic-bezier(0.12, 0.8, 0.1, 1)';
+      strip.style.transform = `translateX(-${center + jitter}px)`;
+
+      setTimeout(() => {
+        isSpinning = false;
+        disableButtons(false);
+
+        // Add Skin
+        game.skinsOwned.push(wonSkin.id);
+        renderInventory();
+
+        alert(`GEZOGEN: ${wonSkin.name} (${wonSkin.rarity.toUpperCase()})`);
+        saveGame();
+      }, 5000);
+    }
+
+    function generateCaseStrip(count, winner) {
+      const strip = document.getElementById('caseStrip');
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateX(0px)';
+      strip.innerHTML = '';
+
+      for (let i = 0; i < count; i++) {
+        let item = SKINS[Math.floor(Math.random() * SKINS.length)];
+        if (i === 45) item = winner; // The target index
+
+        const el = document.createElement('div');
+        el.className = `case-item rarity-${item.rarity}`;
+        el.innerHTML = `<img src="${item.url}" style="filter:${item.filter}">`;
+        strip.appendChild(el);
       }
     }
 
@@ -1886,7 +2293,12 @@
       el.style.left = (x - 20 + Math.random() * 40) + 'px'; el.style.top = y + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 800);
     }
     function spawnFallingFace(x, y) {
-      const img = document.createElement('img'); img.src = IMG_URL; img.className = 'falling-face';
+      // Use current skin for particles too
+      const currentSkin = SKINS.find(s => s.id === game.equippedSkin) || SKINS[0];
+      const img = document.createElement('img');
+      img.src = currentSkin.url;
+      img.className = 'falling-face';
+      img.style.filter = currentSkin.filter;
       img.style.left = (x - 17) + 'px'; img.style.top = (y - 17) + 'px'; document.getElementById('clickPanel').appendChild(img); setTimeout(() => img.remove(), 1200);
     }
 
@@ -2012,7 +2424,10 @@
         upgrades: game.upgrades,
         casinoHistory: game.casinoHistory,
         playerName: game.playerName,
-        prestige: game.prestige || 0
+        prestige: game.prestige || 0,
+        cases: game.cases,
+        skinsOwned: game.skinsOwned,
+        equippedSkin: game.equippedSkin
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
@@ -2028,6 +2443,10 @@
         game.casinoHistory = saved.casinoHistory || [];
         if (saved.playerName) game.playerName = saved.playerName;
         game.prestige = saved.prestige || 0;
+        // LOAD SKINS
+        game.cases = saved.cases || 0;
+        game.skinsOwned = saved.skinsOwned || ['default'];
+        game.equippedSkin = saved.equippedSkin || 'default';
       }
     }
 
@@ -2047,6 +2466,7 @@
       document.getElementById('modal-current-prestige').textContent = formatNum(current);
       document.getElementById('modal-new-prestige').textContent = formatNum(potentialTotal);
       document.getElementById('modal-gain-prestige').textContent = formatNum(gain);
+      document.getElementById('modal-gain-cases').textContent = formatNum(gain); // Show Case Reward
 
       const btn = document.getElementById('confirmPrestigeBtn');
       if (gain > 0) {
@@ -2070,13 +2490,21 @@
       const potentialTotal = calculatePotentialPrestige();
       if (potentialTotal <= game.prestige) return;
 
+      const gain = potentialTotal - game.prestige;
+
+      // Update Prestige
       game.prestige = potentialTotal;
 
+      // Award Cases
+      game.cases += gain;
+
+      // Reset Game Progress
       game.score = 0;
       game.clicks = 0;
       game.clickLevel = 1;
       game.buildings = new Array(BUILDINGS.length).fill(0);
       game.upgrades = [];
+      // Keep Skins & Cases!
 
       saveGame();
       location.reload();
