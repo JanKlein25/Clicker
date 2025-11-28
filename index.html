@@ -1717,49 +1717,30 @@
     /* --- UI --- */
     const tooltipEl = document.getElementById('global-tooltip');
     const ttName = document.getElementById('tt-name-display');
-    const ttPrice = document.getElementById('tt-price-display');
-    const ttEffect = document.getElementById('tt-effect-display');
-    const ttDesc = document.getElementById('tt-desc-display');
-    const ttStats = document.getElementById('tt-stats-container');
+    renderUpgrades();
+    renderHistory();
+    initVisuals();
+    requestAnimationFrame(gameLoop);
+    setInterval(slowLoop, 1000);
+    scheduleGolden();
 
-    /* --- INIT --- */
-    function init() {
-      try {
-        loadGame();
-        if (game.buildings.length < BUILDINGS.length) {
-          const diff = BUILDINGS.length - game.buildings.length;
-          for (let i = 0; i < diff; i++) game.buildings.push(0);
-        }
-      } catch (e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
-
-      // Apply initial skin
-      equipSkin(game.equippedSkin, true);
-
-      buildBuildingUI();
-      renderUpgrades();
-      renderHistory();
-      initVisuals();
-      requestAnimationFrame(gameLoop);
-      setInterval(slowLoop, 1000);
-      scheduleGolden();
-
-      if (game.playerName.startsWith("Spieler")) {
-        const newName = prompt("Wie möchtest du auf dem Leaderboard heißen?", game.playerName);
-        if (newName && newName.trim() !== "") {
-          game.playerName = newName.trim().substring(0, 15);
-          saveGame();
-        }
+    if (game.playerName.startsWith("Spieler")) {
+      const newName = prompt("Wie möchtest du auf dem Leaderboard heißen?", game.playerName);
+      if (newName && newName.trim() !== "") {
+        game.playerName = newName.trim().substring(0, 15);
+        saveGame();
       }
-      document.getElementById('my-player-name').textContent = game.playerName;
+    }
+    document.getElementById('my-player-name').textContent = game.playerName;
 
-      document.addEventListener('mousemove', (e) => {
-        if (tooltipEl.style.display === 'block') {
-          let top = e.clientY + 10; let left = e.clientX - 330;
-          if (left < 10) left = e.clientX + 10;
-          if (top + tooltipEl.offsetHeight > window.innerHeight) top = window.innerHeight - tooltipEl.offsetHeight - 10;
-          tooltipEl.style.top = top + 'px'; tooltipEl.style.left = left + 'px';
-        }
-      });
+    document.addEventListener('mousemove', (e) => {
+      if (tooltipEl.style.display === 'block') {
+        let top = e.clientY + 10; let left = e.clientX - 330;
+        if (left < 10) left = e.clientX + 10;
+        if (top + tooltipEl.offsetHeight > window.innerHeight) top = window.innerHeight - tooltipEl.offsetHeight - 10;
+        tooltipEl.style.top = top + 'px'; tooltipEl.style.left = left + 'px';
+      }
+    });
     }
 
     function gameLoop(now) {
@@ -2408,45 +2389,17 @@
       g.style.left = Math.random() * maxX + 'px'; g.style.top = Math.random() * maxY + 'px'; g.style.display = 'block';
       setTimeout(() => { if (g.style.display === 'block') { g.style.display = 'none'; scheduleGolden(); } }, 10000);
     }
-    document.getElementById('goldenKlein').onmousedown = function (e) {
-      e.stopPropagation(); this.style.display = 'none'; buffs.frenzy.active = true; buffs.frenzy.time = 30; renderBuffs();
-      spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7 CPS)"); scheduleGolden();
-    };
-
-    /* --- SAVE --- */
-    function saveGame() {
-      const data = {
-        score: game.score,
-        totalScore: game.totalScore,
-        clicks: game.clicks,
-        clickLevel: game.clickLevel,
-        buildings: game.buildings,
-        upgrades: game.upgrades,
-        casinoHistory: game.casinoHistory,
-        playerName: game.playerName,
-        prestige: game.prestige || 0,
-        cases: game.cases,
-        skinsOwned: game.skinsOwned,
-        equippedSkin: game.equippedSkin
-      };
-      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-    }
-    function loadGame() {
-      const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-      if (saved) {
-        game.score = saved.score || 0;
-        game.totalScore = saved.totalScore || 0;
-        game.clicks = saved.clicks || 0;
-        game.clickLevel = saved.clickLevel || 1;
-        if (saved.buildings) game.buildings = saved.buildings;
-        game.upgrades = saved.upgrades || [];
-        game.casinoHistory = saved.casinoHistory || [];
-        if (saved.playerName) game.playerName = saved.playerName;
-        game.prestige = saved.prestige || 0;
-        // LOAD SKINS
-        game.cases = saved.cases || 0;
-        game.skinsOwned = saved.skinsOwned || ['default'];
-        game.equippedSkin = saved.equippedSkin || 'default';
+    game.clicks = saved.clicks || 0;
+    game.clickLevel = saved.clickLevel || 1;
+    if (saved.buildings) game.buildings = saved.buildings;
+    game.upgrades = saved.upgrades || [];
+    game.casinoHistory = saved.casinoHistory || [];
+    if (saved.playerName) game.playerName = saved.playerName;
+    game.prestige = saved.prestige || 0;
+    // LOAD SKINS
+    game.cases = saved.cases || 0;
+    game.skinsOwned = saved.skinsOwned || ['default'];
+    game.equippedSkin = saved.equippedSkin || 'default';
       }
     }
 
