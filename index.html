@@ -206,6 +206,7 @@
       letter-spacing: 2px;
       background: linear-gradient(to bottom, #f1c40f, #d35400);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       filter: drop-shadow(0 4px 0px rgba(0, 0, 0, 0.5));
       z-index: 20;
@@ -1524,6 +1525,7 @@
 
       requestAnimationFrame(gameLoop);
     }
+
     function slowLoop() {
       saveGame();
       renderUpgrades();
@@ -1534,6 +1536,7 @@
         dbRef.child(game.playerName).set({
           name: game.playerName,
           score: Math.floor(game.totalScore),
+          prestige: game.prestige || 0,
           timestamp: firebase.database.ServerValue.TIMESTAMP
         }).catch(err => console.log("Sync error", err));
       }
@@ -2137,7 +2140,7 @@
 
       list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Lade...</div>';
 
-      dbRef.orderByChild('score').limitToLast(20).once('value').then(snapshot => {
+      dbRef.orderByChild('prestige').limitToLast(20).once('value').then(snapshot => {
         const scores = [];
         snapshot.forEach(child => {
           scores.push(child.val());
@@ -2169,7 +2172,7 @@
         el.innerHTML = `
           <div class="${rankClass}">#${rank}</div>
           <div class="lb-name">${s.name}</div>
-          <div class="lb-score">${formatNum(s.score)}</div>
+          <div class="lb-score">Lvl ${formatNum(s.prestige || 0)}</div>
         `;
         list.appendChild(el);
       });
