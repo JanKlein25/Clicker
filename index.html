@@ -2353,17 +2353,17 @@
           let rnd = Math.random();
           let sym = '🍒'; // Fallback
           
-          if (rnd < 0.001) sym = '👑';      // Wild (0.1%)
-          else if (rnd < 0.005) sym = '💎'; // Diamond (0.4%)
-          else if (rnd < 0.02) sym = '7️⃣';  // Seven (1.5%)
-          else if (rnd < 0.05) sym = '🎰';  // Bar (3%)
-          else if (rnd < 0.10) sym = '🔔';  // Bell (5%)
-          else if (rnd < 0.17) sym = '🍀';  // Clover (7%)
-          else if (rnd < 0.27) sym = '🍉';  // Melon (10%)
-          else if (rnd < 0.40) sym = '🍇';  // Grape (13%)
-          else if (rnd < 0.58) sym = '🍊';  // Orange (18%)
-          else if (rnd < 0.78) sym = '🍋';  // Lemon (20%)
-          else sym = '🍒';                  // Cherry (Rest ~22%)
+          if (rnd < 0.015) sym = '👑';      // Wild (1.5% statt 0.1%) - Ab und zu sichtbar!
+          else if (rnd < 0.04) sym = '💎';  // Diamant (2.5%)
+          else if (rnd < 0.09) sym = '7️⃣';  // Seven (5%)
+          else if (rnd < 0.15) sym = '🎰';  // Bar (6%)
+          else if (rnd < 0.22) sym = '🔔';  // Glocke (7%)
+          else if (rnd < 0.32) sym = '🍀';  // Klee (10%)
+          else if (rnd < 0.45) sym = '🍉';  // Melone (13%)
+          else if (rnd < 0.60) sym = '🍇';  // Traube (15%)
+          else if (rnd < 0.75) sym = '🍊';  // Orange (15%)
+          else if (rnd < 0.88) sym = '🍋';  // Zitrone (13%)
+          else sym = '🍒';                  // Kirsche (Rest ~12%)
 
           col.push(sym);
         }
@@ -2481,21 +2481,25 @@
           let base = 0;
           
           // LOW TIER (LOSS LEADERS)
-          if (s === '🍒' || s === '🍋' || s === '🍊') base = 0.2; // 80% Verlust bei 3 Treffern
-          else if (s === '🍇' || s === '🍉') base = 0.5; // 50% Verlust
-          else if (s === '🍀') base = 1.2; // Kleiner Gewinn
+          if (s === '🍒') base = 0.5;       // Kleiner Verlust statt fast Totalverlust
+          else if (s === '🍋') base = 1;    // Geld zurück (Fairer)
+          else if (s === '🍊') base = 1.5;  // Kleiner Gewinn
+          else if (s === '🍇') base = 2.5;
+          else if (s === '🍉') base = 4;
           
-          // MID TIER
-          else if (s === '🔔') base = 3;
-          else if (s === '🎰') base = 8;
+          // Mittlere Gewinne
+          else if (s === '🍀') base = 6;
+          else if (s === '🔔') base = 10;
+          else if (s === '🎰') base = 15;
           
-          // HIGH TIER
-          else if (s === '7️⃣') base = 20;
-          else if (s === '💎') base = 50; 
+          // Jackpots
+          else if (s === '7️⃣') base = 40;
+          else if (s === '💎') base = 100; // Mega Jackpot
 
-          // Exponential growth for 4 or 5 matches
-          if (matchCount === 4) base *= 5; // e.g. Cherry becomes x1.0 (break even)
-          if (matchCount === 5) base *= 20; // e.g. Cherry becomes x4.0 (win)
+          // Bonus für längere Reihen
+          if (matchCount === 4) base *= 2.5; // War vorher x5 (zu extrem, dafür Basis erhöht)
+          if (matchCount === 5) base *= 10;  // War vorher x20
+
 
           totalWin += bet * base;
 
