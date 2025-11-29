@@ -2322,13 +2322,32 @@
       img.style.left = (x - 17) + 'px'; img.style.top = (y - 17) + 'px'; document.getElementById('clickPanel').appendChild(img); setTimeout(() => img.remove(), 1200);
     }
 
-    function formatNum(num, decimals = 0) {
+      function formatNum(num, decimals = 0) {
       if (num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
-      if (num < 1000000000) return (num / 1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mio";
-      if (num < 1000000000000) return (num / 1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mrd";
-      if (num < 1000000000000000) return (num / 1000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Bio";
-      if (num < 1000000000000000000) return (num / 1000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Brd";
-      return (num / 1000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Trio";
+
+      // Liste der Einheiten (von Groß nach Klein sortiert)
+      const units = [
+        { val: 1e36, suffix: " Sext" },   // Sextillionen
+        { val: 1e33, suffix: " Quintd" }, // Quintilliarden
+        { val: 1e30, suffix: " Quint" },  // Quintillionen
+        { val: 1e27, suffix: " Quard" },  // Quadrilliarden
+        { val: 1e24, suffix: " Quad" },   // Quadrillionen
+        { val: 1e21, suffix: " Trd" },    // Trilliarden
+        { val: 1e18, suffix: " Trio" },   // Trillionen
+        { val: 1e15, suffix: " Brd" },    // Billiarden
+        { val: 1e12, suffix: " Bio" },    // Billionen
+        { val: 1e9,  suffix: " Mrd" },    // Milliarden
+        { val: 1e6,  suffix: " Mio" }     // Millionen
+      ];
+
+      for (const unit of units) {
+        if (num >= unit.val) {
+          return (num / unit.val).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + unit.suffix;
+        }
+      }
+
+      // Falls die Zahl noch größer ist (unwahrscheinlich), nutze wissenschaftliche Notation (z.B. 1e+40)
+      return num.toExponential(2);
     }
 
     /* --- SHOP --- */
