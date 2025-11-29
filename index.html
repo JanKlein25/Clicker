@@ -1670,48 +1670,56 @@
           <div class="pro-slot-screen">
             <!-- HELP OVERLAY -->
             <div id="slot-help-overlay">
-              <div class="help-title" style="border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; width:100%;">🎰 Anleitung & Gewinne</div>
+  <div class="help-title" style="border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; width:100%;">🎰 Hardcore Modus: Infos</div>
 
-              <div style="text-align: left; max-width: 500px; font-size: 0.85rem; line-height: 1.5; color: #ccc; overflow-y: auto; max-height: 60vh; padding-right: 5px;">
+  <div style="text-align: left; max-width: 500px; font-size: 0.85rem; line-height: 1.5; color: #ccc; overflow-y: auto; max-height: 60vh; padding-right: 5px;">
 
-                <!-- ZIEL & LINIEN -->
-                <div style="margin-bottom: 12px;">
-                  <strong style="color:var(--gold); font-size:0.95rem;">1. Das Ziel</strong><br>
-                  Sammle mindestens <strong>3 gleiche Symbole</strong> (oder Joker) von <strong>links nach rechts</strong>.
-                  <br><span style="font-size:0.8rem; color:#888;">Es gibt 5 Linien: Oben, Mitte, Unten, V-Form (Tal) & Dach-Form (Berg).</span>
-                </div>
+    <!-- ZIEL & LINIEN -->
+    <div style="margin-bottom: 12px;">
+      <strong style="color:var(--gold); font-size:0.95rem;">1. Das Ziel</strong><br>
+      Sammle mindestens <strong>3 gleiche Symbole</strong> von links nach rechts.<br>
+      <span style="font-size:0.8rem; color:#888;">Warnung: Die Chancen sind extrem gering eingestellt. Das Haus gewinnt fast immer.</span>
+    </div>
 
-                <!-- SYMBOLE -->
-                <div style="margin-bottom: 12px; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px;">
-                  <strong style="color:var(--gold); font-size:0.95rem;">2. Die Symbole</strong>
-                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
-                    <div>👑 <strong>WILD (Joker)</strong><br><span style="font-size:0.75rem; color:#aaa;">Ersetzt alles!</span></div>
-                    <div>💎 <strong>Diamant</strong><br><span style="font-size:0.75rem; color:#aaa;">Jackpot (x50)</span></div>
-                    <div>🔔 <strong>Glocke</strong><br><span style="font-size:0.75rem; color:#aaa;">High (x25)</span></div>
-                    <div>🍒🍋🍇🍉 <strong>Früchte</strong><br><span style="font-size:0.75rem; color:#aaa;">x3 bis x12</span></div>
-                  </div>
-                </div>
+    <!-- SYMBOLE -->
+    <div style="margin-bottom: 12px; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px;">
+      <strong style="color:var(--gold); font-size:0.95rem;">2. Die Werte (Basis x3 Treffer)</strong>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px; font-size:0.8rem;">
+        
+        <div style="grid-column: span 2; border-bottom:1px solid #333; padding-bottom:4px; margin-bottom:4px;">
+          👑 <strong>WILD</strong>: <span style="color:#e74c3c">Extrem selten (0.1%)</span>
+        </div>
 
-                <!-- BERECHNUNG -->
-                <div style="margin-bottom: 12px;">
-                  <strong style="color:var(--gold); font-size:0.95rem;">3. Super-Kombos (Der Boost)</strong><br>
-                  Längere Ketten multiplizieren deinen Gewinn extrem:<br>
-                  • <strong>3er Reihe:</strong> Basis-Gewinn<br>
-                  • <strong>4er Reihe:</strong> Gewinn <span style="color:var(--green)">x5</span><br>
-                  • <strong>5er Reihe:</strong> Gewinn <span style="color:var(--red)">x20</span> 🚀
-                </div>
+        <div>💎 <strong>Diamant</strong><br><span style="color:var(--gold)">x50</span></div>
+        <div>🔔 <strong>Glocke</strong><br><span style="color:#aaa;">x12</span></div>
+        
+        <div>🍉 <strong>Melone</strong><br><span style="color:#aaa;">x8</span></div>
+        <div>🍇 <strong>Traube</strong><br><span style="color:#aaa;">x4</span></div>
+        
+        <div>🍋 <strong>Zitrone</strong><br><span style="color:#aaa;">x2</span></div>
+        <div style="color:var(--red);">🍒 <strong>Kirsche</strong><br><strong>x0.75</strong> (Verlust!)</div>
+      </div>
+    </div>
 
-                <!-- FEATURES -->
-                <div>
-                  <strong style="color:var(--gold); font-size:0.95rem;">4. Steuerung</strong><br>
-                  ⚡ <strong>Turbo:</strong> Ergebnis sofort (keine Animation).<br>
-                  🔄 <strong>Auto:</strong> Dreht automatisch, solange Geld da ist.
-                </div>
+    <!-- BERECHNUNG -->
+    <div style="margin-bottom: 12px;">
+      <strong style="color:var(--gold); font-size:0.95rem;">3. Kombo-Multiplikator</strong><br>
+      Nur lange Reihen bringen echtes Geld:<br>
+      • 3er Reihe: Basis-Wert (siehe oben)<br>
+      • 4er Reihe: Gewinn <span style="color:var(--green)">x5</span><br>
+      • 5er Reihe: Gewinn <span style="color:var(--red)">x20</span>
+    </div>
 
-              </div>
+    <!-- FEATURES -->
+    <div>
+      <strong style="color:var(--gold); font-size:0.95rem;">4. Steuerung</strong><br>
+      Nutze <strong>TURBO</strong> ⚡ für schnelle Verluste oder <strong>AUTO</strong> 🔄, um dein Konto automatisch zu leeren.
+    </div>
 
-              <button class="toggle-btn active" style="margin-top:15px; width:100%; font-weight:bold; font-size:1rem; padding:12px;" onclick="toggleSlotHelp()">VERSTANDEN & ZOCKEN</button>
-            </div>
+  </div>
+
+  <button class="toggle-btn active" style="margin-top:15px; width:100%; font-weight:bold; font-size:1rem; padding:12px;" onclick="toggleSlotHelp()">ALLES KLAR, VIEL GLÜCK</button>
+</div>
 
             <!-- WIN OVERLAY -->
             <div id="winDisplay" class="win-display-box">
