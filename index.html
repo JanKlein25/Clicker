@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker</title>
+  <title>KleinClicker - Hard Mode</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap"
     rel="stylesheet">
@@ -1366,6 +1366,7 @@
       }
     }
   </style>
+
 </head>
 
 <body>
@@ -1404,6 +1405,7 @@
         </div>
 
         <button class="open-case-btn" id="btnOpenCase" onclick="openCase()">KISTE ÖFFNEN</button>
+
         <div style="margin-top:10px; font-size:0.75rem; color:#555;">
           Erhalte 1 Kiste pro Prestige-Level!
         </div>
@@ -1447,19 +1449,20 @@
         </div>
 
         <button onclick="doPrestige()" id="confirmPrestigeBtn" style="
-          background: linear-gradient(45deg, #e74c3c, #c0392b);
-          border: 2px solid rgba(255,255,255,0.2);
-          color: white;
-          padding: 15px 30px;
-          border-radius: 50px;
-          font-weight: 900;
-          font-size: 1.1rem;
-          cursor: pointer;
-          width: 100%;
-          box-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        border: 2px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: 900;
+        font-size: 1.1rem;
+        cursor: pointer;
+        width: 100%;
+        box-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
         ">
           RESET DURCHFÜHREN
         </button>
+
       </div>
     </div>
   </div>
@@ -1516,7 +1519,6 @@
             🍒x3 • 🍋x5 • 🍇x10 • 7️⃣x25 • <span style="color:var(--gold); font-weight:bold;">💎x50</span>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -1615,18 +1617,16 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V10'; // Version Bumped
+    const SAVE_KEY = 'KleinClicker_Precision_V11'; // Version Bumped for Reset due to Hard Mode
     // Set a placeholder for default image if you don't have a specific friend's face for it yet
     const DEFAULT_IMG = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
 
     // SKINS DATA (Rarities: common, rare, epic, legendary)
-    // NOTE: Using CSS Filters for simulation. Replace urls with real ones if you have them.
     const SKINS = [
       { id: 'default', name: 'Original Klein', rarity: 'common', url: DEFAULT_IMG, filter: '' },
-      { id: 'friend1', name: 'Original Cedric', rarity: 'rare', url: "https://github.com/JanKlein25/Clicker/blob/main/Cedrics%20Gesicht.png?raw=true", filter: '' }, // Beispiel URL
-      { id: 'friend2', name: 'Original Malte', rarity: 'epic', url: "https://github.com/JanKlein25/Clicker/blob/main/Malte%20Gesicht.png?raw=true", filter: '' }, // Beispiel URL
-      { id: 'friend3', name: 'Peter Beispiel', rarity: 'legendary', url: "https://example.com/peter_beispiel.png", filter: '' }, // Beispiel URL
-      // Füge hier weitere Freunde hinzu, wenn du möchtest
+      { id: 'friend1', name: 'Original Cedric', rarity: 'rare', url: "https://github.com/JanKlein25/Clicker/blob/main/Cedrics%20Gesicht.png?raw=true", filter: '' },
+      { id: 'friend2', name: 'Original Malte', rarity: 'epic', url: "https://github.com/JanKlein25/Clicker/blob/main/Malte%20Gesicht.png?raw=true", filter: '' },
+      { id: 'friend3', name: 'Peter Beispiel', rarity: 'legendary', url: "https://example.com/peter_beispiel.png", filter: '' },
     ];
 
     // BUILDINGS
@@ -1673,20 +1673,16 @@
       casinoHistory: [],
       playerName: "Spieler" + Math.floor(Math.random() * 1000),
       prestige: 0,
-      // NEW SKINS STATE
       cases: 0,
       skinsOwned: ['default'],
       equippedSkin: 'default'
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
-    // NEW: ACTIVE CPS TRACKING
     let clickHistory = [];
-
     let lastTime = performance.now();
     let casinoUnlocked = false;
 
-    // Visual State
     let visualElements = [];
     const MAX_VISUALS = 30;
 
@@ -1732,9 +1728,7 @@
         }
       } catch (e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
 
-      // Apply initial skin
       equipSkin(game.equippedSkin, true);
-
       buildBuildingUI();
       renderUpgrades();
       renderHistory();
@@ -1800,7 +1794,6 @@
     function slowLoop() {
       saveGame();
       renderUpgrades();
-      // Aktualisiere Gebäudeanzeigen für dynamische Buffs
       BUILDINGS.forEach((_, i) => updateSingleBuildingUI(i));
 
       if (dbRef) {
@@ -1859,7 +1852,8 @@
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
 
     function getPrestigeMultiplier() {
-      return 1 + (game.prestige * 0.10);
+      // ÄNDERUNG: Nur noch 2% Bonus pro Level (statt 10%)
+      return 1 + (game.prestige * 0.02);
     }
 
     function getBuildingMultiplier(index) {
@@ -1872,7 +1866,6 @@
     function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
     function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
 
-    // MODIFIED CLICK FORMULA (Accepts Level for preview)
     function getClickPower(lvl = game.clickLevel) {
       let levelPower = 1 + (lvl * 2);
       let cpsPower = calculateTotalCPS() * 0.05;
@@ -1906,7 +1899,6 @@
       const currentPower = getClickPower(game.clickLevel);
       const nextPower = getClickPower(game.clickLevel + 1);
 
-      // CLICKER ZENTRALE 2.0: Current ➜ Next
       document.getElementById('click-dmg-display').innerHTML = `${formatNum(currentPower, 1)} <span style="font-size:0.8em; color:#7f8c8d">➜</span> <span style="color:#2ecc71">${formatNum(nextPower, 1)}</span>`;
       document.getElementById('click-cost-display').textContent = formatNum(cost);
 
@@ -2152,7 +2144,6 @@
 
       // Populate placeholder strip
       for (let i = 0; i < 5; i++) {
-        // Hier sollte der DEFAULT_IMG Skin verwendet werden, wenn die Wahrscheinlichkeit hoch ist
         const ph = SKINS.find(s => s.id === 'default');
         const el = document.createElement('div');
         el.className = `case-item rarity-${ph.rarity}`;
@@ -2169,13 +2160,11 @@
       const grid = document.getElementById('inventoryGrid');
       grid.innerHTML = '';
 
-      // Count duplicates
       let inventoryCount = {};
       game.skinsOwned.forEach(id => {
         inventoryCount[id] = (inventoryCount[id] || 0) + 1;
       });
 
-      // Render unique items with counts
       Object.keys(inventoryCount).forEach(skinId => {
         const skin = SKINS.find(s => s.id === skinId);
         if (!skin) return;
@@ -2198,12 +2187,10 @@
       if (skin && game.skinsOwned.includes(id)) {
         game.equippedSkin = id;
 
-        // Update Main Image
         const big = document.getElementById('bigKlein');
         big.src = skin.url;
         big.style.filter = `drop-shadow(0 30px 60px rgba(0,0,0,0.5)) ${skin.filter}`;
 
-        // Update Inventory UI if open
         if (document.getElementById('skinModal').style.display === 'flex') {
           renderInventory();
         }
@@ -2219,33 +2206,24 @@
       isSpinning = true;
       disableButtons(true);
 
-      // --- GEÄNDERTE LOGIK FÜR SKIN-ZIEHUNGSWAHRSCHEINLICHKEIT ---
       const roll = Math.random();
-      let wonSkin = SKINS.find(s => s.id === 'default'); // Standardmäßig der Default-Skin
+      let wonSkin = SKINS.find(s => s.id === 'default');
 
       const nonDefaultSkins = SKINS.filter(s => s.id !== 'default');
 
-      // 10% Chance auf einen der seltenen Skins (falls vorhanden)
       if (roll < 0.1 && nonDefaultSkins.length > 0) {
         wonSkin = nonDefaultSkins[Math.floor(Math.random() * nonDefaultSkins.length)];
       }
 
       generateCaseStrip(60, wonSkin);
 
-      // Animate
       const strip = document.getElementById('caseStrip');
-      strip.offsetHeight; // Force reflow
+      strip.offsetHeight;
 
-      // --- FIXED MATH FOR VISUAL ALIGNMENT ---
-      const itemWidth = 94; // 90px + 4px margin
+      const itemWidth = 94;
       const targetIndex = 45;
 
-      // Position des Gewinners (Mitte der Karte) relativ zum Start des Strips
-      // itemWidth * 45 ist die linke Kante. + 45 ist die Mitte der Karte.
       const positionOfWinner = (targetIndex * itemWidth) + 45;
-
-      // Da der Strip CSS 'left: 50%' hat, müssen wir den Strip genau um 'positionOfWinner' nach links schieben,
-      // damit die Mitte der Gewinner-Karte in der Mitte des Containers landet.
       const jitter = Math.floor(Math.random() * 40) - 20;
       const totalTranslate = positionOfWinner + jitter;
 
@@ -2256,12 +2234,10 @@
         isSpinning = false;
         disableButtons(false);
 
-        // Skin zum Inventar hinzufügen
         if (!game.skinsOwned.includes(wonSkin.id)) {
           game.skinsOwned.push(wonSkin.id);
           alert(`GEZOGEN: NEUER SKIN! ${wonSkin.name}`);
         } else {
-          // Duplikate nur anzeigen, nicht speichern (optional)
           alert(`GEZOGEN: ${wonSkin.name} (Du besitzt diesen Skin bereits)`);
         }
         renderInventory();
@@ -2277,13 +2253,11 @@
 
       for (let i = 0; i < count; i++) {
         let item;
-        if (i === 45) { // The target index for the winner
+        if (i === 45) {
           item = winner;
         } else if (i === 44 || i === 46) {
-          // Die direkten Nachbarn sind immer Common, um optische Verwirrung zu vermeiden
           item = SKINS.find(s => s.id === 'default') || SKINS[0];
         } else {
-          // Zufällige Füller
           item = SKINS[Math.floor(Math.random() * SKINS.length)];
         }
 
@@ -2301,7 +2275,6 @@
     function handleInteraction(x, y) {
       const power = getClickPower(); addScore(power); game.clicks++;
 
-      // NEW: TRACK CLICK FOR DYNAMIC CPS
       clickHistory.push({ time: performance.now(), val: power });
 
       spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power != 1 ? 's' : ''}`); spawnFallingFace(x, y);
@@ -2313,7 +2286,6 @@
       el.style.left = (x - 20 + Math.random() * 40) + 'px'; el.style.top = y + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 800);
     }
     function spawnFallingFace(x, y) {
-      // Use current skin for particles too
       const currentSkin = SKINS.find(s => s.id === game.equippedSkin) || SKINS[0];
       const img = document.createElement('img');
       img.src = currentSkin.url;
@@ -2322,14 +2294,13 @@
       img.style.left = (x - 17) + 'px'; img.style.top = (y - 17) + 'px'; document.getElementById('clickPanel').appendChild(img); setTimeout(() => img.remove(), 1200);
     }
 
-    // UPDATED FORMATTER FOR BIG NUMBERS
     function formatNum(num, decimals = 0) {
       if (num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
       if (num < 1000000000) return (num / 1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mio";
       if (num < 1000000000000) return (num / 1000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Mrd";
-      if (num < 1000000000000000) return (num / 1000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Bio"; // Billionen
-      if (num < 1000000000000000000) return (num / 1000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Brd"; // Billiarden
-      return (num / 1000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Trio"; // Trillionen
+      if (num < 1000000000000000) return (num / 1000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Bio";
+      if (num < 1000000000000000000) return (num / 1000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Brd";
+      return (num / 1000000000000000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " Trio";
     }
 
     /* --- SHOP --- */
@@ -2341,7 +2312,6 @@
         game.buildings[i]++;
         updateSingleBuildingUI(i);
         renderUpgrades();
-        // Visual feedback
         if (visualElements.length < MAX_VISUALS) spawnVisualIcon(BUILDINGS[i].icon);
       }
     }
@@ -2349,7 +2319,6 @@
       const list = document.getElementById('buildingList'); list.innerHTML = '';
       BUILDINGS.forEach((b, i) => {
         const el = document.createElement('div'); el.className = 'building-row'; el.id = `build-row-${i}`; el.onclick = () => buyBuilding(i);
-        // CHANGE: Added IDs for dynamic CPS and Gain preview
         el.innerHTML = `<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps" id="b-cps-${i}">Prod: ...</div><div class="b-cost"><span id="cost-${i}">0 Kleinis</span> <span id="gain-${i}" style="color:#2ecc71; font-size:0.8rem; margin-left:6px; font-weight:normal;"></span></div></div><div class="b-count" id="count-${i}">0</div>`;
         list.appendChild(el); updateSingleBuildingUI(i);
       });
@@ -2358,7 +2327,6 @@
       document.getElementById(`count-${i}`).textContent = game.buildings[i];
       document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i)) + " Kleinis";
 
-      // DYNAMIC MARKET & PREVIEW
       const realCps = getBuildingCPS(i);
       document.getElementById(`b-cps-${i}`).textContent = `Prod: ${formatNum(realCps, 1)}/s`;
       document.getElementById(`gain-${i}`).textContent = `(+${formatNum(realCps, 1)} CPS)`;
@@ -2366,7 +2334,6 @@
     function updateBuildingStates() {
       BUILDINGS.forEach((b, i) => {
         const row = document.getElementById(`build-row-${i}`);
-        // FIX: Target parent container .b-cost instead of span #cost-i
         const costDiv = row.querySelector('.b-cost');
 
         if (game.score >= getBuildingCost(i)) {
@@ -2463,17 +2430,18 @@
         game.casinoHistory = saved.casinoHistory || [];
         if (saved.playerName) game.playerName = saved.playerName;
         game.prestige = saved.prestige || 0;
-        // LOAD SKINS
         game.cases = saved.cases || 0;
         game.skinsOwned = saved.skinsOwned || ['default'];
         game.equippedSkin = saved.equippedSkin || 'default';
       }
     }
 
-    /* --- PRESTIGE LOGIK --- */
+    /* --- PRESTIGE LOGIK (UPDATED FOR HARD MODE) --- */
     function calculatePotentialPrestige() {
-      if (game.totalScore < 1000000) return 0;
-      return Math.floor(Math.cbrt(game.totalScore / 1000000));
+      // ÄNDERUNG: Schwelle auf 100 Mio erhöht (war 1 Mio)
+      if (game.totalScore < 100000000) return 0;
+      // ÄNDERUNG: 4. Wurzel (Math.pow(x, 0.25)) statt 3. Wurzel (Math.cbrt)
+      return Math.floor(Math.pow(game.totalScore / 100000000, 0.25));
     }
 
     function openPrestige() {
@@ -2486,7 +2454,7 @@
       document.getElementById('modal-current-prestige').textContent = formatNum(current);
       document.getElementById('modal-new-prestige').textContent = formatNum(potentialTotal);
       document.getElementById('modal-gain-prestige').textContent = formatNum(gain);
-      document.getElementById('modal-gain-cases').textContent = formatNum(gain); // Show Case Reward
+      document.getElementById('modal-gain-cases').textContent = formatNum(gain);
 
       const btn = document.getElementById('confirmPrestigeBtn');
       if (gain > 0) {
@@ -2512,19 +2480,14 @@
 
       const gain = potentialTotal - game.prestige;
 
-      // Update Prestige
       game.prestige = potentialTotal;
-
-      // Award Cases
       game.cases += gain;
 
-      // Reset Game Progress
       game.score = 0;
       game.clicks = 0;
       game.clickLevel = 1;
       game.buildings = new Array(BUILDINGS.length).fill(0);
       game.upgrades = [];
-      // Keep Skins & Cases!
 
       saveGame();
       location.reload();
@@ -2544,12 +2507,16 @@
       }
 
       const badge = document.getElementById('prestige-badge');
-      if (game.prestige > 0 || game.totalScore > 100000) {
+      // Zeige die Bar erst ab 10 Mio an (statt 100k)
+      if (game.prestige > 0 || game.totalScore > 10000000) {
         badge.style.display = 'block';
         const currentProgressRank = Math.max(game.prestige, potential);
         const nextTargetRank = currentProgressRank + 1;
-        const scoreNeededForNext = Math.pow(nextTargetRank, 3) * 1000000;
-        const scoreForCurrent = Math.pow(currentProgressRank, 3) * 1000000;
+
+        // ÄNDERUNG: Berechnung für Anzeige (Hoch 4 statt Hoch 3, mal 100Mio)
+        const scoreNeededForNext = Math.pow(nextTargetRank, 4) * 100000000;
+        const scoreForCurrent = Math.pow(currentProgressRank, 4) * 100000000;
+
         const remaining = scoreNeededForNext - game.totalScore;
         const totalDistance = scoreNeededForNext - scoreForCurrent;
         const coveredDistance = game.totalScore - scoreForCurrent;
@@ -2558,7 +2525,8 @@
         if (percent > 100) percent = 100;
 
         document.getElementById('prestige-level-display').textContent = formatNum(game.prestige);
-        document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 10);
+        // ÄNDERUNG: Anzeige des Bonus (mal 2 statt mal 10)
+        document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 2);
         document.getElementById('prestige-progress-bar').style.width = percent + "%";
 
         if (remaining > 0) {
@@ -2627,6 +2595,7 @@
     }
     init();
   </script>
+
 </body>
 
 </html>
