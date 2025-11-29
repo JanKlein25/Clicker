@@ -2223,15 +2223,12 @@
       const roll = Math.random();
       let wonSkin = SKINS.find(s => s.id === 'default'); // Standardmäßig der Default-Skin
 
-      // 0.1% Chance für jeden anderen Skin
-      const rareSkinChance = 0.001; // 0.1%
       const nonDefaultSkins = SKINS.filter(s => s.id !== 'default');
 
-      if (roll < (rareSkinChance * nonDefaultSkins.length)) { // Gesamtchance für einen Nicht-Default-Skin
-        const randomIndex = Math.floor(Math.random() * nonDefaultSkins.length);
-        wonSkin = nonDefaultSkins[randomIndex];
+      // 10% Chance auf einen der seltenen Skins (falls vorhanden)
+      if (roll < 0.1 && nonDefaultSkins.length > 0) {
+        wonSkin = nonDefaultSkins[Math.floor(Math.random() * nonDefaultSkins.length)];
       }
-      // Wenn der Roll über der Chance liegt, bleibt wonSkin der 'default' Skin.
 
       generateCaseStrip(60, wonSkin);
 
@@ -2239,26 +2236,32 @@
       const strip = document.getElementById('caseStrip');
       strip.offsetHeight; // Force reflow
 
+      // --- FIXED MATH FOR VISUAL ALIGNMENT ---
       const itemWidth = 94; // 90px + 4px margin
       const targetIndex = 45;
-      const center = (targetIndex * itemWidth) + 45 - (strip.parentElement.offsetWidth / 2);
+
+      // Position des Gewinners (Mitte der Karte) relativ zum Start des Strips
+      // itemWidth * 45 ist die linke Kante. + 45 ist die Mitte der Karte.
+      const positionOfWinner = (targetIndex * itemWidth) + 45;
+
+      // Da der Strip CSS 'left: 50%' hat, müssen wir den Strip genau um 'positionOfWinner' nach links schieben,
+      // damit die Mitte der Gewinner-Karte in der Mitte des Containers landet.
       const jitter = Math.floor(Math.random() * 40) - 20;
+      const totalTranslate = positionOfWinner + jitter;
 
       strip.style.transition = 'transform 5s cubic-bezier(0.12, 0.8, 0.1, 1)';
-      strip.style.transform = `translateX(-${center + jitter}px)`;
+      strip.style.transform = `translateX(-${totalTranslate}px)`;
 
       setTimeout(() => {
         isSpinning = false;
         disableButtons(false);
 
-        // Add Skin, aber nur wenn es nicht der Default-Skin ist UND man ihn noch nicht hat (oder wenn man Duplikate will)
-        // Wenn man den Default-Skin zieht, wird er auch hinzugefügt, falls er nicht schon im Inventar ist.
+        // Skin zum Inventar hinzufügen
         if (!game.skinsOwned.includes(wonSkin.id)) {
           game.skinsOwned.push(wonSkin.id);
           alert(`GEZOGEN: NEUER SKIN! ${wonSkin.name}`);
         } else {
-          // Optional: Wenn man Duplikate ziehen kann, würde man hier `game.skinsOwned.push(wonSkin.id);` wieder aktivieren
-          // Für Gesichter von Freunden ist es vielleicht besser, keine Duplikate zu zählen, da sie immer da sind.
+          // Duplikate nur anzeigen, nicht speichern (optional)
           alert(`GEZOGEN: ${wonSkin.name} (Du besitzt diesen Skin bereits)`);
         }
         renderInventory();
@@ -2276,8 +2279,11 @@
         let item;
         if (i === 45) { // The target index for the winner
           item = winner;
+        } else if (i === 44 || i === 46) {
+          // Die direkten Nachbarn sind immer Common, um optische Verwirrung zu vermeiden
+          item = SKINS.find(s => s.id === 'default') || SKINS[0];
         } else {
-          // Für die Füller der Case Strip, verwenden wir weiterhin alle Skins
+          // Zufällige Füller
           item = SKINS[Math.floor(Math.random() * SKINS.length)];
         }
 
