@@ -1616,17 +1616,17 @@
   <script>
     /* --- CONFIG & ASSETS --- */
     const SAVE_KEY = 'KleinClicker_Precision_V10'; // Version Bumped
+    // Set a placeholder for default image if you don't have a specific friend's face for it yet
     const DEFAULT_IMG = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
 
     // SKINS DATA (Rarities: common, rare, epic, legendary)
     // NOTE: Using CSS Filters for simulation. Replace urls with real ones if you have them.
     const SKINS = [
       { id: 'default', name: 'Original Klein', rarity: 'common', url: DEFAULT_IMG, filter: '' },
-      { id: 'sepia', name: 'Retro Klein', rarity: 'common', url: DEFAULT_IMG, filter: 'sepia(1)' },
-      { id: 'dark', name: 'Night Klein', rarity: 'rare', url: DEFAULT_IMG, filter: 'invert(1) hue-rotate(180deg)' },
-      { id: 'radioactive', name: 'Zombie Klein', rarity: 'rare', url: DEFAULT_IMG, filter: 'hue-rotate(90deg) brightness(1.2)' },
-      { id: 'frozen', name: 'Ice Klein', rarity: 'epic', url: DEFAULT_IMG, filter: 'hue-rotate(200deg) brightness(1.5) drop-shadow(0 0 10px cyan)' },
-      { id: 'golden', name: 'Prestige Klein', rarity: 'legendary', url: DEFAULT_IMG, filter: 'sepia(1) saturate(5) brightness(1.2) drop-shadow(0 0 15px gold)' },
+      { id: 'friend1', name: 'Original Cedric', rarity: 'rare', url: "https://github.com/JanKlein25/Clicker/blob/main/Cedrics%20Gesicht.png?raw=true", filter: '' }, // Beispiel URL
+      { id: 'friend2', name: 'Erika Musterfrau', rarity: 'epic', url: "https://example.com/erika_musterfrau.png", filter: '' }, // Beispiel URL
+      { id: 'friend3', name: 'Peter Beispiel', rarity: 'legendary', url: "https://example.com/peter_beispiel.png", filter: '' }, // Beispiel URL
+      // Füge hier weitere Freunde hinzu, wenn du möchtest
     ];
 
     // BUILDINGS
@@ -2152,7 +2152,8 @@
 
       // Populate placeholder strip
       for (let i = 0; i < 5; i++) {
-        const ph = SKINS[Math.floor(Math.random() * SKINS.length)];
+        // Hier sollte der DEFAULT_IMG Skin verwendet werden, wenn die Wahrscheinlichkeit hoch ist
+        const ph = SKINS.find(s => s.id === 'default');
         const el = document.createElement('div');
         el.className = `case-item rarity-${ph.rarity}`;
         el.innerHTML = `<img src="${ph.url}" style="filter:${ph.filter}">`;
@@ -2218,17 +2219,19 @@
       isSpinning = true;
       disableButtons(true);
 
-      // Determine Result based on Rarity Weights
-      // Common: 60%, Rare: 30%, Epic: 8%, Legendary: 2%
+      // --- GEÄNDERTE LOGIK FÜR SKIN-ZIEHUNGSWAHRSCHEINLICHKEIT ---
       const roll = Math.random();
-      let rarity = 'common';
-      if (roll > 0.98) rarity = 'legendary';
-      else if (roll > 0.90) rarity = 'epic';
-      else if (roll > 0.60) rarity = 'rare';
+      let wonSkin = SKINS.find(s => s.id === 'default'); // Standardmäßig der Default-Skin
 
-      // Filter skins by chosen rarity
-      const pool = SKINS.filter(s => s.rarity === rarity);
-      const wonSkin = pool[Math.floor(Math.random() * pool.length)];
+      // 0.1% Chance für jeden anderen Skin
+      const rareSkinChance = 0.001; // 0.1%
+      const nonDefaultSkins = SKINS.filter(s => s.id !== 'default');
+
+      if (roll < (rareSkinChance * nonDefaultSkins.length)) { // Gesamtchance für einen Nicht-Default-Skin
+        const randomIndex = Math.floor(Math.random() * nonDefaultSkins.length);
+        wonSkin = nonDefaultSkins[randomIndex];
+      }
+      // Wenn der Roll über der Chance liegt, bleibt wonSkin der 'default' Skin.
 
       generateCaseStrip(60, wonSkin);
 
@@ -2248,11 +2251,17 @@
         isSpinning = false;
         disableButtons(false);
 
-        // Add Skin
-        game.skinsOwned.push(wonSkin.id);
+        // Add Skin, aber nur wenn es nicht der Default-Skin ist UND man ihn noch nicht hat (oder wenn man Duplikate will)
+        // Wenn man den Default-Skin zieht, wird er auch hinzugefügt, falls er nicht schon im Inventar ist.
+        if (!game.skinsOwned.includes(wonSkin.id)) {
+          game.skinsOwned.push(wonSkin.id);
+          alert(`GEZOGEN: NEUER SKIN! ${wonSkin.name}`);
+        } else {
+          // Optional: Wenn man Duplikate ziehen kann, würde man hier `game.skinsOwned.push(wonSkin.id);` wieder aktivieren
+          // Für Gesichter von Freunden ist es vielleicht besser, keine Duplikate zu zählen, da sie immer da sind.
+          alert(`GEZOGEN: ${wonSkin.name} (Du besitzt diesen Skin bereits)`);
+        }
         renderInventory();
-
-        alert(`GEZOGEN: ${wonSkin.name} (${wonSkin.rarity.toUpperCase()})`);
         saveGame();
       }, 5000);
     }
@@ -2264,8 +2273,13 @@
       strip.innerHTML = '';
 
       for (let i = 0; i < count; i++) {
-        let item = SKINS[Math.floor(Math.random() * SKINS.length)];
-        if (i === 45) item = winner; // The target index
+        let item;
+        if (i === 45) { // The target index for the winner
+          item = winner;
+        } else {
+          // Für die Füller der Case Strip, verwenden wir weiterhin alle Skins
+          item = SKINS[Math.floor(Math.random() * SKINS.length)];
+        }
 
         const el = document.createElement('div');
         el.className = `case-item rarity-${item.rarity}`;
