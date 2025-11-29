@@ -2468,12 +2468,12 @@
 
           // Base Multipliers
           let base = 0;
-          if (s === '🍒') base = 0,75;
-          else if (s === '🍋') base = 2;
-          else if (s === '🍇') base = 4;
-          else if (s === '🍉') base = 8;
-          else if (s === '🔔') base = 12;
-          else if (s === '💎') base = 50;
+          if (s === '🍒') base = 0.75;      // Verlust trotz Gewinn (Hausvorteil)
+                else if (s === '🍋') base = 2;    // Kleiner Gewinn
+                else if (s === '🍇') base = 4;
+                else if (s === '🍉') base = 8;
+                else if (s === '🔔') base = 12;   // Reduziert von 25
+                else if (s === '💎') base = 50;   // Jackpot bleibt hoch
 
           // Exponential growth for 4 or 5 matches
           if (matchCount === 4) base *= 5;
