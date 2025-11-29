@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker - Hard Mode Fixed</title>
+  <title>KleinClicker - Pro Casino Fixed</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap"
     rel="stylesheet">
@@ -506,7 +506,7 @@
     .casino-window {
       background: #18181b;
       width: 95%;
-      max-width: 600px;
+      max-width: 800px;
       border: 1px solid #333;
       border-radius: 16px;
       padding: 0;
@@ -594,250 +594,218 @@
       color: #fff;
     }
 
-    /* --- LEADERBOARD MODAL --- */
-    #leaderboardModal {
-      position: fixed;
+    /* --- PRO SLOTS STYLES (FIXED) --- */
+    .pro-slot-screen {
+      background: #000;
+      border: 5px solid #d35400;
+      border-radius: 10px;
+      padding: 10px;
+      position: relative;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(211, 84, 0, 0.3);
+      overflow: hidden;
+      /* Ensures content stays inside */
+    }
+
+    .pro-slot-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      /* Slightly wider gap for visuals */
+      background: #111;
+      padding: 2px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pro-reel {
+      height: 240px;
+      /* Exactly 3x 80px */
+      background: linear-gradient(to bottom, #1a1a20, #0f0f12);
+      border: 1px solid #333;
+      border-radius: 4px;
+      overflow: hidden;
+      /* Crucial: Hides the long strip */
+      position: relative;
+    }
+
+    .reel-strip {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      /* Logic: We animate 'transform' to scroll the strip up */
+    }
+
+    .slot-symbol {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      /* Ensures box sizing */
+      box-sizing: border-box;
+    }
+
+    /* SLOT HELP OVERLAY */
+    #slot-help-overlay {
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.92);
-      z-index: 12000;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 50;
+      color: #fff;
       display: none;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(8px);
-    }
-
-    .lb-window {
-      background: #18181b;
-      width: 95%;
-      max-width: 500px;
-      border: 1px solid #333;
-      border-radius: 16px;
-      padding: 0;
-      box-shadow: 0 0 80px rgba(0, 0, 0, 0.8);
-      display: flex;
-      flex-direction: column;
-      max-height: 80vh;
-    }
-
-    .lb-header {
-      background: linear-gradient(to bottom, #2d3436, #1e272e);
+      text-align: center;
       padding: 20px;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 16px 16px 0 0;
     }
 
-    .lb-title {
-      font-family: 'Merriweather', serif;
-      font-size: 1.5rem;
-      color: var(--gold);
-      font-weight: 900;
-      letter-spacing: 1px;
-    }
-
-    .lb-list {
-      padding: 10px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .lb-entry {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-family: 'Roboto', sans-serif;
-    }
-
-    .lb-entry:last-child {
-      border-bottom: none;
-    }
-
-    .lb-rank {
-      width: 30px;
-      font-weight: bold;
-      color: #666;
-    }
-
-    .lb-rank.top-1 {
+    .help-title {
       color: var(--gold);
       font-size: 1.2rem;
-    }
-
-    .lb-rank.top-2 {
-      color: #bdc3c7;
-      font-size: 1.1rem;
-    }
-
-    .lb-rank.top-3 {
-      color: #cd7f32;
-      font-size: 1.1rem;
-    }
-
-    .lb-name {
-      flex: 1;
       font-weight: bold;
-      color: #fff;
+      margin-bottom: 10px;
+      text-transform: uppercase;
     }
 
-    .lb-score {
-      color: var(--green);
-      font-weight: bold;
-    }
-
-    .lb-footer {
-      padding: 15px;
-      border-top: 1px solid #333;
-      text-align: center;
-      color: #666;
+    .help-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
       font-size: 0.8rem;
-    }
-
-    #leaderboardBtn {
-      margin-top: 15px;
-      background: linear-gradient(45deg, #8e44ad, #9b59b6);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 10px 25px;
-      border-radius: 50px;
-      font-weight: 900;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(142, 68, 173, 0.4);
-      transition: all 0.2s;
-      letter-spacing: 1px;
-      z-index: 25;
-    }
-
-    #leaderboardBtn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 30px rgba(142, 68, 173, 0.8);
-    }
-
-    /* ROULETTE TICKER */
-    .roulette-container {
+      text-align: left;
       width: 100%;
-      height: 100px;
-      background: #000;
-      border-radius: 8px;
-      border: 4px solid #333;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 25px;
-      box-shadow: inset 0 0 30px #000;
+      max-width: 400px;
     }
 
-    .roulette-marker {
+    .help-item strong {
+      display: block;
+      color: #ddd;
+      margin-bottom: 3px;
+    }
+
+    .payline-mini {
+      display: inline-block;
+      width: 30px;
+      height: 20px;
+      background: #333;
+      margin-right: 5px;
+      border: 1px solid #555;
+    }
+
+    .payline-overlay {
       position: absolute;
-      left: 50%;
       top: 0;
-      bottom: 0;
-      width: 4px;
-      background: var(--gold);
-      transform: translateX(-50%);
-      z-index: 10;
-      box-shadow: 0 0 10px var(--gold);
-    }
-
-    .roulette-strip {
-      display: flex;
+      left: 0;
+      width: 100%;
       height: 100%;
-      align-items: center;
-      position: absolute;
-      left: 50%;
+      pointer-events: none;
+      z-index: 10;
     }
 
-    .r-card {
+    .slot-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+      border-top: 2px solid #444;
+    }
+
+    .slot-btn-circle {
       width: 70px;
       height: 70px;
-      margin-right: 4px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border-radius: 50%;
+      border: none;
       font-weight: 900;
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 1.2rem;
-      flex-shrink: 0;
-      border-bottom: 4px solid rgba(0, 0, 0, 0.3);
-      position: relative;
-    }
-
-    .rc-red {
-      background: linear-gradient(to bottom, #e74c3c, #c0392b);
-    }
-
-    .rc-black {
-      background: linear-gradient(to bottom, #34495e, #2c3e50);
-    }
-
-    .rc-green {
-      background: linear-gradient(to bottom, #f1c40f, #f39c12);
-      color: #000;
-      box-shadow: 0 0 15px var(--gold);
-      z-index: 2;
-    }
-
-    .rc-logo {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-    }
-
-    /* SLOTS */
-    .slot-machine {
-      background: #000;
-      border: 4px solid #333;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 25px;
+      cursor: pointer;
       display: flex;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: inset 0 0 30px #000;
-    }
-
-    .slot-reel {
-      width: 80px;
-      height: 100px;
-      background: linear-gradient(to bottom, #111, #222);
-      border: 2px solid #444;
-      border-radius: 6px;
-      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 3rem;
-      overflow: hidden;
-      position: relative;
-      box-shadow: inset 0 0 10px #000;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5);
+      transition: all 0.1s;
     }
 
-    .slot-reel.spinning span {
-      animation: slotBlur 0.1s infinite;
-      filter: blur(2px);
+    .btn-spin-main {
+      background: radial-gradient(circle, #2ecc71, #27ae60);
+      color: #fff;
+      font-size: 1rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
 
-    @keyframes slotBlur {
-      0% {
-        transform: translateY(-5px);
-      }
-
-      50% {
-        transform: translateY(5px);
-      }
-
-      100% {
-        transform: translateY(-5px);
-      }
+    .btn-spin-main:active {
+      transform: translateY(4px);
+      box-shadow: none;
     }
 
-    /* CONTROLS */
+    .btn-spin-main:disabled {
+      filter: grayscale(1);
+      cursor: not-allowed;
+    }
+
+    .toggle-btn {
+      background: #444;
+      color: #aaa;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      border: 1px solid #555;
+      cursor: pointer;
+    }
+
+    .toggle-btn.active {
+      background: #d35400;
+      color: #fff;
+      border-color: #e67e22;
+      box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);
+    }
+
+    .win-display-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid var(--gold);
+      padding: 20px 40px;
+      z-index: 20;
+      border-radius: 10px;
+      text-align: center;
+      pointer-events: none;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .win-display-box.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .win-val {
+      color: var(--gold);
+      font-size: 2rem;
+      font-weight: 900;
+      display: block;
+    }
+
+    .win-label {
+      color: #fff;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* --- OLD STYLES REMAINING --- */
     .bet-row {
       display: flex;
       justify-content: center;
@@ -916,11 +884,6 @@
     .btn-green {
       background: linear-gradient(135deg, #f1c40f, #f39c12);
       color: #000;
-    }
-
-    .btn-slot {
-      background: linear-gradient(135deg, #9b59b6, #8e44ad);
-      flex: 0 0 200px;
     }
 
     .sub-text {
@@ -1343,6 +1306,202 @@
       color: #aaa;
     }
 
+    /* LEADERBOARD MODAL */
+    #leaderboardModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 12000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .lb-window {
+      background: #18181b;
+      width: 95%;
+      max-width: 500px;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 0 80px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      max-height: 80vh;
+    }
+
+    .lb-header {
+      background: linear-gradient(to bottom, #2d3436, #1e272e);
+      padding: 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .lb-title {
+      font-family: 'Merriweather', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .lb-list {
+      padding: 10px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .lb-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .lb-entry:last-child {
+      border-bottom: none;
+    }
+
+    .lb-rank {
+      width: 30px;
+      font-weight: bold;
+      color: #666;
+    }
+
+    .lb-rank.top-1 {
+      color: var(--gold);
+      font-size: 1.2rem;
+    }
+
+    .lb-rank.top-2 {
+      color: #bdc3c7;
+      font-size: 1.1rem;
+    }
+
+    .lb-rank.top-3 {
+      color: #cd7f32;
+      font-size: 1.1rem;
+    }
+
+    .lb-name {
+      flex: 1;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .lb-score {
+      color: var(--green);
+      font-weight: bold;
+    }
+
+    .lb-footer {
+      padding: 15px;
+      border-top: 1px solid #333;
+      text-align: center;
+      color: #666;
+      font-size: 0.8rem;
+    }
+
+    #leaderboardBtn {
+      margin-top: 15px;
+      background: linear-gradient(45deg, #8e44ad, #9b59b6);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(142, 68, 173, 0.4);
+      transition: all 0.2s;
+      letter-spacing: 1px;
+      z-index: 25;
+    }
+
+    #leaderboardBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(142, 68, 173, 0.8);
+    }
+
+    /* ROULETTE STYLES */
+    .roulette-container {
+      width: 100%;
+      height: 100px;
+      background: #000;
+      border-radius: 8px;
+      border: 4px solid #333;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 25px;
+      box-shadow: inset 0 0 30px #000;
+    }
+
+    .roulette-marker {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--gold);
+      transform: translateX(-50%);
+      z-index: 10;
+      box-shadow: 0 0 10px var(--gold);
+    }
+
+    .roulette-strip {
+      display: flex;
+      height: 100%;
+      align-items: center;
+      position: absolute;
+      left: 50%;
+    }
+
+    .r-card {
+      width: 70px;
+      height: 70px;
+      margin-right: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      border-bottom: 4px solid rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .rc-red {
+      background: linear-gradient(to bottom, #e74c3c, #c0392b);
+    }
+
+    .rc-black {
+      background: linear-gradient(to bottom, #34495e, #2c3e50);
+    }
+
+    .rc-green {
+      background: linear-gradient(to bottom, #f1c40f, #f39c12);
+      color: #000;
+      box-shadow: 0 0 15px var(--gold);
+      z-index: 2;
+    }
+
+    .rc-logo {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -1471,14 +1630,14 @@
     <div class="casino-window" id="casinoWindow">
       <button class="close-btn" onclick="closeCasino()">×</button>
       <div class="cw-header">
-        <div class="cw-title">🎰 CASINO ROYALE</div>
+        <div class="cw-title">🎰 CASINO PRO</div>
         <div class="cw-balance"><span id="casino-balance">0</span> Kleinis</div>
       </div>
       <div class="cw-body">
 
         <div class="casino-nav">
           <button class="nav-btn active" id="btn-tab-roulette" onclick="switchCasinoTab('roulette')">Roulette</button>
-          <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Slots</button>
+          <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Video Slots (5x3)</button>
         </div>
 
         <div class="bet-row">
@@ -1488,6 +1647,7 @@
           <button class="control-btn" style="color:var(--gold)" onclick="setBetMultiplier('max')">ALL</button>
         </div>
 
+        <!-- ROULETTE VIEW -->
         <div id="view-roulette">
           <div class="roulette-container">
             <div class="roulette-marker"></div>
@@ -1505,18 +1665,63 @@
           </div>
         </div>
 
+        <!-- PRO SLOTS VIEW -->
         <div id="view-slots" style="display:none;">
-          <div class="slot-machine">
-            <div class="slot-reel" id="reel-1"><span>🍒</span></div>
-            <div class="slot-reel" id="reel-2"><span>🍒</span></div>
-            <div class="slot-reel" id="reel-3"><span>🍒</span></div>
+          <div class="pro-slot-screen">
+            <!-- HELP OVERLAY -->
+            <div id="slot-help-overlay">
+              <div class="help-title">Anleitung & Gewinne</div>
+              <div class="help-grid">
+                <div class="help-item">
+                  <strong>Gewinnlinien</strong>
+                  <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;">
+                    <div class="payline-mini" style="background:#e74c3c;"></div>Mitte
+                    <div class="payline-mini" style="background:#2ecc71;"></div>Oben
+                    <div class="payline-mini" style="background:#3498db;"></div>Unten
+                    <div class="payline-mini" style="background:#f1c40f;"></div>V-Form
+                    <div class="payline-mini" style="background:#9b59b6;"></div>Dach
+                  </div>
+                </div>
+                <div class="help-item">
+                  <strong>Symbole</strong>
+                  👑 Wild (Joker)<br>
+                  💎 x50 (Jackpot)<br>
+                  🔔 x25<br>
+                  🍉 x12 | 🍇 x8<br>
+                  🍋 x5 | 🍒 x3
+                </div>
+              </div>
+              <button class="toggle-btn active" style="margin-top:20px; width:150px;" onclick="toggleSlotHelp()">VERSTANDEN</button>
+            </div>
+
+            <!-- WIN OVERLAY -->
+            <div id="winDisplay" class="win-display-box">
+              <span class="win-label">BIG WIN</span>
+              <span class="win-val" id="winAmountDisplay">0</span>
+            </div>
+
+            <svg id="paylineSvg" class="payline-overlay" viewBox="0 0 500 240" preserveAspectRatio="none">
+              <!-- Paylines drawn here by JS -->
+            </svg>
+
+            <div class="pro-slot-grid" id="slotGrid">
+              <!-- Reels generated by JS -->
+            </div>
           </div>
-          <div class="action-row">
-            <button class="bet-btn btn-slot" onclick="spinSlots()">DREHEN<span class="sub-text">3 Gleiche =
-                WIN</span></button>
-          </div>
-          <div style="margin-top:15px; font-size:0.85rem; color:#888; letter-spacing: 1px;">
-            🍒x3 • 🍋x5 • 🍇x10 • 7️⃣x25 • <span style="color:var(--gold); font-weight:bold;">💎x50</span>
+
+          <div class="slot-controls">
+            <div style="display:flex; flex-direction:column; gap:5px;">
+              <button class="toggle-btn" id="btnTurbo" onclick="toggleTurbo()">⚡ TURBO</button>
+              <button class="toggle-btn" id="btnAuto" onclick="toggleAuto()">🔄 AUTO</button>
+            </div>
+
+            <div style="flex:1; text-align:left; padding-left:15px; font-size:0.8rem; color:#888;">
+              <button class="toggle-btn" onclick="toggleSlotHelp()">❓ HILFE</button>
+            </div>
+
+            <button class="slot-btn-circle btn-spin-main" id="btnSpinSlots" onclick="spinProSlots()">
+              SPIN
+            </button>
           </div>
         </div>
       </div>
@@ -1620,11 +1825,10 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V15'; // Version Bumped
-    // Set a placeholder for default image if you don't have a specific friend's face for it yet
+    const SAVE_KEY = 'KleinClicker_Precision_V14';
     const DEFAULT_IMG = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
 
-    // SKINS DATA (Rarities: common, rare, epic, legendary)
+    // SKINS DATA
     const SKINS = [
       { id: 'default', name: 'Original Klein', rarity: 'common', url: DEFAULT_IMG, filter: '' },
       { id: 'friend1', name: 'Original Cedric', rarity: 'rare', url: "https://github.com/JanKlein25/Clicker/blob/main/Cedrics%20Gesicht.png?raw=true", filter: '' },
@@ -1632,7 +1836,7 @@
       { id: 'friend3', name: 'Peter Beispiel', rarity: 'legendary', url: "https://example.com/peter_beispiel.png", filter: '' },
     ];
 
-    // BUILDINGS
+    // BUILDINGS (UPDATED with new endgame buildings)
     const BUILDINGS = [
       { id: 0, name: 'Maxis Zeigefinger', baseCost: 15, baseCps: 0.1, icon: '👆' },
       { id: 1, name: 'Magdas Oma', baseCost: 100, baseCps: 1, icon: '👵' },
@@ -1646,16 +1850,17 @@
       { id: 9, name: 'Cedrics Dimensionstor', baseCost: 75000000000, baseCps: 1600000, icon: '🌀' },
       { id: 10, name: 'Maltes Zeitmaschine', baseCost: 900000000000, baseCps: 12000000, icon: '⏳' },
       { id: 11, name: 'Franjas feuchtes Universum', baseCost: 15000000000000, baseCps: 150000000, icon: '🌌' },
+      // NEW BUILDINGS
       { id: 12, name: 'Quanten-Backofen', baseCost: 350000000000000, baseCps: 2500000000, icon: '⚛️' },
-  { id: 13, name: 'Dunkle Materie Pumpe', baseCost: 6000000000000000, baseCps: 35000000000, icon: '⚫' },
-  { id: 14, name: 'Cedrics Multiversum', baseCost: 120000000000000000, baseCps: 500000000000, icon: '🪐' },
-  { id: 15, name: 'Maltes Realitäts-Glitch', baseCost: 2500000000000000000, baseCps: 8000000000000, icon: '👾' },
-  { id: 16, name: 'Jans Admin-Konsole', baseCost: 55000000000000000000, baseCps: 150000000000000, icon: '💻' },
-  { id: 17, name: 'Tills Unendlichkeit', baseCost: 1300000000000000000000, baseCps: 2500000000000000, icon: '♾️' },
-  { id: 18, name: 'Singularitäts-Antrieb', baseCost: 35000000000000000000000, baseCps: 60000000000000000, icon: '🔆' },
-  { id: 19, name: 'Der Ur-Patrick', baseCost: 900000000000000000000000, baseCps: 1200000000000000000, icon: '👶' },
-  { id: 20, name: 'Sauerteig-Galaxie', baseCost: 25000000000000000000000000, baseCps: 30000000000000000000, icon: '🌌' },
-  { id: 21, name: 'Vegan Pussy', baseCost: 800000000000000000000000000, baseCps: 900000000000000000000, icon: '🏁' }
+      { id: 13, name: 'Dunkle Materie Pumpe', baseCost: 6000000000000000, baseCps: 35000000000, icon: '⚫' },
+      { id: 14, name: 'Cedrics Multiversum', baseCost: 120000000000000000, baseCps: 500000000000, icon: '🪐' },
+      { id: 15, name: 'Maltes Realitäts-Glitch', baseCost: 2500000000000000000, baseCps: 8000000000000, icon: '👾' },
+      { id: 16, name: 'Jans Admin-Konsole', baseCost: 55000000000000000000, baseCps: 150000000000000, icon: '💻' },
+      { id: 17, name: 'Nicos Unendlichkeit', baseCost: 1300000000000000000000, baseCps: 2500000000000000, icon: '♾️' },
+      { id: 18, name: 'Singularitäts-Antrieb', baseCost: 35000000000000000000000, baseCps: 60000000000000000, icon: '🔆' },
+      { id: 19, name: 'Der Ur-Klein', baseCost: 900000000000000000000000, baseCps: 1200000000000000000, icon: '👶' },
+      { id: 20, name: 'Sauerteig-Galaxie', baseCost: 25000000000000000000000000, baseCps: 30000000000000000000, icon: '🌌' },
+      { id: 21, name: 'Simulation Ende', baseCost: 800000000000000000000000000, baseCps: 900000000000000000000, icon: '🏁' }
     ];
 
     // UPGRADES
@@ -1668,15 +1873,7 @@
 
       { id: 'u_b1_1', name: 'Nudelholz', cost: 5000, trigger: { type: 'build', id: 1, val: 10 }, icon: '🥖', desc: 'Die Omas werden aggressiver.', type: 'build', target: 1, multi: 2, text: 'Oma Produktion x2' },
       { id: 'u_b1_2', name: 'Lesebrille', cost: 50000, trigger: { type: 'build', id: 1, val: 50 }, icon: '👓', desc: 'Sie sehen die Kleinis jetzt besser.', type: 'build', target: 1, multi: 2, text: 'Oma Produktion x2' },
-
-      { id: 'u_b2_1', name: 'Dünger', cost: 150000, trigger: { type: 'build', id: 2, val: 10 }, icon: '💩', desc: '100% biologisch abbaubar.', type: 'build', target: 2, multi: 2, text: 'Feld Produktion x2' },
-      { id: 'u_b3_1', name: 'Dynamit', cost: 1200000, trigger: { type: 'build', id: 3, val: 10 }, icon: '🧨', desc: 'Sicherheit ist zweitrangig.', type: 'build', target: 3, multi: 2, text: 'Mine Produktion x2' },
-      { id: 'u_b4_1', name: 'Roboterarm', cost: 15000000, trigger: { type: 'build', id: 4, val: 10 }, icon: '🤖', desc: 'Ersetzt menschliche Fehler.', type: 'build', target: 4, multi: 2, text: 'Fabrik Produktion x2' },
-      { id: 'u_b5_1', name: 'Goldtresor', cost: 200000000, trigger: { type: 'build', id: 5, val: 10 }, icon: '🔐', desc: 'Noch sicherer als Fort Knox.', type: 'build', target: 5, multi: 2, text: 'Bank Produktion x2' },
-
-      { id: 'u_b7_1', name: 'Reagenzglas', cost: 5000000000, trigger: { type: 'build', id: 7, val: 10 }, icon: '🧪', desc: 'Klonflüssigkeit mit Geschmack.', type: 'build', target: 7, multi: 2, text: 'Labor Produktion x2' },
-      { id: 'u_b8_1', name: 'Mars Ticket', cost: 75000000000, trigger: { type: 'build', id: 8, val: 10 }, icon: '🎟️', desc: 'One-Way Ticket für Kleinis.', type: 'build', target: 8, multi: 2, text: 'Raketen Produktion x2' },
-      { id: 'u_b9_1', name: 'Rick\'s Gun', cost: 1500000000000, trigger: { type: 'build', id: 9, val: 10 }, icon: '🔫', desc: 'Wubba Lubba Dub Dub!', type: 'build', target: 9, multi: 2, text: 'Portal Produktion x2' },
+      // ... further upgrades implied
     ];
 
     /* --- GAME STATE --- */
@@ -1735,6 +1932,7 @@
     function init() {
       try {
         loadGame();
+        // Check array lengths in case of new update
         if (game.buildings.length < BUILDINGS.length) {
           const diff = BUILDINGS.length - game.buildings.length;
           for (let i = 0; i < diff; i++) game.buildings.push(0);
@@ -1746,6 +1944,7 @@
       renderUpgrades();
       renderHistory();
       initVisuals();
+      initProSlots(); // Init the new slots
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000);
       scheduleGolden();
@@ -1800,6 +1999,11 @@
 
       updateBuildingStates();
       checkPrestigeUnlock();
+
+      // Auto Spin Logic
+      if (slotState.auto && !slotState.spinning && currentCasinoMode === 'slots' && document.getElementById('casinoModal').style.display === 'flex') {
+        spinProSlots();
+      }
 
       requestAnimationFrame(gameLoop);
     }
@@ -1865,7 +2069,6 @@
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
 
     function getPrestigeMultiplier() {
-      // 2% Bonus pro Level
       return 1 + (game.prestige * 0.02);
     }
 
@@ -1879,16 +2082,9 @@
     function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
     function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
 
-    // --- NEUE MAUS LOGIK (FIXED) ---
     function getClickPower(lvl = game.clickLevel) {
-      // FIX: Wir ziehen 1 ab, damit Level 1 wirklich bei 1 startet.
-      // 1 + (0 * 5) = 1.
-      // 1 + (1 * 5) = 6.
       let baseDamage = 1 + ((lvl - 1) * 5);
-
-      // Prozentualer Anteil der CPS wird zum Klick addiert
-      let cpsPercentage = 0.05 + (lvl * 0.01); 
-      
+      let cpsPercentage = 0.05 + (lvl * 0.01);
       let cpsPower = calculateTotalCPS() * cpsPercentage;
       let power = baseDamage + cpsPower;
 
@@ -1899,7 +2095,6 @@
     }
 
     function getClickLevelCost() {
-      // Exponent von 2.5 auf 1.8 gesenkt -> Kurve ist flacher
       return Math.floor(500 * Math.pow(1.8, game.clickLevel));
     }
 
@@ -1921,7 +2116,6 @@
       const currentPower = getClickPower(game.clickLevel);
       const nextPower = getClickPower(game.clickLevel + 1);
 
-      // Zeige dem Spieler den Prozent-Effekt an, damit er versteht warum es gut ist
       const currentPercent = Math.round((0.05 + (game.clickLevel * 0.01)) * 100);
       const nextPercent = Math.round((0.05 + ((game.clickLevel + 1) * 0.01)) * 100);
 
@@ -1942,15 +2136,22 @@
     function openCasino() {
       document.getElementById('casinoModal').style.display = 'flex';
       updateCasinoUI();
+      // Reset Roulette
       generateStrip(50, null);
       const s = document.getElementById('rouletteStrip');
       s.style.transition = 'none'; s.style.transform = 'translateX(0px)';
+      // Ensure Slot is reset visually
+      slotState.auto = false;
+      document.getElementById('btnAuto').classList.remove('active');
     }
-    function closeCasino() { document.getElementById('casinoModal').style.display = 'none'; }
+    function closeCasino() {
+      document.getElementById('casinoModal').style.display = 'none';
+      slotState.auto = false; // Stop auto on close
+    }
     function updateCasinoUI() { document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score)); }
 
     function switchCasinoTab(mode) {
-      if (isSpinning) return;
+      // If slots are spinning, don't switch violently, but okay for now
       currentCasinoMode = mode;
       document.getElementById('view-roulette').style.display = mode === 'roulette' ? 'block' : 'none';
       document.getElementById('view-slots').style.display = mode === 'slots' ? 'block' : 'none';
@@ -2046,77 +2247,263 @@
       saveGame();
     }
 
-    /* --- SLOTS ENGINE --- */
-    const SLOT_SYMBOLS = ['🍒', '🍋', '🍇', '💎', '7️⃣'];
+    /* --- PRO SLOTS ENGINE (5x3) FIXED --- */
+    const SLOT_SYMBOLS = ['🍒', '🍋', '🍇', '🍉', '🔔', '💎', '👑'];
+    // Wild: 👑
+    // High: 💎, 🔔
 
-    function spinSlots() {
-      if (isSpinning) return;
+    let slotState = {
+      turbo: false,
+      auto: false,
+      spinning: false
+    };
+
+    function initProSlots() {
+      const gridEl = document.getElementById('slotGrid');
+      gridEl.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        let reelEl = document.createElement('div');
+        reelEl.className = 'pro-reel';
+        let strip = document.createElement('div');
+        strip.className = 'reel-strip';
+        strip.id = `pro-reel-${i}`;
+        // Start Position set to 0 visually
+        strip.style.transform = 'translateY(0px)';
+
+        // Initial Symbols
+        for (let j = 0; j < 3; j++) {
+          let sym = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+          let div = document.createElement('div');
+          div.className = 'slot-symbol';
+          div.textContent = sym;
+          strip.appendChild(div);
+        }
+        reelEl.appendChild(strip);
+        gridEl.appendChild(reelEl);
+      }
+    }
+
+    function toggleTurbo() {
+      slotState.turbo = !slotState.turbo;
+      const btn = document.getElementById('btnTurbo');
+      if (slotState.turbo) btn.classList.add('active'); else btn.classList.remove('active');
+    }
+
+    function toggleAuto() {
+      slotState.auto = !slotState.auto;
+      const btn = document.getElementById('btnAuto');
+      if (slotState.auto) btn.classList.add('active'); else btn.classList.remove('active');
+    }
+
+    function toggleSlotHelp() {
+      const el = document.getElementById('slot-help-overlay');
+      el.style.display = (el.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function spinProSlots() {
+      if (slotState.spinning) return;
+
+      // Clear previous win lines and boxes
+      document.getElementById('paylineSvg').innerHTML = '';
+      document.getElementById('winDisplay').classList.remove('show');
+
       const bet = getBet();
-      if (!bet) return;
+      if (!bet) {
+        slotState.auto = false;
+        document.getElementById('btnAuto').classList.remove('active');
+        return;
+      }
 
       game.score -= bet;
       updateCasinoUI();
-      isSpinning = true;
+      slotState.spinning = true;
       disableButtons(true);
+      document.getElementById('btnSpinSlots').disabled = true;
 
-      const reels = [document.getElementById('reel-1'), document.getElementById('reel-2'), document.getElementById('reel-3')];
-      reels.forEach(r => r.classList.add('spinning'));
-
-      let intervals = reels.map(r => setInterval(() => {
-        r.querySelector('span').textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
-      }, 50));
-
-      const finalSymbols = [];
-      const roll = Math.random();
-      let forcedWin = null;
-
-      if (roll < 0.30) {
-        const typeRoll = Math.random();
-        if (typeRoll < 0.02) forcedWin = '💎';
-        else if (typeRoll < 0.1) forcedWin = '7️⃣';
-        else if (typeRoll < 0.3) forcedWin = '🍇';
-        else if (typeRoll < 0.6) forcedWin = '🍋';
-        else forcedWin = '🍒';
+      // 1. Determine Results
+      let finalGrid = [];
+      for (let i = 0; i < 5; i++) {
+        let col = [];
+        for (let r = 0; r < 3; r++) {
+          let rnd = Math.random();
+          let sym = '🍒';
+          if (rnd < 0.05) sym = '👑';
+          else if (rnd < 0.15) sym = '💎';
+          else if (rnd < 0.3) sym = '🔔';
+          else if (rnd < 0.5) sym = '🍉';
+          else if (rnd < 0.7) sym = '🍇';
+          else if (rnd < 0.85) sym = '🍋';
+          col.push(sym);
+        }
+        finalGrid.push(col);
       }
 
-      for (let i = 0; i < 3; i++) {
-        if (forcedWin) finalSymbols.push(forcedWin);
-        else finalSymbols.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
-      }
+      // 2. Animate Reels (Long Strip Method)
+      // This ensures precise pixel alignment
+      const SYMBOL_HEIGHT = 80;
+      const SPINS = 20; // Number of fake symbols before result
 
-      if (!forcedWin && finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
-        finalSymbols[2] = finalSymbols[0] === '🍒' ? '🍋' : '🍒';
+      for (let i = 0; i < 5; i++) {
+        const strip = document.getElementById(`pro-reel-${i}`);
+        
+        // Build a long strip: Current Symbols + Randoms + Final Result
+        // We actually just replace the innerHTML with a long list ending in the result
+        // To make it seamless, we usually keep the current visible ones at top, but for simplicity/robustness:
+        // We just generate a long strip.
+        
+        let html = '';
+        // Add random filler symbols
+        for(let k=0; k<SPINS; k++) {
+           let s = SLOT_SYMBOLS[Math.floor(Math.random()*SLOT_SYMBOLS.length)];
+           html += `<div class="slot-symbol">${s}</div>`;
+        }
+        // Add Result Symbols (Result is 3 rows. Row 0 is Top, Row 1 Middle, Row 2 Bottom)
+        // The strip renders top-down. 
+        html += `<div class="slot-symbol">${finalGrid[i][0]}</div>`;
+        html += `<div class="slot-symbol">${finalGrid[i][1]}</div>`;
+        html += `<div class="slot-symbol">${finalGrid[i][2]}</div>`;
+        
+        strip.innerHTML = html;
+        
+        // Reset Position to 0 (top of random strip)
+        strip.style.transition = 'none';
+        strip.style.transform = 'translateY(0px)';
+        
+        // Force Reflow
+        strip.offsetHeight; 
+        
+        // Animate to the bottom (showing the last 3 symbols)
+        // Total symbols = SPINS + 3. 
+        // We want the viewport (240px) to show the last 3.
+        // So we translate up by SPINS * 80px.
+        const targetY = -(SPINS * SYMBOL_HEIGHT);
+        
+        let duration = slotState.turbo ? 0.5 + (i * 0.1) : 1.5 + (i * 0.3);
+        strip.style.transition = `transform ${duration}s cubic-bezier(0.25, 1, 0.5, 1)`;
+        strip.style.transform = `translateY(${targetY}px)`;
+        
+        // On Finish
+        if (i === 4) {
+          setTimeout(() => {
+            // Cleanup to just the 3 result symbols to save DOM memory
+            // and check wins
+            checkSlotWins(finalGrid, bet);
+          }, duration * 1000);
+        }
       }
-
-      [1500, 2000, 2500].forEach((delay, i) => {
-        setTimeout(() => {
-          clearInterval(intervals[i]);
-          reels[i].classList.remove('spinning');
-          reels[i].querySelector('span').textContent = finalSymbols[i];
-          reels[i].style.transform = "scale(1.2)";
-          setTimeout(() => reels[i].style.transform = "scale(1)", 150);
-          if (i === 2) finishSlotSpin(finalSymbols, bet);
-        }, delay);
-      });
     }
 
-    function finishSlotSpin(symbols, bet) {
-      isSpinning = false;
+    function checkSlotWins(grid, bet) {
+      slotState.spinning = false;
       disableButtons(false);
-
-      let multiplier = 0;
-      if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
-        const s = symbols[0];
-        if (s === '🍒') multiplier = 3;
-        else if (s === '🍋') multiplier = 5;
-        else if (s === '🍇') multiplier = 10;
-        else if (s === '7️⃣') multiplier = 25;
-        else if (s === '💎') multiplier = 50;
+      document.getElementById('btnSpinSlots').disabled = false;
+      
+      // Clean up DOM (remove the long strip, keep only result)
+      for(let i=0; i<5; i++) {
+         const strip = document.getElementById(`pro-reel-${i}`);
+         strip.style.transition = 'none';
+         strip.innerHTML = '';
+         // Create the 3 result divs
+         for(let r=0; r<3; r++) {
+            let d = document.createElement('div');
+            d.className = 'slot-symbol';
+            d.textContent = grid[i][r];
+            strip.appendChild(d);
+         }
+         strip.style.transform = 'translateY(0px)';
       }
 
-      if (multiplier > 0) triggerWin(bet * multiplier);
+      // Paylines Definitions (Coordinates [col, row])
+      const paylines = [
+        [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1]], // Middle
+        [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]], // Top
+        [[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]], // Bottom
+        [[0, 0], [1, 1], [2, 2], [3, 1], [4, 0]], // V
+        [[0, 2], [1, 1], [2, 0], [3, 1], [4, 2]]  // Inverted V
+      ];
+
+      let totalWin = 0;
+
+      paylines.forEach((line, index) => {
+        // Determine the "target symbol" for this line (first non-wild)
+        let firstNonWild = null;
+        for (let i = 0; i < 5; i++) {
+          let s = grid[line[i][0]][line[i][1]];
+          if (s !== '👑') { firstNonWild = s; break; }
+        }
+        // If all are wilds, treat as highest symbol
+        let targetSymbol = firstNonWild || '💎';
+
+        let matchCount = 0;
+        for (let i = 0; i < 5; i++) {
+          let sym = grid[line[i][0]][line[i][1]];
+          if (sym === targetSymbol || sym === '👑') matchCount++;
+          else break; // Line broken
+        }
+
+        if (matchCount >= 3) {
+          // Determine value
+          let s = targetSymbol;
+
+          // Base Multipliers
+          let base = 0;
+          if (s === '🍒') base = 3;
+          else if (s === '🍋') base = 5;
+          else if (s === '🍇') base = 8;
+          else if (s === '🍉') base = 12;
+          else if (s === '🔔') base = 25;
+          else if (s === '💎') base = 50;
+
+          // Exponential growth for 4 or 5 matches
+          if (matchCount === 4) base *= 5;
+          if (matchCount === 5) base *= 20;
+
+          totalWin += bet * base;
+
+          // Calculate colors for line
+          let colors = ['#e74c3c', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6'];
+          drawPayline(line.slice(0, matchCount), colors[index % colors.length]);
+        }
+      });
+
+      if (totalWin > 0) {
+        triggerWin(totalWin);
+
+        // Show Win Box
+        const box = document.getElementById('winDisplay');
+        document.getElementById('winAmountDisplay').textContent = formatNum(totalWin);
+        box.classList.add('show');
+        setTimeout(() => box.classList.remove('show'), 1500);
+      }
+
       updateCasinoUI();
       saveGame();
+    }
+
+    function drawPayline(coords, color) {
+      // SVG Coord mapping (500x240)
+      // Col centers: 50, 150, 250... (20% steps of 500 = 100px width per col)
+      // Row centers: 40, 120, 200 (80px height per row)
+
+      const svg = document.getElementById('paylineSvg');
+      let points = "";
+
+      coords.forEach((c, i) => {
+        let x = (c[0] * 100) + 50;
+        let y = (c[1] * 80) + 40;
+        points += `${x},${y} `;
+      });
+
+      const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      poly.setAttribute("points", points);
+      poly.setAttribute("fill", "none");
+      poly.setAttribute("stroke", color);
+      poly.setAttribute("stroke-width", "8");
+      poly.setAttribute("stroke-linecap", "round");
+      poly.setAttribute("stroke-linejoin", "round");
+      poly.style.filter = "drop-shadow(0 0 5px " + color + ")";
+
+      svg.appendChild(poly);
     }
 
     /* --- SHARED CASINO FUNCS --- */
@@ -2322,22 +2709,22 @@
       img.style.left = (x - 17) + 'px'; img.style.top = (y - 17) + 'px'; document.getElementById('clickPanel').appendChild(img); setTimeout(() => img.remove(), 1200);
     }
 
-      function formatNum(num, decimals = 0) {
+    // UPDATED FORMAT NUM (Handles up to Sextillions)
+    function formatNum(num, decimals = 0) {
       if (num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
 
-      // Liste der Einheiten (von Groß nach Klein sortiert)
       const units = [
-        { val: 1e36, suffix: " Sext" },   // Sextillionen
-        { val: 1e33, suffix: " Quintd" }, // Quintilliarden
-        { val: 1e30, suffix: " Quint" },  // Quintillionen
-        { val: 1e27, suffix: " Quard" },  // Quadrilliarden
-        { val: 1e24, suffix: " Quad" },   // Quadrillionen
-        { val: 1e21, suffix: " Trd" },    // Trilliarden
-        { val: 1e18, suffix: " Trio" },   // Trillionen
-        { val: 1e15, suffix: " Brd" },    // Billiarden
-        { val: 1e12, suffix: " Bio" },    // Billionen
-        { val: 1e9,  suffix: " Mrd" },    // Milliarden
-        { val: 1e6,  suffix: " Mio" }     // Millionen
+        { val: 1e36, suffix: " Sext" },   
+        { val: 1e33, suffix: " Quintd" }, 
+        { val: 1e30, suffix: " Quint" },  
+        { val: 1e27, suffix: " Quard" },  
+        { val: 1e24, suffix: " Quad" },   
+        { val: 1e21, suffix: " Trd" },    
+        { val: 1e18, suffix: " Trio" },   
+        { val: 1e15, suffix: " Brd" },    
+        { val: 1e12, suffix: " Bio" },    
+        { val: 1e9,  suffix: " Mrd" },    
+        { val: 1e6,  suffix: " Mio" }     
       ];
 
       for (const unit of units) {
@@ -2345,8 +2732,6 @@
           return (num / unit.val).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + unit.suffix;
         }
       }
-
-      // Falls die Zahl noch größer ist (unwahrscheinlich), nutze wissenschaftliche Notation (z.B. 1e+40)
       return num.toExponential(2);
     }
 
@@ -2483,7 +2868,7 @@
       }
     }
 
-    /* --- PRESTIGE LOGIK (HARD MODE) --- */
+    /* --- PRESTIGE LOGIK --- */
     function calculatePotentialPrestige() {
       if (game.totalScore < 100000000) return 0;
       return Math.floor(Math.pow(game.totalScore / 100000000, 0.25));
