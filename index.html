@@ -1670,28 +1670,47 @@
           <div class="pro-slot-screen">
             <!-- HELP OVERLAY -->
             <div id="slot-help-overlay">
-              <div class="help-title">Anleitung & Gewinne</div>
-              <div class="help-grid">
-                <div class="help-item">
-                  <strong>Gewinnlinien</strong>
-                  <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;">
-                    <div class="payline-mini" style="background:#e74c3c;"></div>Mitte
-                    <div class="payline-mini" style="background:#2ecc71;"></div>Oben
-                    <div class="payline-mini" style="background:#3498db;"></div>Unten
-                    <div class="payline-mini" style="background:#f1c40f;"></div>V-Form
-                    <div class="payline-mini" style="background:#9b59b6;"></div>Dach
+              <div class="help-title" style="border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; width:100%;">🎰 Anleitung & Gewinne</div>
+
+              <div style="text-align: left; max-width: 500px; font-size: 0.85rem; line-height: 1.5; color: #ccc; overflow-y: auto; max-height: 60vh; padding-right: 5px;">
+
+                <!-- ZIEL & LINIEN -->
+                <div style="margin-bottom: 12px;">
+                  <strong style="color:var(--gold); font-size:0.95rem;">1. Das Ziel</strong><br>
+                  Sammle mindestens <strong>3 gleiche Symbole</strong> (oder Joker) von <strong>links nach rechts</strong>.
+                  <br><span style="font-size:0.8rem; color:#888;">Es gibt 5 Linien: Oben, Mitte, Unten, V-Form (Tal) & Dach-Form (Berg).</span>
+                </div>
+
+                <!-- SYMBOLE -->
+                <div style="margin-bottom: 12px; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px;">
+                  <strong style="color:var(--gold); font-size:0.95rem;">2. Die Symbole</strong>
+                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
+                    <div>👑 <strong>WILD (Joker)</strong><br><span style="font-size:0.75rem; color:#aaa;">Ersetzt alles!</span></div>
+                    <div>💎 <strong>Diamant</strong><br><span style="font-size:0.75rem; color:#aaa;">Jackpot (x50)</span></div>
+                    <div>🔔 <strong>Glocke</strong><br><span style="font-size:0.75rem; color:#aaa;">High (x25)</span></div>
+                    <div>🍒🍋🍇🍉 <strong>Früchte</strong><br><span style="font-size:0.75rem; color:#aaa;">x3 bis x12</span></div>
                   </div>
                 </div>
-                <div class="help-item">
-                  <strong>Symbole</strong>
-                  👑 Wild (Joker)<br>
-                  💎 x50 (Jackpot)<br>
-                  🔔 x25<br>
-                  🍉 x12 | 🍇 x8<br>
-                  🍋 x5 | 🍒 x3
+
+                <!-- BERECHNUNG -->
+                <div style="margin-bottom: 12px;">
+                  <strong style="color:var(--gold); font-size:0.95rem;">3. Super-Kombos (Der Boost)</strong><br>
+                  Längere Ketten multiplizieren deinen Gewinn extrem:<br>
+                  • <strong>3er Reihe:</strong> Basis-Gewinn<br>
+                  • <strong>4er Reihe:</strong> Gewinn <span style="color:var(--green)">x5</span><br>
+                  • <strong>5er Reihe:</strong> Gewinn <span style="color:var(--red)">x20</span> 🚀
                 </div>
+
+                <!-- FEATURES -->
+                <div>
+                  <strong style="color:var(--gold); font-size:0.95rem;">4. Steuerung</strong><br>
+                  ⚡ <strong>Turbo:</strong> Ergebnis sofort (keine Animation).<br>
+                  🔄 <strong>Auto:</strong> Dreht automatisch, solange Geld da ist.
+                </div>
+
               </div>
-              <button class="toggle-btn active" style="margin-top:20px; width:150px;" onclick="toggleSlotHelp()">VERSTANDEN</button>
+
+              <button class="toggle-btn active" style="margin-top:15px; width:100%; font-weight:bold; font-size:1rem; padding:12px;" onclick="toggleSlotHelp()">VERSTANDEN & ZOCKEN</button>
             </div>
 
             <!-- WIN OVERLAY -->
