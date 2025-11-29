@@ -2348,12 +2348,12 @@
           let sym = '🍒'; // Standard (wenn keine andere Zahl trifft)
 
           // HIER DIE ZAHLEN ÄNDERN:
-          if (rnd < 0.01) sym = '👑';       // 1% Chance (WILD) - Extrem selten
-          else if (rnd < 0.03) sym = '💎';  // 2% Chance (Jackpot)
-          else if (rnd < 0.08) sym = '🔔';  // 5% Chance (High)
-          else if (rnd < 0.20) sym = '🍉';  // 12% Chance (Mid)
-          else if (rnd < 0.40) sym = '🍇';  // 20% Chance (Low-Mid)
-          else if (rnd < 0.70) sym = '🍋';  // 30% Chance (Low)
+          if (rnd < 0.001) sym = '👑';      // 0.1% Chance (1 zu 1000) - Fast unmöglich
+              else if (rnd < 0.005) sym = '💎'; // 0.4% Chance (1 zu 250)
+              else if (rnd < 0.02) sym = '🔔';  // 1.5% Chance (Sehr selten)
+              else if (rnd < 0.07) sym = '🍉';  // 5% Chance
+              else if (rnd < 0.17) sym = '🍇';  // 10% Chance
+              else if (rnd < 0.50) sym = '🍋';  // 33% Chance (Massenware)
           col.push(sym);
         }
         finalGrid.push(col);
