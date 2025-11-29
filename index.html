@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker - Hard Mode</title>
+  <title>KleinClicker - Hard Mode Fixed</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap"
     rel="stylesheet">
@@ -1596,11 +1596,14 @@
     <div class="upgrades-container" id="upgradeGrid"></div>
 
     <!-- NEW CLICKER UPGRADE SECTION -->
-    <div class="store-header">Clicker Zentrale 2.0</div>
+    <div class="store-header">Clicker Zentrale 3.0</div>
     <div class="click-booster" id="clickBooster">
       <div class="cb-card">
         <div class="cb-info">
           <div class="cb-title">Maus Training</div>
+          <div class="cb-stat" style="font-size:0.75rem;">
+            Effekt: <span id="click-effect-desc" style="color:#2ecc71"></span>
+          </div>
           <div class="cb-stat">Kraft: <span id="click-dmg-display" style="color:var(--gold); font-weight:bold;">1</span>
           </div>
         </div>
@@ -1617,7 +1620,7 @@
 
   <script>
     /* --- CONFIG & ASSETS --- */
-    const SAVE_KEY = 'KleinClicker_Precision_V10'; // Version Bumped for Reset due to Hard Mode
+    const SAVE_KEY = 'KleinClicker_Precision_V10'; // Version Bumped
     // Set a placeholder for default image if you don't have a specific friend's face for it yet
     const DEFAULT_IMG = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
 
@@ -1852,7 +1855,7 @@
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
 
     function getPrestigeMultiplier() {
-      // ÄNDERUNG: Nur noch 2% Bonus pro Level (statt 10%)
+      // 2% Bonus pro Level
       return 1 + (game.prestige * 0.02);
     }
 
@@ -1866,10 +1869,18 @@
     function getBuildingCPS(index) { return BUILDINGS[index].baseCps * getBuildingMultiplier(index); }
     function calculateTotalCPS() { let cps = 0; game.buildings.forEach((count, i) => cps += count * getBuildingCPS(i)); return cps; }
 
+    // --- NEUE MAUS LOGIK (FIXED) ---
     function getClickPower(lvl = game.clickLevel) {
-      let levelPower = 1 + (lvl * 2);
-      let cpsPower = calculateTotalCPS() * 0.05;
-      let power = levelPower + cpsPower;
+      // FIX: Wir ziehen 1 ab, damit Level 1 wirklich bei 1 startet.
+      // 1 + (0 * 5) = 1.
+      // 1 + (1 * 5) = 6.
+      let baseDamage = 1 + ((lvl - 1) * 5);
+
+      // Prozentualer Anteil der CPS wird zum Klick addiert
+      let cpsPercentage = 0.05 + (lvl * 0.01); 
+      
+      let cpsPower = calculateTotalCPS() * cpsPercentage;
+      let power = baseDamage + cpsPower;
 
       UPGRADES.forEach(u => { if (u.type === 'click' && game.upgrades.includes(u.id)) power *= u.multi; });
       if (buffs.frenzy.active) power *= buffs.frenzy.multi;
@@ -1878,7 +1889,8 @@
     }
 
     function getClickLevelCost() {
-      return Math.floor(500 * Math.pow(2.5, game.clickLevel));
+      // Exponent von 2.5 auf 1.8 gesenkt -> Kurve ist flacher
+      return Math.floor(500 * Math.pow(1.8, game.clickLevel));
     }
 
     function buyClickStats() {
@@ -1898,6 +1910,12 @@
       const cost = getClickLevelCost();
       const currentPower = getClickPower(game.clickLevel);
       const nextPower = getClickPower(game.clickLevel + 1);
+
+      // Zeige dem Spieler den Prozent-Effekt an, damit er versteht warum es gut ist
+      const currentPercent = Math.round((0.05 + (game.clickLevel * 0.01)) * 100);
+      const nextPercent = Math.round((0.05 + ((game.clickLevel + 1) * 0.01)) * 100);
+
+      document.getElementById('click-effect-desc').innerHTML = `${currentPercent}% CPS <span style="font-size:0.8em; color:#777">➜</span> ${nextPercent}% CPS`;
 
       document.getElementById('click-dmg-display').innerHTML = `${formatNum(currentPower, 1)} <span style="font-size:0.8em; color:#7f8c8d">➜</span> <span style="color:#2ecc71">${formatNum(nextPower, 1)}</span>`;
       document.getElementById('click-cost-display').textContent = formatNum(cost);
@@ -2436,11 +2454,9 @@
       }
     }
 
-    /* --- PRESTIGE LOGIK (UPDATED FOR HARD MODE) --- */
+    /* --- PRESTIGE LOGIK (HARD MODE) --- */
     function calculatePotentialPrestige() {
-      // ÄNDERUNG: Schwelle auf 100 Mio erhöht (war 1 Mio)
       if (game.totalScore < 100000000) return 0;
-      // ÄNDERUNG: 4. Wurzel (Math.pow(x, 0.25)) statt 3. Wurzel (Math.cbrt)
       return Math.floor(Math.pow(game.totalScore / 100000000, 0.25));
     }
 
@@ -2507,13 +2523,11 @@
       }
 
       const badge = document.getElementById('prestige-badge');
-      // Zeige die Bar erst ab 10 Mio an (statt 100k)
       if (game.prestige > 0 || game.totalScore > 10000000) {
         badge.style.display = 'block';
         const currentProgressRank = Math.max(game.prestige, potential);
         const nextTargetRank = currentProgressRank + 1;
 
-        // ÄNDERUNG: Berechnung für Anzeige (Hoch 4 statt Hoch 3, mal 100Mio)
         const scoreNeededForNext = Math.pow(nextTargetRank, 4) * 100000000;
         const scoreForCurrent = Math.pow(currentProgressRank, 4) * 100000000;
 
@@ -2525,7 +2539,6 @@
         if (percent > 100) percent = 100;
 
         document.getElementById('prestige-level-display').textContent = formatNum(game.prestige);
-        // ÄNDERUNG: Anzeige des Bonus (mal 2 statt mal 10)
         document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 2);
         document.getElementById('prestige-progress-bar').style.width = percent + "%";
 
