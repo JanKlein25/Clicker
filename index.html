@@ -2980,7 +2980,7 @@
       }
 
       const badge = document.getElementById('prestige-badge');
-      if (game.prestige > 0 || game.totalScore > 10000000) {
+      if (game.prestige > 0 || game.totalScore > 10000) {
         badge.style.display = 'block';
         const currentProgressRank = Math.max(game.prestige, potential);
         const nextTargetRank = currentProgressRank + 1;
