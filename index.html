@@ -296,6 +296,29 @@
       box-shadow: 0 0 30px rgba(243, 156, 18, 0.8);
     }
 
+    /* --- SKINS BUTTON (UPDATE: Gleicher Style wie Casino) --- */
+    #skinsBtn {
+      margin-top: 30px; /* Synchronisiert mit Casino */
+      background: linear-gradient(45deg, #1abc9c, #16a085);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 12px 30px; /* Synchronisiert mit Casino */
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 1.2rem; /* Synchronisiert mit Casino */
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(26, 188, 156, 0.4);
+      transition: all 0.2s;
+      letter-spacing: 1px;
+      z-index: 25;
+      display: none;
+    }
+
+    #skinsBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(26, 188, 156, 0.8);
+    }
+
     /* --- CLICK UPGRADE SECTION --- */
     .click-booster {
       padding: 15px;
@@ -1108,29 +1131,7 @@
     }
 
     /* --- SKINS & INVENTORY STYLES (NEW) --- */
-    #skinsBtn {
-      margin-top: 15px;
-      background: linear-gradient(45deg, #1abc9c, #16a085);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 10px 25px;
-      border-radius: 50px;
-      font-weight: 900;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(26, 188, 156, 0.4);
-      transition: all 0.2s;
-      letter-spacing: 1px;
-      z-index: 25;
-      display: none;
-      /* Visible after first prestige or unlock */
-    }
-
-    #skinsBtn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 30px rgba(26, 188, 156, 0.8);
-    }
-
+    
     #skinModal {
       position: fixed;
       top: 0;
