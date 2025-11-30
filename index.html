@@ -4072,7 +4072,7 @@ function updateTopPlayer() {
         const el = document.getElementById('top-player-display');
         
         // Text setzen: Name + Prestige Level
-        el.innerHTML = `👑 King: ${topData.name} <span style="font-size:0.8em; color:#ccc;">(Lvl ${topData.prestige})</span>`;
+        el.innerHTML = `👑 Platz 1: ${topData.name} <span style="font-size:0.8em; color:#ccc;">(Lvl ${topData.prestige})</span>`;
       }
     })
     .catch(err => console.log("Top Player fetch error", err));
