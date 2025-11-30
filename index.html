@@ -1860,6 +1860,56 @@
   50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 15px var(--gold); }
   100% { opacity: 0.7; transform: scale(1); }
 }
+
+    /* --- CASE CONTENT PREVIEW --- */
+.case-contents-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.cc-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: help;
+  transition: transform 0.1s;
+}
+
+.cc-icon:hover {
+  transform: scale(1.1);
+  z-index: 10;
+}
+
+.cc-icon img {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+}
+
+/* Mini-Tooltip beim Drüberfahren */
+.cc-icon:hover::after {
+  content: attr(data-name);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  border: 1px solid #444;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   </style>
 
 </head>
