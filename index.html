@@ -1590,7 +1590,12 @@
       position: relative;
     }
 
+    /* --- ÄNDERUNG: Absolute Positionierung für den Innenteil --- */
     .upgrade-inner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       width: 85%;
       height: 85%;
       background: #18181b;
@@ -1909,12 +1914,15 @@
           <div class="upgrader-container">
             <!-- Der Kreis / Die Grafik -->
             <div class="upgrade-circle-wrap">
-              <div class="upgrade-circle" id="upgradeCircle">
-                <div class="upgrade-inner">
-                  <span class="chance-label">Chance</span>
-                  <span id="upgrader-chance-display" style="font-size:1.8rem; color:#fff; font-weight:900;">47.50%</span>
-                </div>
+              <!-- ÄNDERUNG: Kreis ist jetzt leer -->
+              <div class="upgrade-circle" id="upgradeCircle"></div>
+
+              <!-- ÄNDERUNG: Innerer Inhalt steht jetzt außerhalb des rotierenden Kreises -->
+              <div class="upgrade-inner">
+                <span class="chance-label">Chance</span>
+                <span id="upgrader-chance-display" style="font-size:1.8rem; color:#fff; font-weight:900;">47.50%</span>
               </div>
+
               <!-- Ein kleiner Pfeil oben -->
               <div class="upgrade-pointer">▼</div>
             </div>
