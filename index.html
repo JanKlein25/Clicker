@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KleinClicker - Real Casino Update</title>
+  <title>KleinClicker - Casino Update</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap"
     rel="stylesheet">
@@ -1647,6 +1647,63 @@
       color: #aaa;
     }
 
+    /* --- CSGO CASE ITEMS DESIGN (NEU) --- */
+    .mc-item {
+      width: 100px; /* Breite einer Kachel */
+      height: 100px;
+      margin-right: 6px; /* Abstand zwischen Kacheln */
+      background: linear-gradient(to bottom, #1a1a1d, #141416);
+      border: 1px solid #333;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      flex-shrink: 0; /* Wichtig: Verhindert Schrumpfen */
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    /* Der dicke Multiplikator Text */
+    .mc-multi {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #fff;
+      z-index: 2;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    }
+
+    /* Der Name darunter (z.B. JACKPOT) */
+    .mc-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      margin-top: 5px;
+      color: rgba(255,255,255,0.6);
+      z-index: 2;
+      letter-spacing: 1px;
+    }
+
+    /* Farbiger Balken unten */
+    .mc-item::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: var(--glow-color); /* Wird per JS gesetzt */
+      box-shadow: 0 -2px 15px var(--glow-color);
+    }
+
+    /* Seltenheits-Farben definieren wir hier vor */
+    .rarity-trash { --glow-color: #555; }       /* Grau */
+    .rarity-loss  { --glow-color: #3498db; }    /* Blau */
+    .rarity-win   { --glow-color: #9b59b6; }    /* Lila */
+    .rarity-big   { --glow-color: #e91e63; }    /* Pink */
+    .rarity-jack  { --glow-color: #f1c40f; border: 1px solid #f1c40f; } /* Gold */
+
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -1792,6 +1849,8 @@
           <button class="nav-btn active" id="btn-tab-roulette" onclick="switchCasinoTab('roulette')">Roulette</button>
           <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Slots (5x3)</button>
           <button class="nav-btn" id="btn-tab-upgrader" onclick="switchCasinoTab('upgrader')">Upgrader</button>
+          <!-- NEUER BUTTON -->
+          <button class="nav-btn" id="btn-tab-moneycase" onclick="switchCasinoTab('moneycase')">Kleini Case</button>
         </div>
 
         <div class="bet-row">
@@ -1949,6 +2008,47 @@
             </button>
           </div>
         </div>
+
+        <!-- CSGO STYLE MONEY CASE (NEU) -->
+        <div id="view-case-money" style="display:none;">
+          <div class="upgrader-container" style="border-color: #f1c40f;">
+            
+            <div style="margin-bottom:15px; text-align:center;">
+              <h3 style="color:#f1c40f; margin-bottom:5px; text-transform:uppercase; letter-spacing:2px;">💰 Kleini Case 💰</h3>
+              <div style="font-size:0.8rem; color:#aaa;">Kaufe einen Schlüssel (Einsatz) & gewinne Multiplikatoren!</div>
+            </div>
+
+            <!-- Die Case Animation -->
+            <div class="case-spinner" style="border-color:#f1c40f; box-shadow: 0 0 30px rgba(241, 196, 15, 0.15); height:140px;">
+              <!-- Der Strich in der Mitte -->
+              <div class="roulette-marker" style="background:#f1c40f; box-shadow:0 0 15px #f1c40f; width:4px;"></div>
+              <div class="case-strip" id="moneyCaseStrip" style="height:100%;"></div>
+            </div>
+
+            <!-- Info und Button -->
+            <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:8px; margin-top:20px; width:100%;">
+              
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.75rem; color:#ccc; margin-bottom:15px; text-align:left;">
+                <div>💀 <span style="color:#7f8c8d">0x (Niete):</span> 45%</div>
+                <div>🔻 <span style="color:#3498db">0.5x (Rückgeld):</span> 30%</div>
+                <div>✅ <span style="color:#9b59b6">2x (Gewinn):</span> 15%</div>
+                <div>🔥 <span style="color:#e91e63">10x (Super):</span> 8%</div>
+                <div>👑 <span style="color:#f1c40f">100x (JACKPOT):</span> 2%</div>
+              </div>
+
+              <div style="font-size:0.9rem; margin-bottom:10px; color:#fff;">
+                Preis für Schlüssel: <span id="key-price-display" style="color:#f1c40f; font-weight:bold;">0</span> Kleinis
+              </div>
+
+              <button class="open-case-btn" onclick="openMoneyCase()" 
+                      style="width:100%; background: linear-gradient(45deg, #f39c12, #d35400); box-shadow: 0 4px 0 #a04000;">
+                KISTE ÖFFNEN
+              </button>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -2183,6 +2283,9 @@
       setInterval(slowLoop, 1000);
       scheduleGolden();
 
+      // Preisanzeige für Money Case initialisieren
+      document.getElementById('betAmount').addEventListener('input', updateMoneyCaseUI);
+
       if (game.playerName.startsWith("Spieler")) {
         const newName = prompt("Wie möchtest du auf dem Leaderboard heißen?", game.playerName);
         if (newName && newName.trim() !== "") {
@@ -2384,7 +2487,7 @@
     }
     function updateCasinoUI() { document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score)); }
 
-    // UPDATED FOR UPGRADER
+    /* --- CASINO TAB SWITCHER (UPDATED) --- */
     function switchCasinoTab(mode) {
       currentCasinoMode = mode;
 
@@ -2392,11 +2495,10 @@
       document.getElementById('view-roulette').style.display = 'none';
       document.getElementById('view-slots').style.display = 'none';
       document.getElementById('view-upgrader').style.display = 'none';
+      document.getElementById('view-case-money').style.display = 'none'; // NEU
 
       // Alle Buttons zurücksetzen
-      document.getElementById('btn-tab-roulette').className = 'nav-btn';
-      document.getElementById('btn-tab-slots').className = 'nav-btn';
-      document.getElementById('btn-tab-upgrader').className = 'nav-btn';
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
       // Aktiven Tab anzeigen
       if (mode === 'roulette') {
@@ -2412,6 +2514,118 @@
         document.getElementById('btn-tab-upgrader').classList.add('active');
         updateUpgraderCalc();
       }
+      else if (mode === 'moneycase') {
+        document.getElementById('view-case-money').style.display = 'block';
+        document.getElementById('btn-tab-moneycase').classList.add('active');
+        updateMoneyCaseUI(); // Preis Text updaten
+      }
+    }
+
+    /* --- MONEY CASE LOGIC (NEU) --- */
+    const MONEY_CASE_ODDS = [
+      // chance: Wahrscheinlichkeit für das Ergebnis
+      // fillWeight: Wie oft taucht es als "Deko" beim Drehen auf (damit nicht alles Gold ist)
+      { id: 'trash', multi: 0,   name: 'NIETE',    style: 'rarity-trash', chance: 0.45, fillWeight: 50 },
+      { id: 'loss',  multi: 0.5, name: 'RÜCKGELD', style: 'rarity-loss',  chance: 0.30, fillWeight: 30 },
+      { id: 'win',   multi: 2,   name: 'PROFIT',   style: 'rarity-win',   chance: 0.15, fillWeight: 15 },
+      { id: 'big',   multi: 10,  name: 'BIG WIN',  style: 'rarity-big',   chance: 0.08, fillWeight: 4  },
+      { id: 'jack',  multi: 100, name: 'JACKPOT',  style: 'rarity-jack',  chance: 0.02, fillWeight: 1  }
+    ];
+
+    function getRandomFillerItem() {
+      let pool = [];
+      MONEY_CASE_ODDS.forEach(item => {
+        for(let i=0; i < item.fillWeight; i++) pool.push(item);
+      });
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function updateMoneyCaseUI() {
+      const bet = document.getElementById('betAmount').value || 0;
+      const display = document.getElementById('key-price-display');
+      if(display) display.textContent = formatNum(parseInt(bet));
+    }
+
+    function openMoneyCase() {
+      const bet = getBet(); 
+      if (!bet) return;
+      if (isSpinning) return;
+
+      game.score -= bet;
+      updateCasinoUI();
+      
+      disableButtons(true);
+      isSpinning = true;
+
+      // 1. Gewinner ermitteln
+      let r = Math.random();
+      let accumulated = 0;
+      let winner = MONEY_CASE_ODDS[0];
+
+      for (let item of MONEY_CASE_ODDS) {
+        accumulated += item.chance;
+        if (r < accumulated) {
+          winner = item;
+          break;
+        }
+      }
+
+      // 2. Streifen bauen
+      const strip = document.getElementById('moneyCaseStrip');
+      strip.innerHTML = '';
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateX(0px)';
+
+      const TOTAL_ITEMS = 60;
+      const WIN_INDEX = 45;
+
+      for (let i = 0; i < TOTAL_ITEMS; i++) {
+        let item;
+        if (i === WIN_INDEX) {
+          item = winner; 
+        } else {
+          item = getRandomFillerItem();
+        }
+
+        const el = document.createElement('div');
+        el.className = `mc-item ${item.style}`;
+        el.innerHTML = `
+          <div class="mc-multi">${item.multi}x</div>
+          <div class="mc-label">${item.name}</div>
+        `;
+        strip.appendChild(el);
+      }
+
+      strip.offsetHeight;
+
+      // 3. Animation
+      const ITEM_FULL_WIDTH = 106;
+      const containerWidth = document.querySelector('.case-spinner').offsetWidth;
+      const jitter = Math.floor(Math.random() * 50) - 25; 
+      const scrollPos = (WIN_INDEX * ITEM_FULL_WIDTH) - (containerWidth / 2) + (ITEM_FULL_WIDTH / 2) + jitter;
+
+      strip.style.transition = 'transform 6s cubic-bezier(0.15, 0.85, 0.15, 1)';
+      strip.style.transform = `translateX(-${scrollPos}px)`;
+
+      // 4. Ende
+      setTimeout(() => {
+        isSpinning = false;
+        disableButtons(false);
+
+        const winAmount = Math.floor(bet * winner.multi);
+
+        if (winAmount > 0) {
+          triggerWin(winAmount); 
+          const winBox = document.getElementById('winDisplay');
+          document.getElementById('winAmountDisplay').textContent = formatNum(winAmount);
+          document.querySelector('.win-label').textContent = `${winner.multi}x GEWINN`;
+          winBox.classList.add('show');
+          setTimeout(() => winBox.classList.remove('show'), 2000);
+        } 
+
+        updateCasinoUI();
+        saveGame(); 
+      }, 6000);
     }
 
     function setBetMultiplier(multi) {
@@ -2422,6 +2636,8 @@
         if (val === 0) val = 100;
         input.value = Math.floor(val * multi);
       }
+      updateUpgraderCalc();
+      updateMoneyCaseUI();
     }
 
     /* --- ROULETTE ENGINE --- */
