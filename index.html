@@ -2180,9 +2180,12 @@
           </div>
 
           <div class="action-row" style="margin-top:20px;">
-            <button class="bet-btn" id="btnCrashAction" onclick="crashAction()" style="background: linear-gradient(45deg, #8e44ad, #9b59b6); width: 100%;">
-              STARTEN
-            </button>
+            <button class="bet-btn" id="btnCrashAction" 
+              onmousedown="crashAction()" 
+              ontouchstart="crashAction()"
+              style="background: linear-gradient(45deg, #8e44ad, #9b59b6); width: 100%; user-select: none; -webkit-user-select: none;">
+          STARTEN
+        </button>
           </div>
         </div>
 
