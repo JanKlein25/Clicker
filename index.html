@@ -1,3 +1,10 @@
+Hier ist der **komplette Code**. Ich habe das "Crash"-Spiel (Rakete) integriert.
+
+Alles andere (deine Slots, Roulette, Skins, Upgrades, Prestige etc.) ist exakt gleich geblieben. Der Speicherstand (`SAVE_KEY`) wurde nicht geändert, damit dein Fortschritt erhalten bleibt.
+
+Einfach den Code kopieren, als `.html` speichern und Spaß haben! 🚀
+
+```html
 <!DOCTYPE html>
 <html lang="de">
 
@@ -593,6 +600,7 @@
       padding: 5px;
       border-radius: 8px;
       border: 1px solid #333;
+      flex-wrap: wrap; /* Damit Buttons auf kleinen Screens umbrechen */
     }
 
     .nav-btn {
@@ -605,6 +613,7 @@
       cursor: pointer;
       border-radius: 6px;
       transition: all 0.2s;
+      min-width: 80px;
     }
 
     .nav-btn.active {
@@ -1705,6 +1714,85 @@
     .rarity-big   { --glow-color: #e91e63; }    /* Pink */
     .rarity-jack  { --glow-color: #f1c40f; border: 1px solid #f1c40f; } /* Gold */
 
+    /* CRASH GAME STYLES */
+    .crash-container {
+      position: relative;
+      width: 100%;
+      height: 350px;
+      background: #0f0f12;
+      border: 2px solid #333;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+    }
+
+    #crashCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .crash-info {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #crash-current-multi {
+      font-size: 5rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+      font-family: 'Roboto', sans-serif;
+    }
+
+    #crash-status-text {
+      font-size: 1.2rem;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 10px;
+    }
+
+    .crash-history-bar {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+
+    .crash-hist-badge {
+      background: rgba(0,0,0,0.6);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border: 1px solid #333;
+    }
+    .crash-hist-win { color: #2ecc71; border-color: #2ecc71; }
+    .crash-hist-loss { color: #e74c3c; border-color: #e74c3c; }
+
+    /* Animation für den Crash */
+    .crashed-anim {
+      animation: shakeCrash 0.5s cubic-bezier(.36,.07,.19,.97) both;
+      color: #e74c3c !important;
+    }
+
+    @keyframes shakeCrash {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -1880,8 +1968,9 @@
           <button class="nav-btn active" id="btn-tab-roulette" onclick="switchCasinoTab('roulette')">Roulette</button>
           <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Slots (5x3)</button>
           <button class="nav-btn" id="btn-tab-upgrader" onclick="switchCasinoTab('upgrader')">Upgrader</button>
-          <!-- NEUER BUTTON -->
           <button class="nav-btn" id="btn-tab-moneycase" onclick="switchCasinoTab('moneycase')">Kleini Case</button>
+          <!-- NEU: CRASH BUTTON -->
+          <button class="nav-btn" id="btn-tab-crash" onclick="switchCasinoTab('crash')">Crash 🚀</button>
         </div>
 
         <div class="bet-row">
@@ -2077,6 +2166,30 @@
               </button>
             </div>
 
+          </div>
+        </div>
+
+        <!-- CRASH GAME VIEW -->
+        <div id="view-crash" style="display:none;">
+          <div class="crash-container">
+            <canvas id="crashCanvas" width="700" height="350"></canvas>
+            
+            <!-- Overlay Text -->
+            <div class="crash-info">
+              <div id="crash-current-multi">1.00x</div>
+              <div id="crash-status-text">Warte auf Start...</div>
+            </div>
+
+            <!-- History -->
+            <div class="crash-history-bar" id="crashHistory">
+              <!-- Wird per JS gefüllt -->
+            </div>
+          </div>
+
+          <div class="action-row" style="margin-top:20px;">
+            <button class="bet-btn" id="btnCrashAction" onclick="crashAction()" style="background: linear-gradient(45deg, #8e44ad, #9b59b6); width: 100%;">
+              STARTEN
+            </button>
           </div>
         </div>
 
@@ -2526,7 +2639,8 @@
       document.getElementById('view-roulette').style.display = 'none';
       document.getElementById('view-slots').style.display = 'none';
       document.getElementById('view-upgrader').style.display = 'none';
-      document.getElementById('view-case-money').style.display = 'none'; // NEU
+      document.getElementById('view-case-money').style.display = 'none';
+      document.getElementById('view-crash').style.display = 'none'; // NEU HINZUFÜGEN
 
       // Alle Buttons zurücksetzen
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -2549,6 +2663,16 @@
         document.getElementById('view-case-money').style.display = 'block';
         document.getElementById('btn-tab-moneycase').classList.add('active');
         updateMoneyCaseUI(); // Preis Text updaten
+      }
+      // --- NEU ---
+      else if (mode === 'crash') {
+        document.getElementById('view-crash').style.display = 'block';
+        document.getElementById('btn-tab-crash').classList.add('active');
+        // Canvas Größe fixen falls CSS es verzerrt hat
+        const c = document.getElementById('crashCanvas');
+        c.width = c.parentElement.offsetWidth;
+        c.height = c.parentElement.offsetHeight;
+        drawCrashGraph(); // Leeren Graph zeichnen
       }
     }
 
@@ -3206,7 +3330,7 @@
       for (let i = 0; i < 5; i++) {
         const ph = SKINS.find(s => s.id === 'default');
         const el = document.createElement('div');
-        el.className = `case-item rarity-${ph.rarity}`;
+        el.className = 'case-item rarity-' + ph.rarity;
         el.innerHTML = `<img src="${ph.url}" style="filter:${ph.filter}">`;
         strip.appendChild(el);
       }
@@ -3382,6 +3506,208 @@
         el.innerHTML = `<img src="${item.url}" style="filter:${item.filter}">`;
         strip.appendChild(el);
       }
+    }
+
+    /* --- CRASH GAME LOGIC --- */
+    let crashState = {
+      running: false,
+      crashed: false,
+      cashedOut: false,
+      startTime: 0,
+      currentMulti: 1.00,
+      crashPoint: 0,
+      bet: 0,
+      history: [],
+      animFrame: null
+    };
+
+    // Canvas Setup
+    const cCanvas = document.getElementById('crashCanvas');
+    const ctx = cCanvas.getContext('2d');
+
+    function drawCrashGraph() {
+      // Canvas Größe anpassen
+      const w = cCanvas.width;
+      const h = cCanvas.height;
+      
+      ctx.clearRect(0, 0, w, h);
+
+      // Gitter zeichnen (optional)
+      ctx.strokeStyle = "rgba(255,255,255,0.05)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for(let i=0; i<w; i+=50) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
+      for(let i=0; i<h; i+=50) { ctx.moveTo(0,i); ctx.lineTo(w,i); }
+      ctx.stroke();
+
+      if (!crashState.running && !crashState.crashed) return;
+
+      // Kurve zeichnen
+      // X-Achse ist Zeit (0 bis 10 Sekunden für volle Breite skaliert)
+      // Y-Achse ist Multiplikator (Logarithmisch skaliert für bessere Optik)
+      
+      const timeElapsed = Date.now() - crashState.startTime;
+      const progress = Math.min(timeElapsed / 10000, 1); // 10 sekunden bis "Rechtsanschlag" (nur visuell)
+      
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      
+      // Bezier Kurve simulieren
+      const endX = w * progress;
+      // Je höher der Multi, desto höher der Punkt.
+      // Wir mappen 1x bis 10x auf die Höhe
+      let normalizedY = (crashState.currentMulti - 1) / 10; 
+      if(normalizedY > 0.9) normalizedY = 0.9;
+      
+      const endY = h - (normalizedY * h);
+
+      ctx.quadraticCurveTo(endX / 2, h, endX, endY);
+      
+      ctx.strokeStyle = crashState.crashed ? "#e74c3c" : (crashState.cashedOut ? "#aaa" : "#8e44ad");
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Rakete am Ende zeichnen
+      ctx.font = "30px Arial";
+      ctx.fillText(crashState.crashed ? "💥" : "🚀", endX - 15, endY - 10);
+      
+      // Bereich unter Kurve füllen
+      ctx.lineTo(endX, h);
+      ctx.lineTo(0, h);
+      ctx.fillStyle = crashState.crashed ? "rgba(231, 76, 60, 0.2)" : "rgba(142, 68, 173, 0.2)";
+      ctx.fill();
+    }
+
+    function crashLoop() {
+      if (!crashState.running) return;
+
+      const now = Date.now();
+      const timeElapsed = now - crashState.startTime;
+
+      // Formel für Wachstum: Wachstum beschleunigt sich
+      // 1.00 + (Zeit^2 oder e^t)
+      // Einfache Formel ähnlich CSGO: 
+      crashState.currentMulti = 1 + 0.00006 * timeElapsed + Math.pow(1.00015, timeElapsed) - 1;
+      
+      // UI Update
+      const uiMulti = document.getElementById('crash-current-multi');
+      uiMulti.textContent = crashState.currentMulti.toFixed(2) + "x";
+
+      // Check Cashout Button Update
+      if(!crashState.cashedOut) {
+        const currentWin = Math.floor(crashState.bet * crashState.currentMulti);
+        document.getElementById('btnCrashAction').innerHTML = `CASHOUT: <span style="color:#2ecc71">${formatNum(currentWin)}</span>`;
+      }
+
+      // CRASH CHECK
+      if (crashState.currentMulti >= crashState.crashPoint) {
+        doCrash();
+      } else {
+        drawCrashGraph();
+        crashState.animFrame = requestAnimationFrame(crashLoop);
+      }
+    }
+
+    function crashAction() {
+      const btn = document.getElementById('btnCrashAction');
+      
+      // STARTEN
+      if (!crashState.running && !crashState.crashed) {
+        const bet = getBet();
+        if (!bet) return;
+        
+        // Reset
+        crashState.bet = bet;
+        game.score -= bet;
+        updateCasinoUI();
+        disableButtons(true); // Deaktiviert andere Casino Tabs
+        btn.disabled = false; // Dieser Button muss aktiv bleiben!
+        
+        // Crash Point berechnen (Hausvorteil 4%)
+        // Formel: 0.96 / (1 - random)
+        // Wenn random sehr hoch ist, geht es gegen Unendlich.
+        const r = Math.random();
+        crashState.crashPoint = Math.max(1.00, Math.floor((0.96 / (1 - r)) * 100) / 100);
+        
+        // State setzen
+        crashState.running = true;
+        crashState.crashed = false;
+        crashState.cashedOut = false;
+        crashState.startTime = Date.now();
+        crashState.currentMulti = 1.00;
+        
+        // UI Reset
+        document.getElementById('crash-current-multi').classList.remove('crashed-anim');
+        document.getElementById('crash-current-multi').style.color = "#fff";
+        document.getElementById('crash-status-text').textContent = "ROCKET FLYING...";
+        btn.classList.add('btn-green'); // Grün machen für Cashout
+        
+        crashLoop();
+      }
+      
+      // CASHOUT
+      else if (crashState.running && !crashState.cashedOut) {
+        // Gewinn sichern
+        crashState.cashedOut = true;
+        const winAmount = Math.floor(crashState.bet * crashState.currentMulti);
+        triggerWin(winAmount); // Konfetti & Score addieren
+        
+        // UI Feedback
+        const uiMulti = document.getElementById('crash-current-multi');
+        uiMulti.style.color = "#2ecc71";
+        document.getElementById('crash-status-text').textContent = "GEWONNEN!";
+        
+        btn.innerHTML = `GEWONNEN: ${formatNum(winAmount)}`;
+        btn.disabled = true; // Button deaktivieren bis Runde vorbei
+        
+        saveGame();
+      }
+    }
+
+    function doCrash() {
+      crashState.running = false;
+      crashState.crashed = true;
+      cancelAnimationFrame(crashState.animFrame);
+      
+      // UI Finalisieren auf exakten Crash Point
+      crashState.currentMulti = crashState.crashPoint;
+      const uiMulti = document.getElementById('crash-current-multi');
+      uiMulti.textContent = crashState.crashPoint.toFixed(2) + "x";
+      uiMulti.classList.add('crashed-anim');
+      
+      document.getElementById('crash-status-text').textContent = "CRASHED!";
+      drawCrashGraph(); // Letzter Frame in Rot
+      
+      // History Update
+      addCrashHistory(crashState.crashPoint);
+      
+      // Reset Button
+      setTimeout(() => {
+        const btn = document.getElementById('btnCrashAction');
+        disableButtons(false);
+        btn.disabled = false;
+        btn.innerHTML = "STARTEN";
+        btn.classList.remove('btn-green');
+        
+        // Reset State Visuals slightly
+        crashState.crashed = false; // Damit man neu starten kann
+        updateCasinoUI();
+      }, 2000);
+    }
+
+    function addCrashHistory(val) {
+      crashState.history.unshift(val);
+      if (crashState.history.length > 5) crashState.history.pop();
+      
+      const container = document.getElementById('crashHistory');
+      container.innerHTML = '';
+      crashState.history.forEach(v => {
+        const div = document.createElement('div');
+        const isHigh = v >= 2;
+        div.className = `crash-hist-badge ${isHigh ? 'crash-hist-win' : 'crash-hist-loss'}`;
+        div.textContent = v.toFixed(2) + "x";
+        container.appendChild(div);
+      });
     }
 
     /* --- INTERACTIONS --- */
@@ -3727,3 +4053,4 @@
 </body>
 
 </html>
+```
