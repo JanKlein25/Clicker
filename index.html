@@ -1,3 +1,7 @@
+Hier ist der vollständige Code mit dem eingebauten **Skin-Wahrscheinlichkeits-System** (Anzeige & Logik).
+Der `SAVE_KEY` wurde **nicht** verändert (`KleinClicker_Precision_V20`), dein Spielstand bleibt also erhalten.
+
+```html
 <!DOCTYPE html>
 <html lang="de">
 
@@ -1502,6 +1506,62 @@
       object-fit: contain;
     }
 
+    /* --- CASE INFO STYLES --- */
+    .case-info-box {
+      margin-top: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 10px;
+      width: 80%;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .ci-title {
+      color: #aaa;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .ci-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ci-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      padding: 3px 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 4px;
+    }
+
+    .rarity-text-common {
+      color: var(--rarity-common);
+    }
+
+    .rarity-text-rare {
+      color: var(--rarity-rare);
+    }
+
+    .rarity-text-epic {
+      color: var(--rarity-epic);
+    }
+
+    .rarity-text-legendary {
+      color: var(--rarity-legendary);
+    }
+
+    .rarity-text-mythic {
+      color: var(--rarity-mythic);
+    }
+
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -1564,6 +1624,14 @@
         </div>
 
         <button class="open-case-btn" id="btnOpenCase" onclick="openCase()">KISTE ÖFFNEN</button>
+
+        <!-- CASE INFO BOX -->
+        <div class="case-info-box">
+          <div class="ci-title">ℹ️ Drop-Chancen</div>
+          <div id="case-odds-list" class="ci-list">
+            <!-- Wird per JS gefüllt -->
+          </div>
+        </div>
 
         <div style="margin-top:10px; font-size:0.75rem; color:#555;">
           Erhalte 1 Kiste pro Prestige-Level!
@@ -1670,52 +1738,58 @@
           <div class="pro-slot-screen">
             <!-- HELP OVERLAY -->
             <div id="slot-help-overlay">
-  <div class="help-title" style="border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; width:100%;">🎰 Real Slots: Paytable</div>
+              <div class="help-title"
+                style="border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; width:100%;">🎰 Real
+                Slots: Paytable</div>
 
-  <div style="text-align: left; max-width: 500px; font-size: 0.85rem; line-height: 1.5; color: #ccc; overflow-y: auto; max-height: 60vh; padding-right: 5px;">
+              <div
+                style="text-align: left; max-width: 500px; font-size: 0.85rem; line-height: 1.5; color: #ccc; overflow-y: auto; max-height: 60vh; padding-right: 5px;">
 
-    <!-- ZIEL & LINIEN -->
-    <div style="margin-bottom: 12px;">
-      <strong style="color:var(--gold); font-size:0.95rem;">Das Haus gewinnt (fast) immer.</strong><br>
-      Sammle mindestens <strong>3 gleiche Symbole</strong> auf einer Linie.<br>
-    </div>
+                <!-- ZIEL & LINIEN -->
+                <div style="margin-bottom: 12px;">
+                  <strong style="color:var(--gold); font-size:0.95rem;">Das Haus gewinnt (fast) immer.</strong><br>
+                  Sammle mindestens <strong>3 gleiche Symbole</strong> auf einer Linie.<br>
+                </div>
 
-    <!-- SYMBOLE -->
-    <div style="margin-bottom: 12px; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px;">
-      <strong style="color:var(--gold); font-size:0.95rem;">Die Werte (Basis x3 Treffer)</strong>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px; font-size:0.8rem;">
-        
-        <div style="grid-column: span 2; border-bottom:1px solid #333; padding-bottom:4px; margin-bottom:4px;">
-          👑 <strong>WILD</strong>: <span style="color:#2ecc71">1.5% Chance</span> (Joker)
-        </div>
+                <!-- SYMBOLE -->
+                <div style="margin-bottom: 12px; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px;">
+                  <strong style="color:var(--gold); font-size:0.95rem;">Die Werte (Basis x3 Treffer)</strong>
+                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px; font-size:0.8rem;">
 
-        <div>💎 <strong>Diamant</strong><br><span style="color:var(--gold)">x100 (Jackpot)</span></div>
-        <div>7️⃣ <strong>Seven</strong><br><span style="color:#ffcc00;">x40 (Mega Win)</span></div>
-        
-        <div>🎰 <strong>Bar</strong><br><span style="color:#aaa;">x15</span></div>
-        <div>🔔 <strong>Glocke</strong><br><span style="color:#aaa;">x10</span></div>
-        
-        <div>🍀 <strong>Klee</strong><br><span style="color:#aaa;">x6</span></div>
-        <div>🍉/🍇 <strong>Obst</strong><br><span style="color:#888;">x2.5 - x4</span></div>
-        
-        <div style="color:#fff;">🍊 <strong>Orange</strong><br><strong>x1.5</strong> (Gewinn)</div>
-        <div style="color:#ccc;">🍋 <strong>Zitrone</strong><br><strong>x1.0</strong> (Geld zurück)</div>
-        <div style="color:#e74c3c;">🍒 <strong>Kirsche</strong><br><strong>x0.5</strong> (Verlust)</div>
-      </div>
-    </div>
+                    <div
+                      style="grid-column: span 2; border-bottom:1px solid #333; padding-bottom:4px; margin-bottom:4px;">
+                      👑 <strong>WILD</strong>: <span style="color:#2ecc71">1.5% Chance</span> (Joker)
+                    </div>
 
-    <!-- BERECHNUNG -->
-    <div style="margin-bottom: 12px;">
-      <strong style="color:var(--gold); font-size:0.95rem;">Längere Reihen Boni</strong><br>
-      • 3er Reihe: Basis-Wert (siehe oben)<br>
-      • 4er Reihe: Gewinn <span style="color:var(--green)">x2.5</span><br>
-      • 5er Reihe: Gewinn <span style="color:var(--gold)">x10</span>
-    </div>
+                    <div>💎 <strong>Diamant</strong><br><span style="color:var(--gold)">x100 (Jackpot)</span></div>
+                    <div>7️⃣ <strong>Seven</strong><br><span style="color:#ffcc00;">x40 (Mega Win)</span></div>
 
-  </div>
+                    <div>🎰 <strong>Bar</strong><br><span style="color:#aaa;">x15</span></div>
+                    <div>🔔 <strong>Glocke</strong><br><span style="color:#aaa;">x10</span></div>
 
-  <button class="toggle-btn active" style="margin-top:15px; width:100%; font-weight:bold; font-size:1rem; padding:12px;" onclick="toggleSlotHelp()">ALLES KLAR, VIEL GLÜCK</button>
-</div>
+                    <div>🍀 <strong>Klee</strong><br><span style="color:#aaa;">x6</span></div>
+                    <div>🍉/🍇 <strong>Obst</strong><br><span style="color:#888;">x2.5 - x4</span></div>
+
+                    <div style="color:#fff;">🍊 <strong>Orange</strong><br><strong>x1.5</strong> (Gewinn)</div>
+                    <div style="color:#ccc;">🍋 <strong>Zitrone</strong><br><strong>x1.0</strong> (Geld zurück)</div>
+                    <div style="color:#e74c3c;">🍒 <strong>Kirsche</strong><br><strong>x0.5</strong> (Verlust)</div>
+                  </div>
+                </div>
+
+                <!-- BERECHNUNG -->
+                <div style="margin-bottom: 12px;">
+                  <strong style="color:var(--gold); font-size:0.95rem;">Längere Reihen Boni</strong><br>
+                  • 3er Reihe: Basis-Wert (siehe oben)<br>
+                  • 4er Reihe: Gewinn <span style="color:var(--green)">x2.5</span><br>
+                  • 5er Reihe: Gewinn <span style="color:var(--gold)">x10</span>
+                </div>
+
+              </div>
+
+              <button class="toggle-btn active"
+                style="margin-top:15px; width:100%; font-weight:bold; font-size:1rem; padding:12px;"
+                onclick="toggleSlotHelp()">ALLES KLAR, VIEL GLÜCK</button>
+            </div>
 
             <!-- WIN OVERLAY -->
             <div id="winDisplay" class="win-display-box">
@@ -1858,6 +1932,15 @@
       { id: 'friend2', name: 'Original Malte', rarity: 'epic', url: "https://github.com/JanKlein25/Clicker/blob/main/Malte%20Gesicht.png?raw=true", filter: '' },
       { id: 'friend3', name: 'Peter Beispiel', rarity: 'legendary', url: "https://example.com/peter_beispiel.png", filter: '' },
     ];
+
+    // CHANCEN KONFIGURATION
+    const CASE_ODDS = {
+      common: 0.70,    // 70%
+      rare: 0.20,      // 20%
+      epic: 0.07,      // 7%
+      legendary: 0.025,// 2.5%
+      mythic: 0.005    // 0.5%
+    };
 
     // BUILDINGS (UPDATED with new endgame buildings)
     const BUILDINGS = [
@@ -2595,6 +2678,9 @@
       renderInventory();
       document.getElementById('case-count').textContent = game.cases;
 
+      // NEU: Wahrscheinlichkeiten anzeigen
+      renderCaseOddsUI();
+
       // Reset Strip Visual
       const strip = document.getElementById('caseStrip');
       strip.innerHTML = '';
@@ -2641,6 +2727,39 @@
       });
     }
 
+    function renderCaseOddsUI() {
+      const container = document.getElementById('case-odds-list');
+      container.innerHTML = '';
+      
+      // Mapping für schöne Namen
+      const names = {
+        common: "Gewöhnlich",
+        rare: "Selten",
+        epic: "Episch",
+        legendary: "Legendär",
+        mythic: "Mythisch"
+      };
+
+      Object.keys(CASE_ODDS).forEach(rarity => {
+        // Nur anzeigen, wenn Chance > 0
+        if (CASE_ODDS[rarity] > 0) {
+          const chance = (CASE_ODDS[rarity] * 100).toFixed(1); // z.B. 2.5
+          // Prüfen, ob wir überhaupt Skins dieser Stufe haben (optional)
+          const count = SKINS.filter(s => s.rarity === rarity).length;
+          
+          if (true) { // Immer anzeigen, damit man sieht was möglich ist
+            const div = document.createElement('div');
+            div.className = 'ci-row';
+            div.innerHTML = `
+              <span class="rarity-text-${rarity}" style="font-weight:bold;">${names[rarity] || rarity}</span>
+              <span style="color:#fff;">${chance}%</span>
+            `;
+            container.appendChild(div);
+          }
+        }
+      });
+    }
+
     function equipSkin(id, mute = false) {
       const skin = SKINS.find(s => s.id === id);
       if (skin && game.skinsOwned.includes(id)) {
@@ -2657,6 +2776,34 @@
       }
     }
 
+    // Hilfsfunktion für echte Zufallsauswahl nach Gewichtung
+    function pickSkinByRarity() {
+      const rand = Math.random();
+      let cumulative = 0;
+      
+      // Reihenfolge ist wichtig: Common -> Rare -> Epic ...
+      const tiers = ['common', 'rare', 'epic', 'legendary', 'mythic'];
+      
+      let selectedRarity = 'common'; // Fallback
+      
+      for (let tier of tiers) {
+        cumulative += CASE_ODDS[tier] || 0;
+        if (rand < cumulative) {
+          selectedRarity = tier;
+          break;
+        }
+      }
+      
+      // Alle Skins dieser Seltenheit finden
+      const pool = SKINS.filter(s => s.rarity === selectedRarity);
+      
+      // Wenn es keine Skins dieser Seltenheit gibt, nimm Common
+      if (pool.length === 0) return SKINS.find(s => s.rarity === 'common') || SKINS[0];
+      
+      // Zufälligen Skin aus dem Pool wählen
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
     function openCase() {
       if (game.cases <= 0 || isSpinning) return;
       game.cases--;
@@ -2665,14 +2812,9 @@
       isSpinning = true;
       disableButtons(true);
 
-      const roll = Math.random();
-      let wonSkin = SKINS.find(s => s.id === 'default');
-
-      const nonDefaultSkins = SKINS.filter(s => s.id !== 'default');
-
-      if (roll < 0.1 && nonDefaultSkins.length > 0) {
-        wonSkin = nonDefaultSkins[Math.floor(Math.random() * nonDefaultSkins.length)];
-      }
+      // --- NEUE LOGIK HIER: ---
+      let wonSkin = pickSkinByRarity(); 
+      // ------------------------
 
       generateCaseStrip(60, wonSkin);
 
@@ -3070,3 +3212,4 @@
 </body>
 
 </html>
+```
