@@ -3501,192 +3501,176 @@
       }
     }
 
-    /* --- CRASH GAME LOGIC --- */
-    let crashState = {
-      running: false,
-      crashed: false,
-      cashedOut: false,
-      startTime: 0,
-      currentMulti: 1.00,
-      crashPoint: 0,
-      bet: 0,
-      history: [],
-      animFrame: null
-    };
+    /* --- CRASH GAME LOGIC (OPTIMIERT) --- */
+let crashState = {
+  running: false,
+  crashed: false,
+  cashedOut: false,
+  startTime: 0,
+  currentMulti: 1.00,
+  crashPoint: 0,
+  bet: 0,
+  history: [],
+  animFrame: null
+};
 
-    // Canvas Setup
-    const cCanvas = document.getElementById('crashCanvas');
-    const ctx = cCanvas.getContext('2d');
+// Canvas Setup
+const cCanvas = document.getElementById('crashCanvas');
+const ctx = cCanvas.getContext('2d');
 
-    function drawCrashGraph() {
-      // Canvas Größe anpassen
-      const w = cCanvas.width;
-      const h = cCanvas.height;
-      
-      ctx.clearRect(0, 0, w, h);
+function drawCrashGraph() {
+  const w = cCanvas.width;
+  const h = cCanvas.height;
+  
+  ctx.clearRect(0, 0, w, h);
 
-      // Gitter zeichnen (optional)
-      ctx.strokeStyle = "rgba(255,255,255,0.05)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      for(let i=0; i<w; i+=50) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
-      for(let i=0; i<h; i+=50) { ctx.moveTo(0,i); ctx.lineTo(w,i); }
-      ctx.stroke();
+  ctx.strokeStyle = "rgba(255,255,255,0.05)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for(let i=0; i<w; i+=50) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
+  for(let i=0; i<h; i+=50) { ctx.moveTo(0,i); ctx.lineTo(w,i); }
+  ctx.stroke();
 
-      if (!crashState.running && !crashState.crashed) return;
+  if (!crashState.running && !crashState.crashed) return;
+  
+  const timeElapsed = Date.now() - crashState.startTime;
+  const progress = Math.min(timeElapsed / 10000, 1);
+  
+  ctx.beginPath();
+  ctx.moveTo(0, h);
+  
+  const endX = w * progress;
+  let normalizedY = (crashState.currentMulti - 1) / 10; 
+  if(normalizedY > 0.9) normalizedY = 0.9;
+  
+  const endY = h - (normalizedY * h);
 
-      // Kurve zeichnen
-      // X-Achse ist Zeit (0 bis 10 Sekunden für volle Breite skaliert)
-      // Y-Achse ist Multiplikator (Logarithmisch skaliert für bessere Optik)
-      
-      const timeElapsed = Date.now() - crashState.startTime;
-      const progress = Math.min(timeElapsed / 10000, 1); // 10 sekunden bis "Rechtsanschlag" (nur visuell)
-      
-      ctx.beginPath();
-      ctx.moveTo(0, h);
-      
-      // Bezier Kurve simulieren
-      const endX = w * progress;
-      // Je höher der Multi, desto höher der Punkt.
-      // Wir mappen 1x bis 10x auf die Höhe
-      let normalizedY = (crashState.currentMulti - 1) / 10; 
-      if(normalizedY > 0.9) normalizedY = 0.9;
-      
-      const endY = h - (normalizedY * h);
+  ctx.quadraticCurveTo(endX / 2, h, endX, endY);
+  
+  ctx.strokeStyle = crashState.crashed ? "#e74c3c" : (crashState.cashedOut ? "#aaa" : "#8e44ad");
+  ctx.lineWidth = 4;
+  ctx.stroke();
 
-      ctx.quadraticCurveTo(endX / 2, h, endX, endY);
-      
-      ctx.strokeStyle = crashState.crashed ? "#e74c3c" : (crashState.cashedOut ? "#aaa" : "#8e44ad");
-      ctx.lineWidth = 4;
-      ctx.stroke();
+  ctx.font = "30px Arial";
+  ctx.fillText(crashState.crashed ? "💥" : "🚀", endX - 15, endY - 10);
+  
+  ctx.lineTo(endX, h);
+  ctx.lineTo(0, h);
+  ctx.fillStyle = crashState.crashed ? "rgba(231, 76, 60, 0.2)" : "rgba(142, 68, 173, 0.2)";
+  ctx.fill();
+}
 
-      // Rakete am Ende zeichnen
-      ctx.font = "30px Arial";
-      ctx.fillText(crashState.crashed ? "💥" : "🚀", endX - 15, endY - 10);
-      
-      // Bereich unter Kurve füllen
-      ctx.lineTo(endX, h);
-      ctx.lineTo(0, h);
-      ctx.fillStyle = crashState.crashed ? "rgba(231, 76, 60, 0.2)" : "rgba(142, 68, 173, 0.2)";
-      ctx.fill();
-    }
+function crashLoop() {
+  if (!crashState.running) return;
 
-    function crashLoop() {
-      if (!crashState.running) return;
+  const now = Date.now();
+  const timeElapsed = now - crashState.startTime;
 
-      const now = Date.now();
-      const timeElapsed = now - crashState.startTime;
+  // Formel für Wachstum
+  crashState.currentMulti = 1 + 0.00006 * timeElapsed + Math.pow(1.00015, timeElapsed) - 1;
+  
+  // UI Update (Text)
+  const uiMulti = document.getElementById('crash-current-multi');
+  if(uiMulti) uiMulti.textContent = crashState.currentMulti.toFixed(2) + "x";
 
-      // Formel für Wachstum: Wachstum beschleunigt sich
-      // 1.00 + (Zeit^2 oder e^t)
-      // Einfache Formel ähnlich CSGO: 
-      crashState.currentMulti = 1 + 0.00006 * timeElapsed + Math.pow(1.00015, timeElapsed) - 1;
-      
-      // UI Update
-      const uiMulti = document.getElementById('crash-current-multi');
-      uiMulti.textContent = crashState.currentMulti.toFixed(2) + "x";
+  // WICHTIG: Performance Optimierung für den Button
+  // Wir suchen das Span-Element für den Betrag und updaten NUR das.
+  // Das verhindert, dass der Button neu gezeichnet wird und Klicks verliert.
+  if(!crashState.cashedOut) {
+     const currentWin = Math.floor(crashState.bet * crashState.currentMulti);
+     const amountSpan = document.getElementById('crash-btn-amount');
+     if (amountSpan) {
+       amountSpan.textContent = formatNum(currentWin);
+     }
+  }
 
-      // Check Cashout Button Update
-      if(!crashState.cashedOut) {
-        const currentWin = Math.floor(crashState.bet * crashState.currentMulti);
-        document.getElementById('btnCrashAction').innerHTML = `CASHOUT: <span style="color:#2ecc71">${formatNum(currentWin)}</span>`;
-      }
+  // CRASH CHECK
+  if (crashState.currentMulti >= crashState.crashPoint) {
+    doCrash();
+  } else {
+    drawCrashGraph();
+    crashState.animFrame = requestAnimationFrame(crashLoop);
+  }
+}
 
-      // CRASH CHECK
-      if (crashState.currentMulti >= crashState.crashPoint) {
-        doCrash();
-      } else {
-        drawCrashGraph();
-        crashState.animFrame = requestAnimationFrame(crashLoop);
-      }
-    }
+function crashAction() {
+  // Verhindert Doppelklick-Auswahl und Fokus-Probleme
+  const btn = document.getElementById('btnCrashAction');
+  
+  // STARTEN
+  if (!crashState.running && !crashState.crashed) {
+    const bet = getBet();
+    if (!bet) return;
+    
+    crashState.bet = bet;
+    game.score -= bet;
+    updateCasinoUI();
+    disableButtons(true);
+    btn.disabled = false;
+    
+    const r = Math.random();
+    crashState.crashPoint = Math.max(1.00, Math.floor((0.96 / (1 - r)) * 100) / 100);
+    
+    crashState.running = true;
+    crashState.crashed = false;
+    crashState.cashedOut = false;
+    crashState.startTime = Date.now();
+    crashState.currentMulti = 1.00;
+    
+    document.getElementById('crash-current-multi').classList.remove('crashed-anim');
+    document.getElementById('crash-current-multi').style.color = "#fff";
+    document.getElementById('crash-status-text').textContent = "ROCKET FLYING...";
+    
+    btn.classList.add('btn-green');
+    // HIER: Wir setzen das HTML EINMALIG. Im Loop ändern wir nur noch den Text in 'crash-btn-amount'.
+    btn.innerHTML = `CASHOUT: <span id="crash-btn-amount" style="color:#2ecc71; pointer-events:none;">${formatNum(bet)}</span>`;
+    
+    crashLoop();
+  }
+  
+  // CASHOUT (Sofortige Reaktion)
+  else if (crashState.running && !crashState.cashedOut) {
+    crashState.cashedOut = true;
+    const winAmount = Math.floor(crashState.bet * crashState.currentMulti);
+    triggerWin(winAmount);
+    
+    const uiMulti = document.getElementById('crash-current-multi');
+    uiMulti.style.color = "#2ecc71";
+    document.getElementById('crash-status-text').textContent = "GEWONNEN!";
+    
+    btn.innerHTML = `GEWONNEN: ${formatNum(winAmount)}`;
+    btn.disabled = true;
+    
+    saveGame();
+  }
+}
 
-    function crashAction() {
-      const btn = document.getElementById('btnCrashAction');
-      
-      // STARTEN
-      if (!crashState.running && !crashState.crashed) {
-        const bet = getBet();
-        if (!bet) return;
-        
-        // Reset
-        crashState.bet = bet;
-        game.score -= bet;
-        updateCasinoUI();
-        disableButtons(true); // Deaktiviert andere Casino Tabs
-        btn.disabled = false; // Dieser Button muss aktiv bleiben!
-        
-        // Crash Point berechnen (Hausvorteil 4%)
-        // Formel: 0.96 / (1 - random)
-        // Wenn random sehr hoch ist, geht es gegen Unendlich.
-        const r = Math.random();
-        crashState.crashPoint = Math.max(1.00, Math.floor((0.96 / (1 - r)) * 100) / 100);
-        
-        // State setzen
-        crashState.running = true;
-        crashState.crashed = false;
-        crashState.cashedOut = false;
-        crashState.startTime = Date.now();
-        crashState.currentMulti = 1.00;
-        
-        // UI Reset
-        document.getElementById('crash-current-multi').classList.remove('crashed-anim');
-        document.getElementById('crash-current-multi').style.color = "#fff";
-        document.getElementById('crash-status-text').textContent = "ROCKET FLYING...";
-        btn.classList.add('btn-green'); // Grün machen für Cashout
-        
-        crashLoop();
-      }
-      
-      // CASHOUT
-      else if (crashState.running && !crashState.cashedOut) {
-        // Gewinn sichern
-        crashState.cashedOut = true;
-        const winAmount = Math.floor(crashState.bet * crashState.currentMulti);
-        triggerWin(winAmount); // Konfetti & Score addieren
-        
-        // UI Feedback
-        const uiMulti = document.getElementById('crash-current-multi');
-        uiMulti.style.color = "#2ecc71";
-        document.getElementById('crash-status-text').textContent = "GEWONNEN!";
-        
-        btn.innerHTML = `GEWONNEN: ${formatNum(winAmount)}`;
-        btn.disabled = true; // Button deaktivieren bis Runde vorbei
-        
-        saveGame();
-      }
-    }
-
-    function doCrash() {
-      crashState.running = false;
-      crashState.crashed = true;
-      cancelAnimationFrame(crashState.animFrame);
-      
-      // UI Finalisieren auf exakten Crash Point
-      crashState.currentMulti = crashState.crashPoint;
-      const uiMulti = document.getElementById('crash-current-multi');
-      uiMulti.textContent = crashState.crashPoint.toFixed(2) + "x";
-      uiMulti.classList.add('crashed-anim');
-      
-      document.getElementById('crash-status-text').textContent = "CRASHED!";
-      drawCrashGraph(); // Letzter Frame in Rot
-      
-      // History Update
-      addCrashHistory(crashState.crashPoint);
-      
-      // Reset Button
-      setTimeout(() => {
-        const btn = document.getElementById('btnCrashAction');
-        disableButtons(false);
-        btn.disabled = false;
-        btn.innerHTML = "STARTEN";
-        btn.classList.remove('btn-green');
-        
-        // Reset State Visuals slightly
-        crashState.crashed = false; // Damit man neu starten kann
-        updateCasinoUI();
-      }, 2000);
-    }
+function doCrash() {
+  crashState.running = false;
+  crashState.crashed = true;
+  cancelAnimationFrame(crashState.animFrame);
+  
+  crashState.currentMulti = crashState.crashPoint;
+  const uiMulti = document.getElementById('crash-current-multi');
+  uiMulti.textContent = crashState.crashPoint.toFixed(2) + "x";
+  uiMulti.classList.add('crashed-anim');
+  
+  document.getElementById('crash-status-text').textContent = "CRASHED!";
+  drawCrashGraph();
+  
+  addCrashHistory(crashState.crashPoint);
+  
+  setTimeout(() => {
+    const btn = document.getElementById('btnCrashAction');
+    disableButtons(false);
+    btn.disabled = false;
+    btn.innerHTML = "STARTEN";
+    btn.classList.remove('btn-green');
+    
+    crashState.crashed = false;
+    updateCasinoUI();
+  }, 2000);
+}
 
     function addCrashHistory(val) {
       crashState.history.unshift(val);
