@@ -1558,6 +1558,90 @@
       color: var(--rarity-mythic);
     }
 
+    /* --- UPGRADER STYLES --- */
+    .upgrader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      background: #111;
+      border-radius: 12px;
+      border: 1px solid #333;
+    }
+
+    .upgrade-circle-wrap {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin-bottom: 20px;
+    }
+
+    .upgrade-circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      /* Der Trick für das Diagramm: */
+      background: conic-gradient(var(--green) 0deg, var(--green) var(--deg), #222 var(--deg), #222 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      transition: transform 3s cubic-bezier(0.1, 0.9, 0.2, 1);
+      position: relative;
+    }
+
+    .upgrade-inner {
+      width: 85%;
+      height: 85%;
+      background: #18181b;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .upgrade-pointer {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 1.5rem;
+      z-index: 10;
+      text-shadow: 0 2px 4px #000;
+    }
+
+    .chance-label {
+      color: #888;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .upgrader-controls {
+      width: 100%;
+      max-width: 300px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .uc-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      text-align: left;
+    }
+
+    .uc-group label {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -1702,6 +1786,7 @@
         <div class="casino-nav">
           <button class="nav-btn active" id="btn-tab-roulette" onclick="switchCasinoTab('roulette')">Roulette</button>
           <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Video Slots (5x3)</button>
+          <button class="nav-btn" id="btn-tab-upgrader" onclick="switchCasinoTab('upgrader')">Upgrader</button>
         </div>
 
         <div class="bet-row">
@@ -1814,6 +1899,45 @@
 
             <button class="slot-btn-circle btn-spin-main" id="btnSpinSlots" onclick="spinProSlots()">
               SPIN
+            </button>
+          </div>
+        </div>
+
+        <!-- UPGRADER VIEW -->
+        <div id="view-upgrader" style="display:none;">
+
+          <div class="upgrader-container">
+            <!-- Der Kreis / Die Grafik -->
+            <div class="upgrade-circle-wrap">
+              <div class="upgrade-circle" id="upgradeCircle">
+                <div class="upgrade-inner">
+                  <span class="chance-label">Chance</span>
+                  <span id="upgrader-chance-display" style="font-size:1.8rem; color:#fff; font-weight:900;">47.50%</span>
+                </div>
+              </div>
+              <!-- Ein kleiner Pfeil oben -->
+              <div class="upgrade-pointer">▼</div>
+            </div>
+
+            <!-- Kontrollen für Multiplikator -->
+            <div class="upgrader-controls">
+              <div class="uc-group">
+                <label>Multiplikator (x)</label>
+                <div style="display:flex; gap:5px;">
+                  <input type="number" id="upgraderMulti" class="bet-input" value="2.00" step="0.1" min="1.1"
+                    oninput="updateUpgraderCalc()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Info Text -->
+            <div style="margin: 15px 0; font-size: 0.9rem; color: #888;">
+              Gewinn: <span id="upgrader-win-preview" style="color:var(--green); font-weight:bold;">0</span> Kleinis
+            </div>
+
+            <button class="slot-btn-circle btn-spin-main" id="btnUpgrade" onclick="startUpgrade()"
+              style="width:100%; border-radius:10px; height:60px;">
+              UPGRADE
             </button>
           </div>
         </div>
@@ -2252,14 +2376,34 @@
     }
     function updateCasinoUI() { document.getElementById('casino-balance').textContent = formatNum(Math.floor(game.score)); }
 
+    // UPDATED FOR UPGRADER
     function switchCasinoTab(mode) {
-      // If slots are spinning, don't switch violently, but okay for now
       currentCasinoMode = mode;
-      document.getElementById('view-roulette').style.display = mode === 'roulette' ? 'block' : 'none';
-      document.getElementById('view-slots').style.display = mode === 'slots' ? 'block' : 'none';
 
-      document.getElementById('btn-tab-roulette').className = mode === 'roulette' ? 'nav-btn active' : 'nav-btn';
-      document.getElementById('btn-tab-slots').className = mode === 'slots' ? 'nav-btn active' : 'nav-btn';
+      // Alle Tabs verstecken
+      document.getElementById('view-roulette').style.display = 'none';
+      document.getElementById('view-slots').style.display = 'none';
+      document.getElementById('view-upgrader').style.display = 'none';
+
+      // Alle Buttons zurücksetzen
+      document.getElementById('btn-tab-roulette').className = 'nav-btn';
+      document.getElementById('btn-tab-slots').className = 'nav-btn';
+      document.getElementById('btn-tab-upgrader').className = 'nav-btn';
+
+      // Aktiven Tab anzeigen
+      if (mode === 'roulette') {
+        document.getElementById('view-roulette').style.display = 'block';
+        document.getElementById('btn-tab-roulette').classList.add('active');
+      }
+      else if (mode === 'slots') {
+        document.getElementById('view-slots').style.display = 'block';
+        document.getElementById('btn-tab-slots').classList.add('active');
+      }
+      else if (mode === 'upgrader') {
+        document.getElementById('view-upgrader').style.display = 'block';
+        document.getElementById('btn-tab-upgrader').classList.add('active');
+        updateUpgraderCalc();
+      }
     }
 
     function setBetMultiplier(multi) {
@@ -2428,11 +2572,11 @@
       for (let i = 0; i < 5; i++) {
         let col = [];
         for (let r = 0; r < 3; r++) {
-          
+
           // REAL CASINO PROBABILITIES
           let rnd = Math.random();
           let sym = '🍒'; // Fallback
-          
+
           if (rnd < 0.015) sym = '👑';      // Wild (1.5% statt 0.1%) - Ab und zu sichtbar!
           else if (rnd < 0.04) sym = '💎';  // Diamant (2.5%)
           else if (rnd < 0.09) sym = '7️⃣';  // Seven (5%)
@@ -2457,43 +2601,43 @@
 
       for (let i = 0; i < 5; i++) {
         const strip = document.getElementById(`pro-reel-${i}`);
-        
+
         // Build a long strip: Current Symbols + Randoms + Final Result
         // We actually just replace the innerHTML with a long list ending in the result
         // To make it seamless, we usually keep the current visible ones at top, but for simplicity/robustness:
         // We just generate a long strip.
-        
+
         let html = '';
         // Add random filler symbols
-        for(let k=0; k<SPINS; k++) {
-           let s = SLOT_SYMBOLS[Math.floor(Math.random()*SLOT_SYMBOLS.length)];
-           html += `<div class="slot-symbol">${s}</div>`;
+        for (let k = 0; k < SPINS; k++) {
+          let s = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+          html += `<div class="slot-symbol">${s}</div>`;
         }
         // Add Result Symbols (Result is 3 rows. Row 0 is Top, Row 1 Middle, Row 2 Bottom)
         // The strip renders top-down. 
         html += `<div class="slot-symbol">${finalGrid[i][0]}</div>`;
         html += `<div class="slot-symbol">${finalGrid[i][1]}</div>`;
         html += `<div class="slot-symbol">${finalGrid[i][2]}</div>`;
-        
+
         strip.innerHTML = html;
-        
+
         // Reset Position to 0 (top of random strip)
         strip.style.transition = 'none';
         strip.style.transform = 'translateY(0px)';
-        
+
         // Force Reflow
-        strip.offsetHeight; 
-        
+        strip.offsetHeight;
+
         // Animate to the bottom (showing the last 3 symbols)
         // Total symbols = SPINS + 3. 
         // We want the viewport (240px) to show the last 3.
         // So we translate up by SPINS * 80px.
         const targetY = -(SPINS * SYMBOL_HEIGHT);
-        
+
         let duration = slotState.turbo ? 0.5 + (i * 0.1) : 1.5 + (i * 0.3);
         strip.style.transition = `transform ${duration}s cubic-bezier(0.25, 1, 0.5, 1)`;
         strip.style.transform = `translateY(${targetY}px)`;
-        
+
         // On Finish
         if (i === 4) {
           setTimeout(() => {
@@ -2509,20 +2653,20 @@
       slotState.spinning = false;
       disableButtons(false);
       document.getElementById('btnSpinSlots').disabled = false;
-      
+
       // Clean up DOM (remove the long strip, keep only result)
-      for(let i=0; i<5; i++) {
-         const strip = document.getElementById(`pro-reel-${i}`);
-         strip.style.transition = 'none';
-         strip.innerHTML = '';
-         // Create the 3 result divs
-         for(let r=0; r<3; r++) {
-            let d = document.createElement('div');
-            d.className = 'slot-symbol';
-            d.textContent = grid[i][r];
-            strip.appendChild(d);
-         }
-         strip.style.transform = 'translateY(0px)';
+      for (let i = 0; i < 5; i++) {
+        const strip = document.getElementById(`pro-reel-${i}`);
+        strip.style.transition = 'none';
+        strip.innerHTML = '';
+        // Create the 3 result divs
+        for (let r = 0; r < 3; r++) {
+          let d = document.createElement('div');
+          d.className = 'slot-symbol';
+          d.textContent = grid[i][r];
+          strip.appendChild(d);
+        }
+        strip.style.transform = 'translateY(0px)';
       }
 
       // Paylines Definitions (Coordinates [col, row])
@@ -2559,19 +2703,19 @@
 
           // Base Multipliers (3-of-a-kind)
           let base = 0;
-          
+
           // LOW TIER (LOSS LEADERS)
           if (s === '🍒') base = 0.5;       // Kleiner Verlust statt fast Totalverlust
           else if (s === '🍋') base = 1;    // Geld zurück (Fairer)
           else if (s === '🍊') base = 1.5;  // Kleiner Gewinn
           else if (s === '🍇') base = 2.5;
           else if (s === '🍉') base = 4;
-          
+
           // Mittlere Gewinne
           else if (s === '🍀') base = 6;
           else if (s === '🔔') base = 10;
           else if (s === '🎰') base = 15;
-          
+
           // Jackpots
           else if (s === '7️⃣') base = 40;
           else if (s === '💎') base = 100; // Mega Jackpot
@@ -2668,6 +2812,115 @@
       }
     }
 
+    /* --- UPGRADER LOGIC --- */
+    function updateUpgraderCalc() {
+      const bet = parseInt(document.getElementById('betAmount').value) || 0;
+      let multi = parseFloat(document.getElementById('upgraderMulti').value) || 2.0;
+
+      // Begrenzungen
+      if (multi < 1.05) multi = 1.05;
+      if (multi > 100) multi = 100;
+
+      // Hausvorteil (5%)
+      const houseEdge = 0.95;
+      const winChance = (houseEdge / multi) * 100;
+
+      // UI Update
+      document.getElementById('upgrader-chance-display').textContent = winChance.toFixed(2) + "%";
+      document.getElementById('upgrader-win-preview').textContent = formatNum(Math.floor(bet * multi));
+
+      // Kreis Grafik Update (Wie viel vom Kreis ist grün?)
+      const deg = (winChance / 100) * 360;
+      const circle = document.getElementById('upgradeCircle');
+      // Wir setzen CSS variable direkt
+      circle.style.setProperty('--deg', deg + 'deg');
+      circle.style.setProperty('--green', '#2ecc71'); // Reset Farbe auf Grün
+    }
+
+    // Wenn sich der Einsatz im Hauptfeld ändert, müssen wir auch die Vorschau updaten
+    document.getElementById('betAmount').addEventListener('input', updateUpgraderCalc);
+
+
+    function startUpgrade() {
+      const bet = getBet();
+      if (!bet) return;
+
+      let multi = parseFloat(document.getElementById('upgraderMulti').value);
+      if (isNaN(multi) || multi < 1.05) { alert("Multiplikator ungültig"); return; }
+
+      // Geld abziehen
+      game.score -= bet;
+      updateCasinoUI();
+      disableButtons(true);
+      isSpinning = true;
+
+      // Gewinnchance berechnen
+      const houseEdge = 0.95;
+      const winChance = (houseEdge / multi); // z.B. 0.475 für x2
+
+      // RNG: Zufallszahl zwischen 0 und 1
+      const result = Math.random();
+      const isWin = result < winChance;
+
+      // ANIMATION
+      const circle = document.getElementById('upgradeCircle');
+
+      // 1. Reset Rotation
+      circle.style.transition = 'none';
+      circle.style.transform = 'rotate(0deg)';
+
+      // Force Reflow
+      circle.offsetHeight;
+
+      // 2. Spin!
+      const winAngleRange = (winChance) * 360; // Größe des grünen Bereichs in Grad
+      let targetRotation;
+
+      if (isWin) {
+        // Wir müssen in den grünen Bereich drehen.
+        // Rotation = (Anzahl Spins * 360) - randomWinDegree;
+        const randomWinDegree = Math.random() * winAngleRange;
+        targetRotation = (5 * 360) - randomWinDegree + 360;
+      } else {
+        // Verlustbereich (der Rest des Kreises)
+        const randomLossDegree = winAngleRange + (Math.random() * (360 - winAngleRange));
+        targetRotation = (5 * 360) - randomLossDegree + 360;
+      }
+
+      circle.style.transition = 'transform 3s cubic-bezier(0.15, 0.9, 0.25, 1)';
+      circle.style.transform = `rotate(${targetRotation}deg)`;
+
+      setTimeout(() => {
+        disableButtons(false);
+        isSpinning = false;
+
+        if (isWin) {
+          const winAmount = Math.floor(bet * multi);
+          triggerWin(winAmount);
+          // Visuelles Feedback: Kreis leuchtet
+          circle.style.boxShadow = "0 0 50px #2ecc71";
+          document.getElementById('upgrader-chance-display').textContent = "WIN!";
+          document.getElementById('upgrader-chance-display').style.color = "#2ecc71";
+        } else {
+          // Visuelles Feedback: Grau/Rot
+          circle.style.setProperty('--green', '#555'); // Grün wird grau um Verlust zu zeigen
+          document.getElementById('upgrader-chance-display').textContent = "LOSE";
+          document.getElementById('upgrader-chance-display').style.color = "#e74c3c";
+        }
+
+        updateCasinoUI();
+        saveGame();
+
+        // Reset Text nach kurzer Zeit
+        setTimeout(() => {
+          updateUpgraderCalc();
+          document.getElementById('upgrader-chance-display').style.color = "#fff";
+          circle.style.boxShadow = "0 0 30px rgba(0,0,0,0.5)";
+        }, 2000);
+
+      }, 3000);
+    }
+
     /* --- SKINS SYSTEM (NEW) --- */
     function openSkins() {
       document.getElementById('skinModal').style.display = 'flex';
@@ -2726,7 +2979,7 @@
     function renderCaseOddsUI() {
       const container = document.getElementById('case-odds-list');
       container.innerHTML = '';
-      
+
       // Mapping für schöne Namen
       const names = {
         common: "Gewöhnlich",
@@ -2742,7 +2995,7 @@
           const chance = (CASE_ODDS[rarity] * 100).toFixed(1); // z.B. 2.5
           // Prüfen, ob wir überhaupt Skins dieser Stufe haben (optional)
           const count = SKINS.filter(s => s.rarity === rarity).length;
-          
+
           if (true) { // Immer anzeigen, damit man sieht was möglich ist
             const div = document.createElement('div');
             div.className = 'ci-row';
@@ -2776,12 +3029,12 @@
     function pickSkinByRarity() {
       const rand = Math.random();
       let cumulative = 0;
-      
+
       // Reihenfolge ist wichtig: Common -> Rare -> Epic ...
       const tiers = ['common', 'rare', 'epic', 'legendary', 'mythic'];
-      
+
       let selectedRarity = 'common'; // Fallback
-      
+
       for (let tier of tiers) {
         cumulative += CASE_ODDS[tier] || 0;
         if (rand < cumulative) {
@@ -2789,13 +3042,13 @@
           break;
         }
       }
-      
+
       // Alle Skins dieser Seltenheit finden
       const pool = SKINS.filter(s => s.rarity === selectedRarity);
-      
+
       // Wenn es keine Skins dieser Seltenheit gibt, nimm Common
       if (pool.length === 0) return SKINS.find(s => s.rarity === 'common') || SKINS[0];
-      
+
       // Zufälligen Skin aus dem Pool wählen
       return pool[Math.floor(Math.random() * pool.length)];
     }
@@ -2809,7 +3062,7 @@
       disableButtons(true);
 
       // --- NEUE LOGIK HIER: ---
-      let wonSkin = pickSkinByRarity(); 
+      let wonSkin = pickSkinByRarity();
       // ------------------------
 
       generateCaseStrip(60, wonSkin);
@@ -2896,17 +3149,17 @@
       if (num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
 
       const units = [
-        { val: 1e36, suffix: " Sext" },   
-        { val: 1e33, suffix: " Quintd" }, 
-        { val: 1e30, suffix: " Quint" },  
-        { val: 1e27, suffix: " Quard" },  
-        { val: 1e24, suffix: " Quad" },   
-        { val: 1e21, suffix: " Trd" },    
-        { val: 1e18, suffix: " Trio" },   
-        { val: 1e15, suffix: " Brd" },    
-        { val: 1e12, suffix: " Bio" },    
-        { val: 1e9,  suffix: " Mrd" },    
-        { val: 1e6,  suffix: " Mio" }     
+        { val: 1e36, suffix: " Sext" },
+        { val: 1e33, suffix: " Quintd" },
+        { val: 1e30, suffix: " Quint" },
+        { val: 1e27, suffix: " Quard" },
+        { val: 1e24, suffix: " Quad" },
+        { val: 1e21, suffix: " Trd" },
+        { val: 1e18, suffix: " Trio" },
+        { val: 1e15, suffix: " Brd" },
+        { val: 1e12, suffix: " Bio" },
+        { val: 1e9, suffix: " Mrd" },
+        { val: 1e6, suffix: " Mio" }
       ];
 
       for (const unit of units) {
