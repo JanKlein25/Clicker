@@ -1838,7 +1838,29 @@
         font-size: 0.9rem;
         margin-top: 10px;
       }
-    }</style>
+    }
+  #top-player-display {
+  position: absolute;
+  top: 85px; /* Etwas unter dem Titel */
+  width: 100%;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  font-weight: 900;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+  z-index: 20;
+  pointer-events: none; /* Klicks gehen durch */
+  letter-spacing: 1px;
+  animation: pulseGold 3s infinite ease-in-out;
+}
+
+@keyframes pulseGold {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 15px var(--gold); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
+  </style>
 
 </head>
 
@@ -2214,6 +2236,7 @@
     <div id="visual-canvas"></div>
 
     <div class="bakery-name">KleinClicker</div>
+    <div id="top-player-display">👑 Platz 1: Laden...</div>
     <div class="score-container">
       <div id="score">0</div>
       <div class="currency-label">KLEINIS</div>
@@ -4032,6 +4055,34 @@ function doCrash() {
       });
     }
     init();
+  /* --- TOP PLAYER DISPLAY LOGIC --- */
+function updateTopPlayer() {
+  if (!dbRef) return;
+
+  // Wir holen uns den EINEN höchsten Eintrag (sortiert nach Prestige)
+  dbRef.orderByChild('prestige').limitToLast(1).once('value')
+    .then(snapshot => {
+      const val = snapshot.val();
+      if (val) {
+        // Firebase gibt ein Objekt zurück { "SpielerName": {score: ...} }
+        const keys = Object.keys(val);
+        const topKey = keys[0];
+        const topData = val[topKey];
+        
+        const el = document.getElementById('top-player-display');
+        
+        // Text setzen: Name + Prestige Level
+        el.innerHTML = `👑 King: ${topData.name} <span style="font-size:0.8em; color:#ccc;">(Lvl ${topData.prestige})</span>`;
+      }
+    })
+    .catch(err => console.log("Top Player fetch error", err));
+}
+
+// Startet die Abfrage
+setTimeout(() => {
+  updateTopPlayer(); // Einmal sofort nach Start (verzögert)
+  setInterval(updateTopPlayer, 10000); // Dann alle 10 Sekunden aktualisieren
+}, 2000);
   </script>
 
 </body>
