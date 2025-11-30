@@ -1647,32 +1647,6 @@
       color: #aaa;
     }
 
-    /* --- PLINKO STYLES --- */
-    .plinko-wrapper {
-      position: relative;
-      background: #0f0f12;
-      border: 2px solid #333;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: center;
-      overflow: hidden;
-      box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
-    }
-
-    #plinkoCanvas {
-      background: transparent;
-      z-index: 2;
-    }
-
-    .plinko-controls {
-      display: flex;
-      gap: 10px;
-      background: rgba(255,255,255,0.05);
-      padding: 15px;
-      border-radius: 8px;
-    }
-
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -1815,10 +1789,9 @@
       <div class="cw-body">
 
         <div class="casino-nav">
-            <button class="nav-btn active" id="btn-tab-roulette" onclick="switchCasinoTab('roulette')">Roulette</button>
-            <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Slots (5x3)</button>
-            <button class="nav-btn" id="btn-tab-upgrader" onclick="switchCasinoTab('upgrader')">Upgrader</button>
-            <button class="nav-btn" id="btn-tab-plinko" onclick="switchCasinoTab('plinko')">Plinko</button>
+          <button class="nav-btn active" id="btn-tab-roulette" onclick="switchCasinoTab('roulette')">Roulette</button>
+          <button class="nav-btn" id="btn-tab-slots" onclick="switchCasinoTab('slots')">Slots (5x3)</button>
+          <button class="nav-btn" id="btn-tab-upgrader" onclick="switchCasinoTab('upgrader')">Upgrader</button>
         </div>
 
         <div class="bet-row">
@@ -1976,45 +1949,6 @@
             </button>
           </div>
         </div>
-
-        <!-- PLINKO VIEW -->
-        <div id="view-plinko" style="display:none;">
-            <div class="plinko-wrapper">
-                <!-- Canvas für die Physik -->
-                <canvas id="plinkoCanvas" width="600" height="500"></canvas>
-                
-                <!-- Multiplikatoren Anzeige (wird vom Canvas überlagert, hier nur Struktur) -->
-                <div id="plinko-multipliers"></div>
-            </div>
-
-            <div class="plinko-controls">
-                <div class="uc-group">
-                <label>Risiko:</label>
-                <select id="plinkoRisk" class="bet-input" onchange="updatePlinkoMultipliers()" style="width:100%; height:40px; font-size:0.9rem;">
-                    <option value="low">Niedrig (Sicher)</option>
-                    <option value="medium" selected>Mittel</option>
-                    <option value="high">Hoch (Riskant)</option>
-                </select>
-                </div>
-                
-                <div class="uc-group">
-                <label>Reihen (8-16):</label>
-                <select id="plinkoRows" class="bet-input" onchange="initPlinkoBoard()" style="width:100%; height:40px; font-size:0.9rem;">
-                    <option value="8">8 Reihen</option>
-                    <option value="10">10 Reihen</option>
-                    <option value="12" selected>12 Reihen</option>
-                    <option value="14">14 Reihen</option>
-                    <option value="16">16 Reihen</option>
-                </select>
-                </div>
-            </div>
-
-            <button class="slot-btn-circle btn-spin-main" onclick="dropPlinkoBall()" 
-                style="width:100%; border-radius:10px; height:60px; margin-top:15px; background: radial-gradient(circle, #2ecc71, #27ae60);">
-                BALL FALLEN LASSEN
-            </button>
-        </div>
-
       </div>
     </div>
   </div>
@@ -2118,25 +2052,6 @@
     /* --- CONFIG & ASSETS --- */
     const SAVE_KEY = 'KleinClicker_Precision_V20';
     const DEFAULT_IMG = "https://raw.githubusercontent.com/Janklein25/clicker/main/Kleinclicker.png";
-
-    // PLINKO CONFIG (BALANCED)
-    const PLINKO_MULTIS = {
-    low: {
-        8: [5.6, 2.1, 1.1, 1, 0.5, 1, 1.1, 2.1, 5.6],
-        12: [10, 3, 1.6, 1.4, 1.1, 1, 0.5, 1, 1.1, 1.4, 1.6, 3, 10],
-        16: [16, 9, 2, 1.4, 1.4, 1.2, 1.1, 1, 0.5, 1, 1.1, 1.2, 1.4, 1.4, 2, 9, 16]
-    },
-    medium: {
-        8: [13, 3, 1.3, 0.7, 0.4, 0.7, 1.3, 3, 13],
-        12: [33, 11, 4, 2, 1.1, 0.6, 0.3, 0.6, 1.1, 2, 4, 11, 33],
-        16: [100, 41, 10, 5, 3, 1.5, 1, 0.5, 0.3, 0.5, 1, 1.5, 3, 5, 10, 41, 100] // Max 100
-    },
-    high: {
-        8: [29, 4, 1.5, 0.3, 0.2, 0.3, 1.5, 4, 29],
-        12: [150, 24, 8.1, 2, 0.7, 0.2, 0.2, 0.2, 0.7, 2, 8.1, 24, 150], // Max 150
-        16: [500, 100, 26, 9, 4, 2, 0.2, 0.2, 0.2, 0.2, 0.2, 2, 4, 9, 26, 100, 500] // Max 500
-    }
-    };
 
     // SKINS DATA
     const SKINS = [
@@ -2264,7 +2179,6 @@
       renderHistory();
       initVisuals();
       initProSlots(); // Init the new slots
-      initPlinkoBoard(); // Init Plinko
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000);
       scheduleGolden();
@@ -2478,13 +2392,11 @@
       document.getElementById('view-roulette').style.display = 'none';
       document.getElementById('view-slots').style.display = 'none';
       document.getElementById('view-upgrader').style.display = 'none';
-      document.getElementById('view-plinko').style.display = 'none';
 
       // Alle Buttons zurücksetzen
       document.getElementById('btn-tab-roulette').className = 'nav-btn';
       document.getElementById('btn-tab-slots').className = 'nav-btn';
       document.getElementById('btn-tab-upgrader').className = 'nav-btn';
-      document.getElementById('btn-tab-plinko').className = 'nav-btn';
 
       // Aktiven Tab anzeigen
       if (mode === 'roulette') {
@@ -2499,11 +2411,6 @@
         document.getElementById('view-upgrader').style.display = 'block';
         document.getElementById('btn-tab-upgrader').classList.add('active');
         updateUpgraderCalc();
-      }
-      else if (mode === 'plinko') { // NEU
-        document.getElementById('view-plinko').style.display = 'block';
-        document.getElementById('btn-tab-plinko').classList.add('active');
-        initPlinkoBoard(); // Board neu zeichnen/initialisieren
       }
     }
 
@@ -3020,240 +2927,6 @@
         }, 2000);
 
       }, 3000);
-    }
-
-    /* --- PLINKO LOGIC --- */
-    const pCanvas = document.getElementById('plinkoCanvas');
-    const pCtx = pCanvas.getContext('2d');
-
-    let plinkoEngine = {
-    balls: [],
-    pins: [],
-    multipliers: [],
-    rows: 12,
-    risk: 'medium',
-    width: 600,
-    height: 500,
-    running: false
-    };
-    
-    let lastPlinkoDrop = 0; // Globale Variable für Cooldown
-
-    function initPlinkoBoard() {
-    const rSelect = document.getElementById('plinkoRows');
-    plinkoEngine.rows = parseInt(rSelect.value);
-    plinkoEngine.pins = [];
-    
-    // Canvas Größe anpassen wenn nötig (hier fix)
-    const rows = plinkoEngine.rows;
-    const startY = 50;
-    const spacingY = 35; // Abstand vertikal
-    
-    // Pins generieren (Pyramide)
-    for (let r = 0; r < rows; r++) {
-        const pinsInRow = r + 3; // Startet mit 3 Pins oben
-        const rowWidth = pinsInRow * 40; // Breite der Reihe
-        const startX = (plinkoEngine.width - rowWidth) / 2 + 20;
-        
-        for (let c = 0; c < pinsInRow; c++) {
-        plinkoEngine.pins.push({
-            x: startX + c * 40,
-            y: startY + r * spacingY,
-            r: 4 // Radius des Pins
-        });
-        }
-    }
-    
-    updatePlinkoMultipliers();
-    if (!plinkoEngine.running) {
-        plinkoEngine.running = true;
-        requestAnimationFrame(plinkoLoop);
-    }
-    }
-
-    function updatePlinkoMultipliers() {
-    const riskSelect = document.getElementById('plinkoRisk');
-    plinkoEngine.risk = riskSelect.value;
-    
-    // Fallback falls Reihe/Risk Kombi nicht existiert (nehme Medium 12 als default)
-    let multis = PLINKO_MULTIS[plinkoEngine.risk][plinkoEngine.rows] || PLINKO_MULTIS['medium'][12];
-    plinkoEngine.multipliers = multis;
-    }
-
-    function dropPlinkoBall() {
-    const now = Date.now();
-    // 1. Schutz: Cooldown von 250ms (4 Bälle pro Sekunde max)
-    if (now - lastPlinkoDrop < 250) return; 
-    
-    // 2. Schutz: Maximal 20 Bälle gleichzeitig (gegen Lags/Glitches)
-    if (plinkoEngine.balls.length >= 20) return;
-
-    const bet = getBet();
-    if (!bet) return;
-    
-    game.score -= bet;
-    updateCasinoUI();
-    
-    lastPlinkoDrop = now; // Zeit aktualisieren
-
-    // Ball spawnen (leicht zufällige X Position oben damit es nicht immer gleich fällt)
-    plinkoEngine.balls.push({
-        x: plinkoEngine.width / 2 + (Math.random() * 10 - 5), 
-        y: 10,
-        vx: 0,
-        vy: 0,
-        radius: 7,
-        bet: bet,
-        active: true
-    });
-    }
-
-    function plinkoLoop() {
-    // Canvas clearen
-    pCtx.clearRect(0, 0, plinkoEngine.width, plinkoEngine.height);
-    
-    // 1. Zeichne Multiplikatoren (Unten)
-    drawPlinkoTargets();
-    
-    // 2. Zeichne Pins
-    pCtx.fillStyle = '#fff';
-    pCtx.beginPath();
-    plinkoEngine.pins.forEach(p => {
-        pCtx.moveTo(p.x, p.y);
-        pCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    });
-    pCtx.fill();
-    
-    // 3. Update & Zeichne Bälle
-    for (let i = plinkoEngine.balls.length - 1; i >= 0; i--) {
-        let b = plinkoEngine.balls[i];
-        
-        if (!b.active) continue;
-        
-        // Physik
-        b.vy += 0.2; // Schwerkraft
-        b.y += b.vy;
-        b.x += b.vx;
-        
-        // Kollision mit Pins
-        plinkoEngine.pins.forEach(p => {
-        const dx = b.x - p.x;
-        const dy = b.y - p.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        
-        if (dist < b.radius + p.r) {
-            // Kollision!
-            // Einfache Physik: Abprallen
-            const angle = Math.atan2(dy, dx);
-            const speed = Math.sqrt(b.vx*b.vx + b.vy*b.vy) * 0.5; // Energieverlust (0.5 schwerer)
-            
-            // Zufall (Noise):
-            const noise = (Math.random() - 0.5) * 2; 
-
-            // TENDENZ ZUR MITTE (Anti-Cheat Bias)
-            let bias = 0;
-            if (b.x > plinkoEngine.width / 2) bias = -0.1; // Schubser nach links
-            else bias = 0.1; // Schubser nach rechts
-            
-            b.vx = Math.cos(angle) * speed + noise + bias;
-            b.vy = Math.sin(angle) * speed;
-            
-            // Aus dem Pin schieben
-            const overlap = (b.radius + p.r) - dist;
-            b.x += Math.cos(angle) * overlap;
-            b.y += Math.sin(angle) * overlap;
-        }
-        });
-        
-        // Wände (optional, aber gut damit Bälle nicht rausfliegen)
-        if (b.x < 0) { b.x = 0; b.vx *= -0.5; }
-        if (b.x > plinkoEngine.width) { b.x = plinkoEngine.width; b.vx *= -0.5; }
-        
-        // Zeichnen
-        pCtx.fillStyle = '#f1c40f'; // Goldener Ball
-        pCtx.shadowBlur = 10;
-        pCtx.shadowColor = 'orange';
-        pCtx.beginPath();
-        pCtx.arc(b.x, b.y, b.radius, 0, Math.PI*2);
-        pCtx.fill();
-        pCtx.shadowBlur = 0;
-        
-        // Win Check (Unten angekommen)
-        const endY = 50 + plinkoEngine.rows * 35 + 20; // Ungefähre Position der Boxen
-        
-        if (b.y > endY) {
-        // Berechne Index basierend auf X
-        const pinsLastRow = plinkoEngine.rows + 3;
-        const totalWidth = (pinsLastRow-1) * 40; // Abstand zwischen erstem und letztem Pin
-        const startX = (plinkoEngine.width - totalWidth) / 2;
-        
-        // Index berechnen (relativ zur Mitte)
-        let index = Math.floor((b.x - (startX - 20)) / 40);
-        
-        // Clamp Index
-        if (index < 0) index = 0;
-        if (index >= plinkoEngine.multipliers.length) index = plinkoEngine.multipliers.length - 1;
-        
-        const multi = plinkoEngine.multipliers[index];
-        const win = Math.floor(b.bet * multi);
-        
-        if (win > 0) {
-            triggerWin(win);
-            // Kleines Feedback Text über dem Slot
-            spawnFloatingText(b.x + document.getElementById('clickPanel').offsetLeft, b.y + 200, `x${multi}`);
-        }
-        
-        // Ball entfernen
-        plinkoEngine.balls.splice(i, 1);
-        updateCasinoUI();
-        saveGame();
-        }
-    }
-    
-    if (document.getElementById('casinoModal').style.display === 'flex') {
-        requestAnimationFrame(plinkoLoop);
-    } else {
-        plinkoEngine.running = false;
-    }
-    }
-
-    function drawPlinkoTargets() {
-    const multis = plinkoEngine.multipliers;
-    const count = multis.length;
-    const startY = 50 + plinkoEngine.rows * 35 + 15;
-    
-    const pinsLastRow = plinkoEngine.rows + 3;
-    const totalWidth = (pinsLastRow-1) * 40; 
-    const startX = (plinkoEngine.width - totalWidth) / 2;
-    
-    for (let i = 0; i < count; i++) {
-        const x = startX + (i * 40) - 20;
-        const w = 38;
-        const h = 30;
-        
-        // Farbe berechnen (Mitte = Gelb/Rot, Außen = Rot/Dunkel)
-        const val = multis[i];
-        let color = '#333';
-        if (val < 1) color = '#3498db'; // Blau für Verlust
-        else if (val < 3) color = '#f1c40f'; // Gelb
-        else color = '#e74c3c'; // Rot
-        
-        // Spezielle Farben für Hohes Risiko
-        if (val >= 10) color = '#9b59b6'; // Lila
-        if (val >= 100) color = '#e74c3c'; // Knallrot
-        
-        pCtx.fillStyle = color;
-        pCtx.beginPath();
-        pCtx.roundRect(x, startY, w, h, 4);
-        pCtx.fill();
-        
-        pCtx.fillStyle = '#fff'; // Text Farbe
-        if (val >= 10) pCtx.fillStyle = '#ff0'; // Highlight Text
-        
-        pCtx.font = 'bold 10px Arial';
-        pCtx.textAlign = 'center';
-        pCtx.fillText(val + 'x', x + w/2, startY + 18);
-    }
     }
 
     /* --- SKINS SYSTEM (NEW) --- */
