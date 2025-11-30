@@ -3415,8 +3415,10 @@
       renderInventory();
       document.getElementById('case-count').textContent = game.cases;
 
-      // NEU: Wahrscheinlichkeiten anzeigen
       renderCaseOddsUI();
+      renderCaseContents(); // <--- HIER EINFÜGEN: Inhalt anzeigen
+
+      // ... Rest der Funktion bleibt gleich ...
 
       // Reset Strip Visual
       const strip = document.getElementById('caseStrip');
