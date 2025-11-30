@@ -3496,6 +3496,30 @@
       });
     }
 
+    function renderCaseContents() {
+      const container = document.getElementById('case-contents-grid');
+      container.innerHTML = '';
+
+      // Sortier-Reihenfolge definieren
+      const rarityOrder = { 'common': 1, 'rare': 2, 'epic': 3, 'legendary': 4, 'mythic': 5 };
+
+      // Skins kopieren und sortieren (damit Common vorne steht, Legendary hinten)
+      const sortedSkins = [...SKINS].sort((a, b) => {
+        return (rarityOrder[a.rarity] || 0) - (rarityOrder[b.rarity] || 0);
+      });
+
+      sortedSkins.forEach(skin => {
+        const el = document.createElement('div');
+        // Wir nutzen die existierenden CSS-Klassen für die farbigen Rahmen
+        el.className = `cc-icon rarity-${skin.rarity}`;
+        // Tooltip Name speichern
+        el.setAttribute('data-name', skin.name);
+        
+        el.innerHTML = `<img src="${skin.url}" style="filter:${skin.filter}">`;
+        container.appendChild(el);
+      });
+    }
+
     function equipSkin(id, mute = false) {
       const skin = SKINS.find(s => s.id === id);
       if (skin && game.skinsOwned.includes(id)) {
