@@ -2785,21 +2785,41 @@
       strip.style.transition = 'transform 6s cubic-bezier(0.15, 0.85, 0.15, 1)';
       strip.style.transform = `translateX(-${scrollPos}px)`;
 
-      // 4. Ende
+      // 4. Ende & Auswertung
       setTimeout(() => {
         isSpinning = false;
         disableButtons(false);
 
         const winAmount = Math.floor(bet * winner.multi);
+        
+        // Button finden, um Text zu ändern
+        const btn = document.querySelector('#view-case-money .open-case-btn');
 
         if (winAmount > 0) {
           triggerWin(winAmount); 
           const winBox = document.getElementById('winDisplay');
-          document.getElementById('winAmountDisplay').textContent = formatNum(winAmount);
+          
+          // HIER: Text deutlicher machen (+ Kleinis)
+          document.getElementById('winAmountDisplay').textContent = `+${formatNum(winAmount)} Kleinis`;
           document.querySelector('.win-label').textContent = `${winner.multi}x GEWINN`;
+          
           winBox.classList.add('show');
           setTimeout(() => winBox.classList.remove('show'), 2000);
-        } 
+
+          // Auch auf dem Button anzeigen
+          btn.innerHTML = `GEWONNEN: ${formatNum(winAmount)}`;
+          btn.style.background = "linear-gradient(45deg, #2ecc71, #27ae60)"; // Grün machen
+        } else {
+          // Bei Niete
+          btn.innerHTML = "NIETE (0x)";
+          btn.style.background = "#444"; // Grau machen
+        }
+
+        // Button nach 2 Sekunden zurücksetzen
+        setTimeout(() => {
+            btn.innerHTML = "KISTE ÖFFNEN";
+            btn.style.background = "linear-gradient(45deg, #f39c12, #d35400)"; // Original Farbe
+        }, 2000);
 
         updateCasinoUI();
         saveGame(); 
