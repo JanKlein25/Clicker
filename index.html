@@ -2091,7 +2091,7 @@
     function addScore(amount) { game.score += amount; game.totalScore += amount; }
 
     function getPrestigeMultiplier() {
-      return 1 + (game.prestige * 0.02);
+      return 1 + (game.prestige * 0.05);
     }
 
     function getBuildingMultiplier(index) {
@@ -2996,7 +2996,7 @@
         if (percent > 100) percent = 100;
 
         document.getElementById('prestige-level-display').textContent = formatNum(game.prestige);
-        document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 2);
+        document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 5);
         document.getElementById('prestige-progress-bar').style.width = percent + "%";
 
         if (remaining > 0) {
