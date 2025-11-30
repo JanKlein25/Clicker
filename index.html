@@ -3097,6 +3097,9 @@
 
 
     function startUpgrade() {
+      // 1. FIX: Verhindert Spammen, wenn bereits eine Drehung läuft
+      if (isSpinning) return;
+
       const bet = getBet();
       if (!bet) return;
 
@@ -3106,8 +3109,14 @@
       // Geld abziehen
       game.score -= bet;
       updateCasinoUI();
+      
+      // Globaler Status setzen
       disableButtons(true);
       isSpinning = true;
+
+      // 2. FIX: Den Button explizit deaktivieren (für visuelles Feedback)
+      const btn = document.getElementById('btnUpgrade');
+      btn.disabled = true;
 
       // Gewinnchance berechnen
       const houseEdge = 0.95;
@@ -3133,7 +3142,6 @@
 
       if (isWin) {
         // Wir müssen in den grünen Bereich drehen.
-        // Rotation = (Anzahl Spins * 360) - randomWinDegree;
         const randomWinDegree = Math.random() * winAngleRange;
         targetRotation = (5 * 360) - randomWinDegree + 360;
       } else {
@@ -3148,18 +3156,21 @@
       setTimeout(() => {
         disableButtons(false);
         isSpinning = false;
+        
+        // 3. FIX: Button wieder aktivieren
+        btn.disabled = false;
 
         if (isWin) {
           const winAmount = Math.floor(bet * multi);
           triggerWin(winAmount);
           // Visuelles Feedback: Kreis leuchtet
           circle.style.boxShadow = "0 0 50px #2ecc71";
-          document.getElementById('upgrader-chance-display').textContent = "WIN!";
+          document.getElementById('upgrader-chance-display').textContent = "MACHER!";
           document.getElementById('upgrader-chance-display').style.color = "#2ecc71";
         } else {
           // Visuelles Feedback: Grau/Rot
           circle.style.setProperty('--green', '#555'); // Grün wird grau um Verlust zu zeigen
-          document.getElementById('upgrader-chance-display').textContent = "LOSE";
+          document.getElementById('upgrader-chance-display').textContent = "NOCH SCHLECHTER ALS TILL!";
           document.getElementById('upgrader-chance-display').style.color = "#e74c3c";
         }
 
