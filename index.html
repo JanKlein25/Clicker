@@ -1,14 +1,3 @@
-Hier ist der **komplette Code** mit der integrierten Offline-Berechnung.
-
-Ich habe folgende Anpassungen vorgenommen (ohne das Aussehen oder den Spielstand zu zerstören):
-1.  Im `game`-Objekt wird jetzt `lastLogin` gespeichert.
-2.  Beim Speichern (`saveGame`) wird die aktuelle Uhrzeit gesichert.
-3.  Beim Laden (`init`) wird berechnet, wie lange du weg warst, und das Geld (Sekunden × CPS) gutgeschrieben.
-4.  Eine Meldung (Alert) zeigt dir beim Start an, wie viel du "im Schlaf" verdient hast.
-
-Du kannst diesen Code einfach als `.html` speichern und dein bisheriger Spielstand bleibt erhalten (beim ersten Start gibt es noch kein Offline-Geld, da der Zeitstempel erst jetzt gesetzt wird, ab dem zweiten Mal funktioniert es).
-
-```html
 <!DOCTYPE html>
 <html lang="de">
 
@@ -4299,4 +4288,4 @@ setTimeout(() => {
 </body>
 
 </html>
-```
+
