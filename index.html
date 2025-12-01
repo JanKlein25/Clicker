@@ -3758,7 +3758,7 @@ function crashAction() {
     crashLoop();
   }
   
-  // CASHOUT (Sofortige Reaktion)
+  // CASHOUT (Sofortige Reaktion + Freigabe der UI)
   else if (crashState.running && !crashState.cashedOut) {
     crashState.cashedOut = true;
     const winAmount = Math.floor(crashState.bet * crashState.currentMulti);
@@ -3769,7 +3769,18 @@ function crashAction() {
     document.getElementById('crash-status-text').textContent = "GEWONNEN!";
     
     btn.innerHTML = `GEWONNEN: ${formatNum(winAmount)}`;
+    
+    // --- HIER IST DER FIX ---
+    
+    // 1. Wir geben sofort alles wieder frei (Tabs, Schließen-Button)
+    disableButtons(false);
+    
+    // 2. ABER: Wir sperren den Crash-Button sofort wieder manuell, 
+    // damit man nicht in die laufende Runde reinfunken kann.
     btn.disabled = true;
+    btn.style.cursor = "not-allowed";
+
+    // ------------------------
     
     saveGame();
   }
