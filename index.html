@@ -2533,6 +2533,18 @@
         // --- HIER DIE OFFLINE BERECHNUNG AUFRUFEN ---
         processOfflineEarnings(); 
 
+        // Nur berechnen, wenn man länger als 10 Sekunden weg war
+      if (secondsOffline > 10) {
+        
+        // --- NEU: CHEAT SCHUTZ (Maximal 24 Stunden = 86400 Sekunden) ---
+        if (secondsOffline > 86400) {
+          secondsOffline = 86400; 
+        }
+        // ---------------------------------------------------------------
+
+        const currentCPS = calculateTotalCPS();
+        // ... (Rest der Funktion bleibt gleich)
+
       } catch (e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
 
       equipSkin(game.equippedSkin, true);
