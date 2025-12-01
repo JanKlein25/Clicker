@@ -2447,6 +2447,14 @@
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
     let clickHistory = [];
+    // --- NEU: AUTO-CLICKER ZÄHLER ---
+    let clickCountSec = 0;
+    
+    // Setzt den Zähler jede Sekunde auf 0 zurück
+    setInterval(() => {
+      clickCountSec = 0;
+    }, 1000);
+    // --------------------------------
     let lastTime = performance.now();
     let casinoUnlocked = false;
 
