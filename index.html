@@ -4114,17 +4114,21 @@ function startCrashCooldown() {
       localStorage.setItem(SAVE_KEY, btoa(JSON.stringify(data)));
     }
     function loadGame() {
+      let saved = null; // WICHTIG: Variable hier oben definieren
+
       try {
-  const raw = localStorage.getItem(SAVE_KEY);
-  // Falls es noch ein alter (nicht verschlüsselter) Save ist, normal laden:
-  if (raw && raw.startsWith("{")) {
-     var saved = JSON.parse(raw);
-  } else {
-     // Ansonsten entschlüsseln
-     var saved = JSON.parse(atob(raw));
-  }
-} catch(e) { console.log("Save error"); 
-           }
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (raw) {
+          // Prüfen ob alter Spielstand (Klartext) oder neuer (Base64)
+          if (raw.startsWith("{")) {
+             saved = JSON.parse(raw);
+          } else {
+             saved = JSON.parse(atob(raw));
+          }
+        }
+      } catch(e) { 
+        console.log("Save error oder Spielstand leer"); 
+      }
     
       if (saved) {
         game.score = saved.score || 0;
@@ -4139,7 +4143,8 @@ function startCrashCooldown() {
         game.cases = saved.cases || 0;
         game.skinsOwned = saved.skinsOwned || ['default'];
         game.equippedSkin = saved.equippedSkin || 'default';
-        // HIER DIE ÄNDERUNG: ZEIT LADEN
+        
+        // Hier wird die Zeit geladen
         game.lastLogin = saved.lastLogin || Date.now(); 
       }
     }
