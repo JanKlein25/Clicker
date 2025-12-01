@@ -1,3 +1,14 @@
+Hier ist der **komplette Code** mit der integrierten Offline-Berechnung.
+
+Ich habe folgende Anpassungen vorgenommen (ohne das Aussehen oder den Spielstand zu zerstören):
+1.  Im `game`-Objekt wird jetzt `lastLogin` gespeichert.
+2.  Beim Speichern (`saveGame`) wird die aktuelle Uhrzeit gesichert.
+3.  Beim Laden (`init`) wird berechnet, wie lange du weg warst, und das Geld (Sekunden × CPS) gutgeschrieben.
+4.  Eine Meldung (Alert) zeigt dir beim Start an, wie viel du "im Schlaf" verdient hast.
+
+Du kannst diesen Code einfach als `.html` speichern und dein bisheriger Spielstand bleibt erhalten (beim ersten Start gibt es noch kein Offline-Geld, da der Zeitstempel erst jetzt gesetzt wird, ab dem zweiten Mal funktioniert es).
+
+```html
 <!DOCTYPE html>
 <html lang="de">
 
@@ -2441,7 +2452,8 @@
       prestige: 0,
       cases: 0,
       skinsOwned: ['default'],
-      equippedSkin: 'default'
+      equippedSkin: 'default',
+      lastLogin: Date.now() // HIER HINZUGEFÜGT
     };
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
@@ -2484,6 +2496,42 @@
     const ttDesc = document.getElementById('tt-desc-display');
     const ttStats = document.getElementById('tt-stats-container');
 
+    /* --- OFFLINE EARNINGS LOGIC --- */
+    function processOfflineEarnings() {
+      // Wenn kein Login-Datum da ist, abbrechen
+      if (!game.lastLogin) return;
+
+      const now = Date.now();
+      // Unterschied in Millisekunden -> in Sekunden umrechnen
+      const secondsOffline = (now - game.lastLogin) / 1000;
+
+      // Nur berechnen, wenn man länger als 10 Sekunden weg war
+      if (secondsOffline > 10) {
+        const currentCPS = calculateTotalCPS();
+        
+        // Offline Einnahmen berechnen (Zeit * Produktion)
+        const offlineEarnings = currentCPS * secondsOffline;
+
+        if (offlineEarnings > 0) {
+          addScore(offlineEarnings);
+          
+          // Zeit schön formatieren
+          let timeString = "";
+          if (secondsOffline < 60) timeString = Math.floor(secondsOffline) + " Sekunden";
+          else if (secondsOffline < 3600) timeString = Math.floor(secondsOffline / 60) + " Minuten";
+          else timeString = (secondsOffline / 3600).toFixed(1) + " Stunden";
+
+          // Alert anzeigen
+          alert(
+            `👋 WILLKOMMEN ZURÜCK!\n\n` +
+            `Du warst ${timeString} offline.\n` +
+            `Deine Bäckerei hat in der Zwischenzeit gearbeitet:\n\n` +
+            `💰 +${formatNum(offlineEarnings)} Kleinis`
+          );
+        }
+      }
+    }
+
     /* --- INIT --- */
     function init() {
       try {
@@ -2493,6 +2541,10 @@
           const diff = BUILDINGS.length - game.buildings.length;
           for (let i = 0; i < diff; i++) game.buildings.push(0);
         }
+
+        // --- HIER DIE OFFLINE BERECHNUNG AUFRUFEN ---
+        processOfflineEarnings(); 
+
       } catch (e) { console.log("Resetting save"); localStorage.removeItem(SAVE_KEY); }
 
       equipSkin(game.equippedSkin, true);
@@ -4022,6 +4074,8 @@ function startCrashCooldown() {
 
     /* --- SAVE --- */
     function saveGame() {
+      game.lastLogin = Date.now(); // HIER DIE ÄNDERUNG: ZULETZT GESPEICHERT JETZT
+      
       const data = {
         score: game.score,
         totalScore: game.totalScore,
@@ -4034,7 +4088,8 @@ function startCrashCooldown() {
         prestige: game.prestige || 0,
         cases: game.cases,
         skinsOwned: game.skinsOwned,
-        equippedSkin: game.equippedSkin
+        equippedSkin: game.equippedSkin,
+        lastLogin: game.lastLogin // HIER DIE ÄNDERUNG: MIT SPEICHERN
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
@@ -4053,6 +4108,8 @@ function startCrashCooldown() {
         game.cases = saved.cases || 0;
         game.skinsOwned = saved.skinsOwned || ['default'];
         game.equippedSkin = saved.equippedSkin || 'default';
+        // HIER DIE ÄNDERUNG: ZEIT LADEN
+        game.lastLogin = saved.lastLogin || Date.now(); 
       }
     }
 
@@ -4242,3 +4299,4 @@ setTimeout(() => {
 </body>
 
 </html>
+```
