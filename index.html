@@ -3941,8 +3941,15 @@ function startCrashCooldown() {
     bigKlein.addEventListener('mousedown', (e) => handleInteraction(e.clientX, e.clientY));
     bigKlein.addEventListener('touchstart', (e) => { e.preventDefault(); for (let i = 0; i < e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY); });
     function handleInteraction(x, y) {
-      const power = getClickPower(); addScore(power); game.clicks++;
+      // --- NEU: HIER BLOCKIEREN WIR ZU SCHNELLE KLICKS ---
+      clickCountSec++;
+      // Wenn mehr als 25 Klicks pro Sekunde -> Abbruch (Ignorieren)
+      if (clickCountSec > 25) return; 
+      // ---------------------------------------------------
 
+      const power = getClickPower(); addScore(power); game.clicks++;
+      
+      // ... (hier geht der alte Code weiter: clickHistory.push, etc.)
       clickHistory.push({ time: performance.now(), val: power });
 
       spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power != 1 ? 's' : ''}`); spawnFallingFace(x, y);
