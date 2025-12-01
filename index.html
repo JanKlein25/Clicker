@@ -2485,17 +2485,27 @@
     const ttDesc = document.getElementById('tt-desc-display');
     const ttStats = document.getElementById('tt-stats-container');
 
-    /* --- OFFLINE EARNINGS LOGIC --- */
+    /* --- OFFLINE EARNINGS LOGIC (MIT CHEAT SCHUTZ) --- */
     function processOfflineEarnings() {
       // Wenn kein Login-Datum da ist, abbrechen
       if (!game.lastLogin) return;
 
       const now = Date.now();
-      // Unterschied in Millisekunden -> in Sekunden umrechnen
-      const secondsOffline = (now - game.lastLogin) / 1000;
+      // Unterschied in Sekunden
+      // WICHTIG: "let" statt "const", damit wir es ändern können
+      let secondsOffline = (now - game.lastLogin) / 1000;
 
       // Nur berechnen, wenn man länger als 10 Sekunden weg war
       if (secondsOffline > 10) {
+        
+        // --- CHEAT SCHUTZ START ---
+        // Maximal 24 Stunden (86400 Sekunden) erlauben
+        // Wenn jemand die Uhr 10 Jahre vorstellt, kriegt er trotzdem nur 24h Geld.
+        if (secondsOffline > 86400) {
+          secondsOffline = 86400;
+        }
+        // --- CHEAT SCHUTZ ENDE ---
+
         const currentCPS = calculateTotalCPS();
         
         // Offline Einnahmen berechnen (Zeit * Produktion)
@@ -2504,11 +2514,18 @@
         if (offlineEarnings > 0) {
           addScore(offlineEarnings);
           
-          // Zeit schön formatieren
+          // Zeit schön formatieren für die Anzeige
           let timeString = "";
-          if (secondsOffline < 60) timeString = Math.floor(secondsOffline) + " Sekunden";
-          else if (secondsOffline < 3600) timeString = Math.floor(secondsOffline / 60) + " Minuten";
-          else timeString = (secondsOffline / 3600).toFixed(1) + " Stunden";
+          // Wenn wir gecapped haben (mehr als 24h weg), zeigen wir "24+ Stunden" an
+          if (secondsOffline >= 86400) {
+            timeString = "über 24 Stunden";
+          } else if (secondsOffline < 60) {
+            timeString = Math.floor(secondsOffline) + " Sekunden";
+          } else if (secondsOffline < 3600) {
+            timeString = Math.floor(secondsOffline / 60) + " Minuten";
+          } else {
+            timeString = (secondsOffline / 3600).toFixed(1) + " Stunden";
+          }
 
           // Alert anzeigen
           alert(
