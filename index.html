@@ -4079,10 +4079,21 @@ function startCrashCooldown() {
         equippedSkin: game.equippedSkin,
         lastLogin: game.lastLogin // HIER DIE ÄNDERUNG: MIT SPEICHERN
       };
-      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+      localStorage.setItem(SAVE_KEY, btoa(JSON.stringify(data)));
     }
     function loadGame() {
-      const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+      try {
+  const raw = localStorage.getItem(SAVE_KEY);
+  // Falls es noch ein alter (nicht verschlüsselter) Save ist, normal laden:
+  if (raw && raw.startsWith("{")) {
+     var saved = JSON.parse(raw);
+  } else {
+     // Ansonsten entschlüsseln
+     var saved = JSON.parse(atob(raw));
+  }
+} catch(e) { console.log("Save error"); 
+           }
+    
       if (saved) {
         game.score = saved.score || 0;
         game.totalScore = saved.totalScore || 0;
