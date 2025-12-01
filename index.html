@@ -3775,7 +3775,37 @@ function crashAction() {
   }
 }
 
-function doCrash() {
+    /* --- CRASH COOLDOWN LOGIC --- */
+function startCrashCooldown() {
+  let timeLeft = 10;
+  const btn = document.getElementById('btnCrashAction');
+  
+  // Button deaktivieren und grau machen
+  btn.disabled = true;
+  btn.style.background = "#333"; // Grau
+  btn.style.cursor = "not-allowed";
+  
+  // Timer Funktion
+  const timerInterval = setInterval(() => {
+    btn.innerHTML = `⏳ COOLDOWN (${timeLeft}s)`;
+    timeLeft--;
+
+    if (timeLeft < 0) {
+      clearInterval(timerInterval);
+      // Cooldown vorbei: Button wieder aktivieren
+      btn.disabled = false;
+      btn.innerHTML = "STARTEN";
+      btn.style.background = "linear-gradient(45deg, #8e44ad, #9b59b6)"; // Lila zurück
+      btn.style.cursor = "pointer";
+      
+      // State sicherstellen
+      crashState.crashed = false; 
+      updateCasinoUI();
+    }
+  }, 1000);
+}
+
+    function doCrash() {
   crashState.running = false;
   crashState.crashed = true;
   cancelAnimationFrame(crashState.animFrame);
