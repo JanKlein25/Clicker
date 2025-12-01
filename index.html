@@ -3775,28 +3775,47 @@ function crashAction() {
   }
 }
 
-    /* --- CRASH COOLDOWN LOGIC --- */
+    /* --- CRASH COOLDOWN LOGIC (FIXED) --- */
 function startCrashCooldown() {
-  let timeLeft = 10;
+  // 1. ZUERST: Alles global freischalten (Tabs, Schließen, etc.)
+  disableButtons(false);
+
+  // 2. DANACH: Nur den Crash-Start-Button gezielt wieder sperren
   const btn = document.getElementById('btnCrashAction');
-  
-  // Button deaktivieren und grau machen
   btn.disabled = true;
   btn.style.background = "#333"; // Grau
   btn.style.cursor = "not-allowed";
   
+  let timeLeft = 10;
+  
+  // Sofort anzeigen, damit man nicht 1 Sekunde warten muss
+  btn.innerHTML = `⏳ COOLDOWN (${timeLeft}s)`;
+
   // Timer Funktion
   const timerInterval = setInterval(() => {
-    btn.innerHTML = `⏳ COOLDOWN (${timeLeft}s)`;
     timeLeft--;
+    btn.innerHTML = `⏳ COOLDOWN (${timeLeft}s)`;
+
+    // Wenn der User zwischendurch den Tab wechselt (z.B. zu Roulette), 
+    // läuft der Timer im Hintergrund weiter.
+    // Wenn er zurückkommt und der Timer < 0 ist, wird der Button grün.
 
     if (timeLeft < 0) {
       clearInterval(timerInterval);
-      // Cooldown vorbei: Button wieder aktivieren
-      btn.disabled = false;
-      btn.innerHTML = "STARTEN";
-      btn.style.background = "linear-gradient(45deg, #8e44ad, #9b59b6)"; // Lila zurück
-      btn.style.cursor = "pointer";
+      
+      // Prüfen, ob wir noch im Crash Tab sind (nur Kosmetik)
+      if(document.getElementById('view-crash').style.display !== 'none') {
+         btn.disabled = false;
+         btn.innerHTML = "STARTEN";
+         btn.style.background = "linear-gradient(45deg, #8e44ad, #9b59b6)"; 
+         btn.style.cursor = "pointer";
+      } else {
+         // Falls wir woanders sind, setzen wir den Status zurück, 
+         // damit er beim nächsten Tab-Wechsel bereit ist.
+         btn.disabled = false;
+         btn.innerHTML = "STARTEN";
+         btn.style.background = "linear-gradient(45deg, #8e44ad, #9b59b6)"; 
+      }
       
       // State sicherstellen
       crashState.crashed = false; 
