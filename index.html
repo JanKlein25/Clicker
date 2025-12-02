@@ -4059,20 +4059,21 @@ function startCrashCooldown() {
     };
 
     // Berechnet den Multiplikator basierend auf Wahrscheinlichkeit
-    function getMinesMultiplier(minesCount, revealedCount) {
-      // Hausvorteil (99% RTP für Fairness wie im Rest des Codes)
-      const houseEdge = 0.99; 
-      
-      // Wahrscheinlichkeitsrechnung
-      // n = 25 (Felder), m = Minen, k = bereits aufgedeckt
-      let prob = 1;
-      for (let i = 0; i < revealedCount + 1; i++) {
-        prob *= (25 - minesCount - i) / (25 - i);
-      }
-      
-      // Kehrwert der Gewinnwahrscheinlichkeit * Hausvorteil
-      return (houseEdge / prob);
-    }
+function getMinesMultiplier(minesCount, revealedCount) {
+  // HIER ÄNDERN:
+  // 0.99 = Sehr fair (Casino gewinnt langfristig 1%)
+  // 0.90 = Strenger (Casino gewinnt 10%) -> Multiplikatoren sinken deutlich
+  // 0.85 = Sehr streng
+  const houseEdge = 0.90; 
+  
+  // Wahrscheinlichkeitsrechnung
+  let prob = 1;
+  for (let i = 0; i < revealedCount + 1; i++) {
+    prob *= (25 - minesCount - i) / (25 - i);
+  }
+  
+  return (houseEdge / prob);
+}
 
     function updateMinesUI() {
       const grid = document.getElementById('mines-grid');
