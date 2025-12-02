@@ -2400,12 +2400,13 @@
 
     // CHANCEN KONFIGURATION (Mythic entfernt, Legendary auf 3% erhöht)
     const CASE_ODDS = {
-      common: 0.70,    // 70%
-      rare: 0.20,      // 20%
-      epic: 0.07,      // 7%
-      legendary: 0.03, // 3%
-      mythic: 0        // 0% (Deaktiviert)
-    };
+  common: 0.69,    // Reduziert von 0.70 auf 0.69, um Platz zu machen
+  rare: 0.20,
+  epic: 0.07,
+  legendary: 0.03,
+  blackmarket: 0.01, // <--- NEU: 1% Chance
+  mythic: 0
+};
 
     // BUILDINGS (UPDATED with new endgame buildings)
     const BUILDINGS = [
