@@ -3622,21 +3622,21 @@
 
     // Hilfsfunktion für echte Zufallsauswahl nach Gewichtung
     function pickSkinByRarity() {
-      const rand = Math.random();
-      let cumulative = 0;
+  const rand = Math.random();
+  let cumulative = 0;
 
-      // Reihenfolge ist wichtig: Common -> Rare -> Epic ...
-      const tiers = ['common', 'rare', 'epic', 'legendary'];
+  // HIER 'blackmarket' HINZUFÜGEN!
+  const tiers = ['common', 'rare', 'epic', 'legendary', 'blackmarket']; 
 
-      let selectedRarity = 'common'; // Fallback
+  let selectedRarity = 'common'; 
 
-      for (let tier of tiers) {
-        cumulative += CASE_ODDS[tier] || 0;
-        if (rand < cumulative) {
-          selectedRarity = tier;
-          break;
-        }
-      }
+  for (let tier of tiers) {
+    cumulative += CASE_ODDS[tier] || 0;
+    if (rand < cumulative) {
+      selectedRarity = tier;
+      break;
+    }
+  }
 
       // Alle Skins dieser Seltenheit finden
       const pool = SKINS.filter(s => s.rarity === selectedRarity);
