@@ -224,17 +224,14 @@
       z-index: 20;
     }
 
-   #score {
-      /* ÄNDERUNG: 'monospace' sorgt dafür, dass jede Ziffer exakt gleich viel Platz braucht */
-      font-family: 'Courier New', Courier, monospace; 
+    #score {
+      font-family: 'Roboto', sans-serif;
       font-size: 3.2rem;
       font-weight: 900;
       text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
       line-height: 1;
-      
-      /* Sicherstellen, dass der Text mittig bleibt */
-      text-align: center;
-      width: 100%;
+      /* NEU: Macht alle Zahlen gleich breit, verhindert Wackeln */
+      font-variant-numeric: tabular-nums;
     }
 
     .currency-label {
@@ -248,22 +245,21 @@
     }
 
     #cps {
-      /* ÄNDERUNG: Auch hier Monospace für stabile Zahlen */
-      font-family: 'Courier New', Courier, monospace;
-      
       font-size: 1.1rem;
       color: #7f8c8d;
       margin-top: 10px;
-      font-weight: 700; /* Fett sieht bei Monospace oft besser aus */
+      font-weight: 500;
       background: rgba(0, 0, 0, 0.4);
       padding: 5px 20px;
       border-radius: 30px;
       border: 1px solid rgba(255, 255, 255, 0.05);
-
-      /* Deine Fixes für den schwarzen Kasten (nicht löschen!) */
-      display: inline-block;
-      min-width: 280px;
+      
+      /* NEU: Verhindert Wackeln der Zahlen im Kästchen */
       font-variant-numeric: tabular-nums;
+      
+      /* NEU: Gibt dem Kästchen eine feste Mindestbreite, damit der Rand nicht zuckt */
+      display: inline-block;
+      min-width: 280px; 
     }
 
     #bigKlein {
