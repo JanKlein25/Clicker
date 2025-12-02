@@ -230,6 +230,8 @@
       font-weight: 900;
       text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
       line-height: 1;
+      /* NEU: Macht alle Zahlen gleich breit, verhindert Wackeln */
+      font-variant-numeric: tabular-nums;
     }
 
     .currency-label {
@@ -251,6 +253,13 @@
       padding: 5px 20px;
       border-radius: 30px;
       border: 1px solid rgba(255, 255, 255, 0.05);
+      
+      /* NEU: Verhindert Wackeln der Zahlen im Kästchen */
+      font-variant-numeric: tabular-nums;
+      
+      /* NEU: Gibt dem Kästchen eine feste Mindestbreite, damit der Rand nicht zuckt */
+      display: inline-block;
+      min-width: 280px; 
     }
 
     #bigKlein {
