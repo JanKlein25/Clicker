@@ -4237,11 +4237,9 @@ function getMinesMultiplier(minesCount, revealedCount) {
         else if (!minesState.active && minesState.mines.includes(i)) {
            tile.classList.add('revealed-mine');
            tile.innerHTML = '💣';
-           // Tile war schon aufgedeckt -> Spiel verloren
            if(minesState.revealed.includes(i)) tile.style.backgroundColor = '#500'; 
         }
         else {
-          // Normales verdecktes Feld
           tile.onclick = () => clickMineTile(i);
         }
         
@@ -4249,45 +4247,50 @@ function getMinesMultiplier(minesCount, revealedCount) {
         grid.appendChild(tile);
       }
 
-      // Update Button Text & Multiplikatoren
+      // Buttons und Anzeigen holen
       const btn = document.getElementById('btnMinesAction');
       const nextMultiDisplay = document.getElementById('mines-next-multi');
-      
-      // --- NEU: Aktueller Multiplikator Update ---
       const currentMultiDisplay = document.getElementById('mines-current-multi');
-      currentMultiDisplay.textContent = minesState.currentMulti.toFixed(2) + "x";
-      // ------------------------------------------
+
+      // --- ÄNDERUNG HIER START ---
+      // Wir zeigen den Wert nur an, wenn das Spiel läuft UND mindestens 1 Feld aufgedeckt ist.
+      // Ansonsten (am Start oder wenn noch nicht geklickt wurde) zeigen wir "/"
+      if (minesState.active && minesState.revealed.length > 0) {
+          currentMultiDisplay.textContent = minesState.currentMulti.toFixed(2) + "x";
+          currentMultiDisplay.style.color = "#2ecc71"; // Grün bei aktivem Gewinn
+      } else {
+          currentMultiDisplay.textContent = "/";
+          currentMultiDisplay.style.color = "#555"; // Ausgegraut / Neutral
+      }
+      // --- ÄNDERUNG HIER ENDE ---
 
       if (!minesState.active) {
+        // --- STARTBILDSCHIRM ---
         btn.textContent = "SPIELEN";
         btn.classList.remove('btn-green'); 
         btn.style.background = "linear-gradient(45deg, #2ecc71, #27ae60)";
         
-        // Preview nächsten Multiplikator für 1. Treffer berechnen
+        // Vorschau auf den ersten Klick
         let nextM = getMinesMultiplier(minesState.count, 0);
         nextMultiDisplay.textContent = nextM.toFixed(2) + "x";
         
-        // Reset Current auf 1.00x wenn Spiel vorbei ist
-        currentMultiDisplay.textContent = "1.00x";
-        currentMultiDisplay.style.color = "#3498db"; // Blau (Reset Farbe)
-
         document.getElementById('minesCountInput').disabled = false;
       } else {
-        // Spiel läuft -> Cashout Button
+        // --- SPIEL LÄUFT ---
         const currentWin = Math.floor(minesState.bet * minesState.currentMulti);
-        btn.textContent = `CASHOUT: ${formatNum(currentWin)}`;
+        
+        // Wenn noch nichts aufgedeckt wurde, ist der Cashout einfach der Einsatz
+        if (minesState.revealed.length === 0) {
+             btn.textContent = "CASHOUT (Start)";
+        } else {
+             btn.textContent = `CASHOUT: ${formatNum(currentWin)}`;
+        }
+        
         btn.style.background = "linear-gradient(45deg, #f1c40f, #d35400)"; // Gold
         
-        // Preview nächsten Multiplikator für NÄCHSTEN Klick
+        // Vorschau auf den NÄCHSTEN Klick
         let nextM = getMinesMultiplier(minesState.count, minesState.revealed.length);
         nextMultiDisplay.textContent = nextM.toFixed(2) + "x";
-        
-        // Farbe ändern wenn man Profit macht (>1.00x)
-        if(minesState.currentMulti > 1.0) {
-            currentMultiDisplay.style.color = "#2ecc71"; // Grün bei Gewinn
-        } else {
-            currentMultiDisplay.style.color = "#3498db"; // Blau bei Start
-        }
         
         document.getElementById('minesCountInput').disabled = true;
       }
