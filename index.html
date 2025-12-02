@@ -227,25 +227,11 @@
     #score {
       font-family: 'Roboto', sans-serif;
       font-size: 3.2rem;
-      
-      /* WICHTIG: Von 900 auf 700 geändert. 
-         Bei 900 ignoriert Roboto oft den Befehl für gleiche Zahlenbreite. */
-      font-weight: 700;
-      
+      font-weight: 900;
       text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
       line-height: 1;
-      text-align: center;
-      width: 100%;
-
-      /* Diese Befehle zwingen die Zahlen in ein festes Raster */
+      /* NEU: Macht alle Zahlen gleich breit, verhindert Wackeln */
       font-variant-numeric: tabular-nums;
-      -moz-font-feature-settings: "tnum";
-      -webkit-font-feature-settings: "tnum";
-      font-feature-settings: "tnum";
-      
-      /* Verhindert, dass sich Abstände zwischen Buchstaben automatisch anpassen */
-      font-kerning: none;
-      letter-spacing: 0px;
     }
 
     .currency-label {
