@@ -224,20 +224,14 @@
       z-index: 20;
     }
 
-   #score {
-      font-family: 'Roboto', sans-serif; /* Deine gewünschte Schriftart */
+    #score {
+      font-family: 'Roboto', sans-serif;
       font-size: 3.2rem;
       font-weight: 900;
       text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
       line-height: 1;
-      text-align: center;
-      width: 100%;
-
-      /* DER FIX: Zwingt Roboto dazu, Zahlen gleich breit zu machen */
+      /* NEU: Macht alle Zahlen gleich breit, verhindert Wackeln */
       font-variant-numeric: tabular-nums;
-      -moz-font-feature-settings: "tnum";
-      -webkit-font-feature-settings: "tnum";
-      font-feature-settings: "tnum";
     }
 
     .currency-label {
@@ -251,27 +245,21 @@
     }
 
     #cps {
-      font-family: 'Roboto', sans-serif; /* Deine gewünschte Schriftart */
       font-size: 1.1rem;
       color: #7f8c8d;
       margin-top: 10px;
       font-weight: 500;
       background: rgba(0, 0, 0, 0.4);
-      padding: 5px 0;
+      padding: 5px 20px;
       border-radius: 30px;
       border: 1px solid rgba(255, 255, 255, 0.05);
-
-      /* DER FIX FÜR DAS SCHWARZE KÄSTCHEN + ZAHLEN */
-      display: block;
-      width: 320px;         /* Feste Breite für den Kasten */
-      margin: 10px auto 0 auto; /* Zentriert den Kasten */
-      text-align: center;   /* Zentriert den Text im Kasten */
       
-      /* Zwingt Roboto dazu, Zahlen gleich breit zu machen */
+      /* NEU: Verhindert Wackeln der Zahlen im Kästchen */
       font-variant-numeric: tabular-nums;
-      -moz-font-feature-settings: "tnum";
-      -webkit-font-feature-settings: "tnum";
-      font-feature-settings: "tnum";
+      
+      /* NEU: Gibt dem Kästchen eine feste Mindestbreite, damit der Rand nicht zuckt */
+      display: inline-block;
+      min-width: 280px; 
     }
 
     #bigKlein {
