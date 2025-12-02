@@ -1239,6 +1239,18 @@
       box-shadow: 0 0 20px var(--rarity-legendary);
     }
 
+    .rarity-blackmarket {
+  border: 2px solid var(--rarity-blackmarket);
+  box-shadow: 0 0 25px var(--rarity-blackmarket);
+  animation: pulseRed 2s infinite; /* Optional: Roter Pulse Effekt */
+}
+
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 10px var(--rarity-blackmarket); }
+  50% { box-shadow: 0 0 30px var(--rarity-blackmarket); }
+  100% { box-shadow: 0 0 10px var(--rarity-blackmarket); }
+}
+
     .open-case-btn {
       background: linear-gradient(45deg, #f1c40f, #d35400);
       border: none;
