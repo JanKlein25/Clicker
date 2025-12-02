@@ -4231,7 +4231,7 @@ function getMinesMultiplier(minesCount, revealedCount) {
         // Wenn das Spiel läuft und Tile schon aufgedeckt ist
         if (minesState.revealed.includes(i)) {
           tile.classList.add('revealed-gem');
-          tile.innerHTML = '💎'; // Oder <img src="...">
+          tile.innerHTML = '💎'; 
         } 
         // Wenn Spiel vorbei ist und hier eine Mine war
         else if (!minesState.active && minesState.mines.includes(i)) {
@@ -4243,18 +4243,20 @@ function getMinesMultiplier(minesCount, revealedCount) {
         else {
           // Normales verdecktes Feld
           tile.onclick = () => clickMineTile(i);
-          if(!minesState.active && minesState.mines.length === 0) {
-             // Vorschau Modus (optional)
-          }
         }
         
         if(!minesState.active) tile.classList.add('disabled');
         grid.appendChild(tile);
       }
 
-      // Update Button Text & Next Multi
+      // Update Button Text & Multiplikatoren
       const btn = document.getElementById('btnMinesAction');
       const nextMultiDisplay = document.getElementById('mines-next-multi');
+      
+      // --- NEU: Aktueller Multiplikator Update ---
+      const currentMultiDisplay = document.getElementById('mines-current-multi');
+      currentMultiDisplay.textContent = minesState.currentMulti.toFixed(2) + "x";
+      // ------------------------------------------
 
       if (!minesState.active) {
         btn.textContent = "SPIELEN";
@@ -4265,6 +4267,10 @@ function getMinesMultiplier(minesCount, revealedCount) {
         let nextM = getMinesMultiplier(minesState.count, 0);
         nextMultiDisplay.textContent = nextM.toFixed(2) + "x";
         
+        // Reset Current auf 1.00x wenn Spiel vorbei ist
+        currentMultiDisplay.textContent = "1.00x";
+        currentMultiDisplay.style.color = "#3498db"; // Blau (Reset Farbe)
+
         document.getElementById('minesCountInput').disabled = false;
       } else {
         // Spiel läuft -> Cashout Button
@@ -4275,6 +4281,13 @@ function getMinesMultiplier(minesCount, revealedCount) {
         // Preview nächsten Multiplikator für NÄCHSTEN Klick
         let nextM = getMinesMultiplier(minesState.count, minesState.revealed.length);
         nextMultiDisplay.textContent = nextM.toFixed(2) + "x";
+        
+        // Farbe ändern wenn man Profit macht (>1.00x)
+        if(minesState.currentMulti > 1.0) {
+            currentMultiDisplay.style.color = "#2ecc71"; // Grün bei Gewinn
+        } else {
+            currentMultiDisplay.style.color = "#3498db"; // Blau bei Start
+        }
         
         document.getElementById('minesCountInput').disabled = true;
       }
