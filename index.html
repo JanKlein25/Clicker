@@ -3397,16 +3397,28 @@
 
     /* --- GAME STATE --- */
     let game = {
-      score: 0, totalScore: 0, clicks: 0, clickLevel: 1,
-      buildings: new Array(BUILDINGS.length).fill(0), upgrades: [],
-      casinoHistory: [],
-      playerName: "Spieler" + Math.floor(Math.random() * 1000),
-      prestige: 0,
-      cases: 0,
-      skinsOwned: ['default'],
-      equippedSkin: 'default',
-      lastLogin: Date.now() // HIER HINZUGEFÜGT
-    };
+  score: 0, 
+  totalScore: 0, 
+  clicks: 0, 
+  clickLevel: 1,
+  buildings: new Array(BUILDINGS.length).fill(0), 
+  upgrades: [],
+  casinoHistory: [],
+  playerName: "Spieler" + Math.floor(Math.random() * 1000),
+  prestige: 0,
+  cases: 0,
+  skinsOwned: ['default'],
+  equippedSkin: 'default',
+  lastLogin: Date.now(),
+  
+  // --- NEU: DIE BIERCHEN ---
+  beers: 0,            
+  lastDailyBonus: 0    
+};
+
+// URL zu deinem Bier-Bild (Ich nutze hier den Platzhalter, du musst die URL einfügen, wo du das Bild hochgeladen hast, oder lokal speichern)
+// TIPP: Lade das Bild auf GitHub oder Imgur hoch und kopiere den Link hier rein.
+const BEER_IMG_URL = "https://i.imgur.com/DeineBierURL.png"; // <-- HIER DEINE URL REINPACKEN!
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
     let clickHistory = [];
@@ -3532,6 +3544,8 @@
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000);
       scheduleGolden();
+
+      checkDailyBonus(); 
 
       // Preisanzeige für Money Case initialisieren
       document.getElementById('betAmount').addEventListener('input', updateMoneyCaseUI);
@@ -5554,17 +5568,31 @@ function formatNum(num, decimals = 0) {
       localStorage.setItem(SAVE_KEY, btoa(JSON.stringify(data)));
     }
     function loadGame() {
-      try {
-  const raw = localStorage.getItem(SAVE_KEY);
-  // Falls es noch ein alter (nicht verschlüsselter) Save ist, normal laden:
-  if (raw && raw.startsWith("{")) {
-     var saved = JSON.parse(raw);
-  } else {
-     // Ansonsten entschlüsseln
-     var saved = JSON.parse(atob(raw));
-  }
-} catch(e) { console.log("Save error"); 
-           }
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    var saved;
+    if (raw && raw.startsWith("{")) {
+       saved = JSON.parse(raw);
+    } else {
+       saved = JSON.parse(atob(raw));
+    }
+
+    if (saved) {
+      Object.keys(saved).forEach(key => {
+        game[key] = saved[key];
+      });
+      
+      // Sicherheits-Check für neue Währung
+      if (typeof game.beers === 'undefined') game.beers = 0;
+      if (typeof game.lastDailyBonus === 'undefined') game.lastDailyBonus = 0;
+      
+      if (game.buildings.length < BUILDINGS.length) {
+          const diff = BUILDINGS.length - game.buildings.length;
+          for (let i = 0; i < diff; i++) game.buildings.push(0);
+      }
+    }
+  } catch(e) { console.log("Save error or new game"); }
+}
     
       if (saved) {
         game.score = saved.score || 0;
@@ -5620,24 +5648,6 @@ function formatNum(num, decimals = 0) {
       document.getElementById('prestigeModal').style.display = 'none';
     }
 
-    function doPrestige() {
-      const potentialTotal = calculatePotentialPrestige();
-      if (potentialTotal <= game.prestige) return;
-
-      const gain = potentialTotal - game.prestige;
-
-      game.prestige = potentialTotal;
-      game.cases += gain;
-
-      game.score = 0;
-      game.clicks = 0;
-      game.clickLevel = 1;
-      game.buildings = new Array(BUILDINGS.length).fill(0);
-      game.upgrades = [];
-
-      saveGame();
-      location.reload();
-    }
 
     function checkPrestigeUnlock() {
       const potential = calculatePotentialPrestige();
@@ -6224,8 +6234,55 @@ initCrazyWheel();
   }
 }
   
+  /* --- BIERCHEN SYSTEM --- */
+
+function checkDailyBonus() {
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000; 
+  
+  if (now - game.lastDailyBonus > oneDay) {
+    const bonusAmount = 50; // Ein Kasten Bier pro Tag? ;)
+    game.beers += bonusAmount;
+    game.lastDailyBonus = now;
+    
+    // Schönes Alert mit Bier-Emoji
+    alert(`🍻 PROST! TÄGLICHER BONUS! 🍻\n\nDu hast einen frischen Kasten mit ${bonusAmount} Bierchen erhalten!\nVerzocke sie weise im Casino.`);
+    saveGame();
+    updateCasinoUI(); 
+  }
+}
+
+// Suche deine doPrestige Funktion und ändere den Gewinn-Teil:
+function doPrestige() {
+  const potentialTotal = calculatePotentialPrestige();
+  if (potentialTotal <= game.prestige) return;
+
+  const gain = potentialTotal - game.prestige;
+
+  // --- 10 Bierchen pro Level ---
+  const beersGained = gain * 10; 
+  
+  game.prestige = potentialTotal;
+  game.cases += gain;
+  game.beers += beersGained; // BIERCHEN DAZU
+
+  game.score = 0;
+  game.clicks = 0;
+  game.clickLevel = 1;
+  game.buildings = new Array(BUILDINGS.length).fill(0);
+  game.upgrades = [];
+
+  saveGame();
+  
+  alert(`ZEITREISE ERFOLGREICH! 🚀\n\nDu erhältst:\n+${gain} Prestige Level\n+${gain} Kisten\n+${beersGained} Bierchen 🍺`);
+  
+  location.reload();
+}
+  
   </script>
-<div id="ct-help-overlay" style="display:none;" onclick="toggleCtHelp()">
+
+  
+  <div id="ct-help-overlay" style="display:none;" onclick="toggleCtHelp()">
   <div class="ct-help-box" onclick="event.stopPropagation()">
     <div class="ct-help-header">
       <span>🤪 SPIELANLEITUNG</span>
