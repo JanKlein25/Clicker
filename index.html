@@ -2733,6 +2733,48 @@
   box-shadow: none;
 }
   
+  /* --- CASINO WÄHRUNG SWITCH --- */
+.currency-switch-container {
+  display: flex; 
+  gap: 10px; 
+  align-items: center;
+  background: rgba(0,0,0,0.3);
+  padding: 5px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  margin: 0 15px; /* Abstand */
+}
+
+.curr-btn {
+  background: transparent;
+  border: none;
+  color: #666;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Kleinis Aktiv */
+.curr-btn.active#btn-curr-kleinis {
+  background: #34495e;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+/* Bierchen Aktiv */
+.curr-btn.active#btn-curr-beers {
+  background: linear-gradient(to bottom, #f1c40f, #d35400);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(243, 156, 18, 0.6);
+  text-shadow: 0 1px 2px #000;
+}
+  
   </style>
 
 </head>
@@ -2850,10 +2892,27 @@
   <div id="casinoModal">
     <div class="casino-window" id="casinoWindow">
       <button class="close-btn" onclick="closeCasino()">×</button>
-      <div class="cw-header">
-        <div class="cw-title">🎰 CASINO PRO</div>
-        <div class="cw-balance"><span id="casino-balance">0</span> Kleinis</div>
-      </div>
+      <!-- NEUER HEADER START -->
+<div class="cw-header">
+  <div class="cw-title">🎰 CASINO PRO</div>
+  
+  <!-- DER NEUE SWITCH FÜR BIERCHEN -->
+  <div class="currency-switch-container">
+    <button id="btn-curr-kleinis" class="curr-btn active" onclick="setCasinoCurrency('kleinis')">
+      Kleinis
+    </button>
+    <button id="btn-curr-beers" class="curr-btn" onclick="setCasinoCurrency('beers')">
+      🍺 Bierchen
+    </button>
+  </div>
+
+  <div class="cw-balance">
+    <!-- Platzhalter für das Bier-Icon -->
+    <img id="balance-icon" src="" style="width:24px; vertical-align:middle; display:none; margin-right:5px;">
+    <span id="casino-balance">0</span> 
+  </div>
+</div>
+<!-- NEUER HEADER ENDE -->
       <div class="cw-body">
 
         <div class="casino-nav">
@@ -6277,6 +6336,82 @@ function doPrestige() {
   alert(`ZEITREISE ERFOLGREICH! 🚀\n\nDu erhältst:\n+${gain} Prestige Level\n+${gain} Kisten\n+${beersGained} Bierchen 🍺`);
   
   location.reload();
+}
+  
+  /* --- WÄHRUNGSLOGIK --- */
+let casinoCurrency = 'kleinis'; 
+
+function setCasinoCurrency(type) {
+  casinoCurrency = type;
+  
+  // Buttons stylen
+  document.getElementById('btn-curr-kleinis').className = type === 'kleinis' ? 'curr-btn active' : 'curr-btn';
+  document.getElementById('btn-curr-beers').className = type === 'beers' ? 'curr-btn active' : 'curr-btn';
+  
+  updateCasinoUI();
+}
+
+// Diese Funktion ÜBERSCHREIBT deine alte updateCasinoUI
+function updateCasinoUI() {
+  const balanceEl = document.getElementById('casino-balance');
+  const iconEl = document.getElementById('balance-icon');
+  
+  if (casinoCurrency === 'kleinis') {
+    balanceEl.textContent = formatNum(Math.floor(game.score));
+    balanceEl.style.color = "#fff";
+    if(iconEl) iconEl.style.display = 'none'; 
+  } else {
+    balanceEl.textContent = formatNum(Math.floor(game.beers));
+    balanceEl.style.color = "#f1c40f"; 
+    if(iconEl) {
+      iconEl.src = BEER_ICON_SRC; 
+      iconEl.style.display = 'inline-block';
+    }
+  }
+}
+
+// GANZ WICHTIG: BEZAHLEN
+function payBet(amount) {
+  if (casinoCurrency === 'kleinis') {
+    game.score -= amount;
+  } else {
+    game.beers -= amount;
+  }
+  updateCasinoUI();
+}
+
+// GEWINNEN (Überschreibt alte Logik teilweise)
+function triggerWin(amount) {
+  if (casinoCurrency === 'kleinis') {
+    addScore(amount);
+  } else {
+    game.beers += amount;
+  }
+  
+  spawnConfetti();
+  document.getElementById('casinoWindow').classList.add('win-pulse');
+  setTimeout(() => document.getElementById('casinoWindow').classList.remove('win-pulse'), 500);
+  updateCasinoUI();
+}
+
+// WETTEN PRÜFEN (Überschreibt alte getBet)
+function getBet() {
+  const betInput = document.getElementById('betAmount');
+  let bet = parseInt(betInput.value);
+  
+  if (isNaN(bet) || bet <= 0) { alert("Wie viel willst du setzen?"); return null; }
+  
+  if (casinoCurrency === 'kleinis') {
+    if (bet > game.score) { bet = Math.floor(game.score); betInput.value = bet; }
+  } else {
+    if (bet > game.beers) { bet = Math.floor(game.beers); betInput.value = bet; }
+  }
+  
+  if (bet <= 0) {
+      if(casinoCurrency === 'beers') alert("Keine Bierchen mehr! Warte auf den täglichen Bonus.");
+      return null;
+  }
+  return bet;
 }
   
   </script>
