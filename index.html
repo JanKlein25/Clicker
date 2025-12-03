@@ -3904,7 +3904,7 @@ const BEER_IMG_URL = "https://i.imgur.com/DeineBierURL.png"; // <-- HIER DEINE U
       if (!bet) return;
       if (isSpinning) return;
 
-      game.score -= bet;
+      payBet(bet);
       updateCasinoUI();
       
       disableButtons(true);
@@ -4039,7 +4039,7 @@ const BEER_IMG_URL = "https://i.imgur.com/DeineBierURL.png"; // <-- HIER DEINE U
       const bet = getBet();
       if (!bet) return;
 
-      game.score -= bet;
+      payBet(bet);
       updateCasinoUI();
       isSpinning = true;
       disableButtons(true);
@@ -4158,7 +4158,7 @@ const BEER_IMG_URL = "https://i.imgur.com/DeineBierURL.png"; // <-- HIER DEINE U
         return;
       }
 
-      game.score -= bet;
+      payBet(bet);
       updateCasinoUI();
       slotState.spinning = true;
       disableButtons(true);
@@ -4449,7 +4449,7 @@ const BEER_IMG_URL = "https://i.imgur.com/DeineBierURL.png"; // <-- HIER DEINE U
       if (isNaN(multi) || multi < 2) { alert("Multiplikator ungültig (Min: 2x)"); return; }
 
       // Geld abziehen
-      game.score -= bet;
+      payBet(bet);
       updateCasinoUI();
       
       // Globaler Status setzen
@@ -4854,7 +4854,7 @@ function crashAction() {
     if (!bet) return;
     
     crashState.bet = bet;
-    game.score -= bet;
+    payBet(bet);
     updateCasinoUI();
     disableButtons(true);
     btn.disabled = false;
@@ -5104,7 +5104,7 @@ function getMinesMultiplier(minesCount, revealedCount) {
         let count = parseInt(document.getElementById('minesCountInput').value);
         if(count < 1) count = 1; if(count > 24) count = 24;
         
-        game.score -= bet;
+        payBet(bet);
         updateCasinoUI();
         
         minesState.bet = bet;
@@ -5278,7 +5278,7 @@ function getMinesMultiplier(minesCount, revealedCount) {
       const bet = getBet();
       if(!bet) return;
       
-      game.score -= bet;
+      payBet(bet);
       updateCasinoUI();
       
       bjState.bet = bet;
@@ -5318,7 +5318,7 @@ function getMinesMultiplier(minesCount, revealedCount) {
       else if(action === 'double') {
         // Check if affordable
         if(game.score >= bjState.bet) {
-          game.score -= bjState.bet;
+          payBet(bjState.bet);
           bjState.bet *= 2;
           updateCasinoUI();
           
@@ -5948,7 +5948,7 @@ function ctBet(type) {
   if(!baseBet) return;
   
   if(game.score >= baseBet) {
-    game.score -= baseBet;
+    payBet(baseBet);
     ctState.bets[type] += baseBet;
     ctState.totalBet += baseBet;
     updateCasinoUI();
@@ -5959,7 +5959,7 @@ function ctBet(type) {
 function ctClearBets() {
   if(ctState.spinning) return;
   for(let key in ctState.bets) {
-    game.score += ctState.bets[key];
+    if(casinoCurrency === 'kleinis') game.score += ctState.bets[key]; else game.beers += ctState.bets[key];
     ctState.bets[key] = 0;
   }
   ctState.totalBet = 0;
