@@ -2547,27 +2547,32 @@
   
   /* CRAZY TIME HELP STYLES */
 #ct-help-overlay {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.85);
-  z-index: 200;
+  position: fixed; /* WICHTIG: Fixed statt absolute */
+  top: 0; 
+  left: 0; 
+  width: 100vw; /* Volle Bildschirmbreite */
+  height: 100vh; /* Volle Bildschirmhöhe */
+  background: rgba(0,0,0,0.92); /* Etwas dunklerer Hintergrund */
+  z-index: 99999; /* Muss höher sein als das Casino Modal (12000) */
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(8px);
 }
 
+/* Damit die Box auf kleinen Screens nicht zu riesig wird */
 .ct-help-box {
   background: #18181b;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90%;
+  width: 95%;
+  max-width: 550px; /* Etwas breiter */
+  max-height: 85vh; /* Damit man scrollen kann, wenn es zu hoch ist */
   border: 2px solid var(--gold);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+  box-shadow: 0 0 80px rgba(0,0,0,1);
+  animation: popIn 0.3s ease-out; /* Schöne Einblend-Animation */
 }
 
 .ct-help-header {
@@ -3056,92 +3061,6 @@
         <!-- CRAZY WHEEL VIEW -->
 <div id="view-crazy" style="display:none;">
 
-  <!-- CRAZY TIME HELP OVERLAY -->
-<div id="ct-help-overlay" style="display:none;" onclick="toggleCtHelp()">
-  <div class="ct-help-box" onclick="event.stopPropagation()">
-    <div class="ct-help-header">
-      <span>🤪 SPIELANLEITUNG</span>
-      <button class="close-btn" onclick="toggleCtHelp()" style="position:static; font-size:1.5rem;">×</button>
-    </div>
-    
-    <div class="ct-help-body">
-      <div class="ct-help-section">
-        <h3>🎰 Der Top Slot (Oben)</h3>
-        <p>Vor jeder Runde dreht sich der Slot über dem Rad. Wenn das Symbol links und der Multiplikator rechts matchen (eine Linie bilden), wird der Gewinn für dieses Symbol vervielfacht!</p>
-      </div>
-
-      <div class="ct-help-grid">
-        <!-- ZAHLEN -->
-        <div class="ct-help-item">
-          <div class="ct-help-icon" style="color:#2980b9">1️⃣</div>
-          <div class="ct-help-desc">
-            <strong>Die Eins</strong><br>
-            Häufigster Treffer.<br>
-            Zahlt <strong>1:1</strong>
-          </div>
-        </div>
-        <div class="ct-help-item">
-          <div class="ct-help-icon" style="color:#f1c40f">2️⃣</div>
-          <div class="ct-help-desc">
-            <strong>Die Zwei</strong><br>
-            Solider Gewinn.<br>
-            Zahlt <strong>2:1</strong>
-          </div>
-        </div>
-        <div class="ct-help-item">
-          <div class="ct-help-icon" style="color:#e91e63">5️⃣</div>
-          <div class="ct-help-desc">
-            <strong>Die Fünf</strong><br>
-            Gute Auszahlung.<br>
-            Zahlt <strong>5:1</strong>
-          </div>
-        </div>
-        <div class="ct-help-item">
-          <div class="ct-help-icon" style="color:#8e44ad">🔟</div>
-          <div class="ct-help-desc">
-            <strong>Die Zehn</strong><br>
-            Selten, aber stark.<br>
-            Zahlt <strong>10:1</strong>
-          </div>
-        </div>
-
-        <!-- BONI -->
-        <div class="ct-help-item bonus">
-          <div class="ct-help-icon">🪙</div>
-          <div class="ct-help-desc">
-            <strong>Coin Flip</strong><br>
-            Rot oder Blau wird geworfen.<br>
-            Gewinn: <strong>5x bis 50x</strong>
-          </div>
-        </div>
-        <div class="ct-help-item bonus">
-          <div class="ct-help-icon">🟣</div>
-          <div class="ct-help-desc">
-            <strong>Pachinko</strong><br>
-            Puck fällt durch die Wand.<br>
-            Gewinn: <strong>10x bis 200x</strong>
-          </div>
-        </div>
-        <div class="ct-help-item bonus">
-          <div class="ct-help-icon">🎯</div>
-          <div class="ct-help-desc">
-            <strong>Cash Hunt</strong><br>
-            Schießbude mit 108 Zielen.<br>
-            Gewinn: <strong>10x bis 100x</strong>
-          </div>
-        </div>
-        <div class="ct-help-item bonus" style="border-color:#e74c3c; background:rgba(231, 76, 60, 0.1);">
-          <div class="ct-help-icon">🤪</div>
-          <div class="ct-help-desc">
-            <strong style="color:#e74c3c">CRAZY TIME</strong><br>
-            Der Jackpot! Rote Tür.<br>
-            Gewinn: <strong>20x bis 500x+</strong>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
   <div class="crazy-container">
     
     <!-- Top Slot (Der Multiplikator vor dem Dreh) -->
@@ -6185,6 +6104,92 @@ initCrazyWheel();
 }
   
   </script>
+<div id="ct-help-overlay" style="display:none;" onclick="toggleCtHelp()">
+  <div class="ct-help-box" onclick="event.stopPropagation()">
+    <div class="ct-help-header">
+      <span>🤪 SPIELANLEITUNG</span>
+      <button class="close-btn" onclick="toggleCtHelp()" style="position:static; font-size:1.5rem;">×</button>
+    </div>
+    
+    <div class="ct-help-body">
+      <div class="ct-help-section">
+        <h3>🎰 Der Top Slot (Oben)</h3>
+        <p>Vor jeder Runde dreht sich der Slot über dem Rad. Wenn das Symbol links und der Multiplikator rechts matchen (eine Linie bilden), wird der Gewinn für dieses Symbol vervielfacht!</p>
+      </div>
+
+      <div class="ct-help-grid">
+        <!-- ZAHLEN -->
+        <div class="ct-help-item">
+          <div class="ct-help-icon" style="color:#2980b9">1️⃣</div>
+          <div class="ct-help-desc">
+            <strong>Die Eins</strong><br>
+            Häufigster Treffer.<br>
+            Zahlt <strong>1:1</strong>
+          </div>
+        </div>
+        <div class="ct-help-item">
+          <div class="ct-help-icon" style="color:#f1c40f">2️⃣</div>
+          <div class="ct-help-desc">
+            <strong>Die Zwei</strong><br>
+            Solider Gewinn.<br>
+            Zahlt <strong>2:1</strong>
+          </div>
+        </div>
+        <div class="ct-help-item">
+          <div class="ct-help-icon" style="color:#e91e63">5️⃣</div>
+          <div class="ct-help-desc">
+            <strong>Die Fünf</strong><br>
+            Gute Auszahlung.<br>
+            Zahlt <strong>5:1</strong>
+          </div>
+        </div>
+        <div class="ct-help-item">
+          <div class="ct-help-icon" style="color:#8e44ad">🔟</div>
+          <div class="ct-help-desc">
+            <strong>Die Zehn</strong><br>
+            Selten, aber stark.<br>
+            Zahlt <strong>10:1</strong>
+          </div>
+        </div>
+
+        <!-- BONI -->
+        <div class="ct-help-item bonus">
+          <div class="ct-help-icon">🪙</div>
+          <div class="ct-help-desc">
+            <strong>Coin Flip</strong><br>
+            Rot oder Blau wird geworfen.<br>
+            Gewinn: <strong>5x bis 50x</strong>
+          </div>
+        </div>
+        <div class="ct-help-item bonus">
+          <div class="ct-help-icon">🟣</div>
+          <div class="ct-help-desc">
+            <strong>Pachinko</strong><br>
+            Puck fällt durch die Wand.<br>
+            Gewinn: <strong>10x bis 200x</strong>
+          </div>
+        </div>
+        <div class="ct-help-item bonus">
+          <div class="ct-help-icon">🎯</div>
+          <div class="ct-help-desc">
+            <strong>Cash Hunt</strong><br>
+            Schießbude mit 108 Zielen.<br>
+            Gewinn: <strong>10x bis 100x</strong>
+          </div>
+        </div>
+        <div class="ct-help-item bonus" style="border-color:#e74c3c; background:rgba(231, 76, 60, 0.1);">
+          <div class="ct-help-icon">🤪</div>
+          <div class="ct-help-desc">
+            <strong style="color:#e74c3c">CRAZY TIME</strong><br>
+            Der Jackpot! Rote Tür.<br>
+            Gewinn: <strong>20x bis 500x+</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 </body>
 
