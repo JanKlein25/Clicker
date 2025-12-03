@@ -2545,6 +2545,82 @@
 .ct-res-win { font-size: 1.2rem; font-weight: bold; color: #2ecc71; margin-top: 5px; }
 .ct-res-loss { font-size: 1rem; color: #aaa; margin-top: 5px; }
   
+  /* CRAZY TIME HELP STYLES */
+#ct-help-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.ct-help-box {
+  background: #18181b;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90%;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+
+.ct-help-header {
+  padding: 15px;
+  background: linear-gradient(to right, #2c3e50, #000);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Merriweather', serif;
+  font-weight: 900;
+  color: var(--gold);
+  border-bottom: 1px solid #333;
+}
+
+.ct-help-body {
+  padding: 15px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.ct-help-section {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #333;
+  color: #ccc;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.ct-help-section h3 { color: #fff; margin-bottom: 5px; }
+
+.ct-help-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ct-help-item {
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+}
+
+.ct-help-item.bonus { border: 1px solid rgba(255,255,255,0.2); }
+
+.ct-help-icon { font-size: 1.8rem; width: 40px; text-align: center; }
+.ct-help-desc { font-size: 0.75rem; color: #aaa; }
+.ct-help-desc strong { color: #fff; display: block; font-size: 0.85rem; }
+  
   </style>
 
 </head>
@@ -2979,6 +3055,93 @@
 
         <!-- CRAZY WHEEL VIEW -->
 <div id="view-crazy" style="display:none;">
+
+  <!-- CRAZY TIME HELP OVERLAY -->
+<div id="ct-help-overlay" style="display:none;" onclick="toggleCtHelp()">
+  <div class="ct-help-box" onclick="event.stopPropagation()">
+    <div class="ct-help-header">
+      <span>🤪 SPIELANLEITUNG</span>
+      <button class="close-btn" onclick="toggleCtHelp()" style="position:static; font-size:1.5rem;">×</button>
+    </div>
+    
+    <div class="ct-help-body">
+      <div class="ct-help-section">
+        <h3>🎰 Der Top Slot (Oben)</h3>
+        <p>Vor jeder Runde dreht sich der Slot über dem Rad. Wenn das Symbol links und der Multiplikator rechts matchen (eine Linie bilden), wird der Gewinn für dieses Symbol vervielfacht!</p>
+      </div>
+
+      <div class="ct-help-grid">
+        <!-- ZAHLEN -->
+        <div class="ct-help-item">
+          <div class="ct-help-icon" style="color:#2980b9">1️⃣</div>
+          <div class="ct-help-desc">
+            <strong>Die Eins</strong><br>
+            Häufigster Treffer.<br>
+            Zahlt <strong>1:1</strong>
+          </div>
+        </div>
+        <div class="ct-help-item">
+          <div class="ct-help-icon" style="color:#f1c40f">2️⃣</div>
+          <div class="ct-help-desc">
+            <strong>Die Zwei</strong><br>
+            Solider Gewinn.<br>
+            Zahlt <strong>2:1</strong>
+          </div>
+        </div>
+        <div class="ct-help-item">
+          <div class="ct-help-icon" style="color:#e91e63">5️⃣</div>
+          <div class="ct-help-desc">
+            <strong>Die Fünf</strong><br>
+            Gute Auszahlung.<br>
+            Zahlt <strong>5:1</strong>
+          </div>
+        </div>
+        <div class="ct-help-item">
+          <div class="ct-help-icon" style="color:#8e44ad">🔟</div>
+          <div class="ct-help-desc">
+            <strong>Die Zehn</strong><br>
+            Selten, aber stark.<br>
+            Zahlt <strong>10:1</strong>
+          </div>
+        </div>
+
+        <!-- BONI -->
+        <div class="ct-help-item bonus">
+          <div class="ct-help-icon">🪙</div>
+          <div class="ct-help-desc">
+            <strong>Coin Flip</strong><br>
+            Rot oder Blau wird geworfen.<br>
+            Gewinn: <strong>5x bis 50x</strong>
+          </div>
+        </div>
+        <div class="ct-help-item bonus">
+          <div class="ct-help-icon">🟣</div>
+          <div class="ct-help-desc">
+            <strong>Pachinko</strong><br>
+            Puck fällt durch die Wand.<br>
+            Gewinn: <strong>10x bis 200x</strong>
+          </div>
+        </div>
+        <div class="ct-help-item bonus">
+          <div class="ct-help-icon">🎯</div>
+          <div class="ct-help-desc">
+            <strong>Cash Hunt</strong><br>
+            Schießbude mit 108 Zielen.<br>
+            Gewinn: <strong>10x bis 100x</strong>
+          </div>
+        </div>
+        <div class="ct-help-item bonus" style="border-color:#e74c3c; background:rgba(231, 76, 60, 0.1);">
+          <div class="ct-help-icon">🤪</div>
+          <div class="ct-help-desc">
+            <strong style="color:#e74c3c">CRAZY TIME</strong><br>
+            Der Jackpot! Rote Tür.<br>
+            Gewinn: <strong>20x bis 500x+</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
   <div class="crazy-container">
     
     <!-- Top Slot (Der Multiplikator vor dem Dreh) -->
@@ -3021,11 +3184,17 @@
   </div>
 
   <div class="action-row" style="margin-top:15px;">
-<button class="bet-btn" onclick="spinCrazyWheel()" id="btn-crazy-spin" style="width:100%; white-space:nowrap;">
-  DREHEN (Total: <span id="ct-total-bet">0</span>)
-</button>
-    <button class="control-btn" onclick="ctClearBets()" style="background:#444; width:auto; margin-left:10px;">🗑️</button>
-  </div>
+  <!-- ... dein Drehen Button ... -->
+  <button class="bet-btn" onclick="spinCrazyWheel()" id="btn-crazy-spin" style="width:100%; white-space:nowrap;">
+    DREHEN (Total: <span id="ct-total-bet">0</span>)
+  </button>
+  
+  <!-- NEU: HILFE BUTTON -->
+  <button class="control-btn" onclick="toggleCtHelp()" style="background:#2980b9; color:#fff; font-weight:bold; width:auto; margin-left:5px;">❓</button>
+  
+  <!-- ... dein Mülleimer Button ... -->
+  <button class="control-btn" onclick="ctClearBets()" style="background:#444; width:auto; margin-left:5px;">🗑️</button>
+</div>
 </div>
         
       </div>
@@ -6005,6 +6174,15 @@ function resetCtGame() {
 
 // Initialisieren beim Laden
 initCrazyWheel();
+  
+  function toggleCtHelp() {
+  const el = document.getElementById('ct-help-overlay');
+  if (el.style.display === 'none' || el.style.display === '') {
+    el.style.display = 'flex';
+  } else {
+    el.style.display = 'none';
+  }
+}
   
   </script>
 
