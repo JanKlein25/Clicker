@@ -5630,46 +5630,36 @@ function formatNum(num, decimals = 0) {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     var saved;
-    if (raw && raw.startsWith("{")) {
-       saved = JSON.parse(raw);
-    } else {
-       saved = JSON.parse(atob(raw));
+    
+    // Prüfen ob Daten da sind
+    if (raw) {
+        if (raw.startsWith("{")) {
+           saved = JSON.parse(raw);
+        } else {
+           saved = JSON.parse(atob(raw));
+        }
     }
 
     if (saved) {
+      // 1. Lädt AUTOMATISCH alle gespeicherten Werte (Score, Clicks, etc.)
       Object.keys(saved).forEach(key => {
         game[key] = saved[key];
       });
       
-      // Sicherheits-Check für neue Währung
+      // 2. Sicherheits-Check für neue Währung (falls es ein alter Spielstand ist)
       if (typeof game.beers === 'undefined') game.beers = 0;
       if (typeof game.lastDailyBonus === 'undefined') game.lastDailyBonus = 0;
       
+      // 3. Fix für Gebäude, falls du neue hinzugefügt hast
       if (game.buildings.length < BUILDINGS.length) {
           const diff = BUILDINGS.length - game.buildings.length;
           for (let i = 0; i < diff; i++) game.buildings.push(0);
       }
     }
-  } catch(e) { console.log("Save error or new game"); }
+  } catch(e) { 
+    console.log("Save error or new game", e); 
+  }
 }
-    
-      if (saved) {
-        game.score = saved.score || 0;
-        game.totalScore = saved.totalScore || 0;
-        game.clicks = saved.clicks || 0;
-        game.clickLevel = saved.clickLevel || 1;
-        if (saved.buildings) game.buildings = saved.buildings;
-        game.upgrades = saved.upgrades || [];
-        game.casinoHistory = saved.casinoHistory || [];
-        if (saved.playerName) game.playerName = saved.playerName;
-        game.prestige = saved.prestige || 0;
-        game.cases = saved.cases || 0;
-        game.skinsOwned = saved.skinsOwned || ['default'];
-        game.equippedSkin = saved.equippedSkin || 'default';
-        // HIER DIE ÄNDERUNG: ZEIT LADEN
-        game.lastLogin = saved.lastLogin || Date.now(); 
-      }
-    }
 
     /* --- PRESTIGE LOGIK --- */
     function calculatePotentialPrestige() {
