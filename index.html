@@ -5772,68 +5772,73 @@ function getCtIcon(type) {
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
 
-  // 1. Initialisierung
+  // 1. Initialisierung und Reset
   if (typeof ctState.rotation === 'undefined') {
     ctState.rotation = 0;
   }
 
-  // 2. Ziel berechnen
+  // "Nuklear-Reset" der Position (Verhindert den "Erster-Spin-Bug")
+  wheel.style.transition = 'none';
+  wheel.style.transform = `rotate(${ctState.rotation}deg)`;
+  void wheel.offsetWidth; // Browser zwingen, den Reset zu zeichnen
+
+  // 2. Ziel bestimmen
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
   const segCount = 54;
-  const degPerSeg = 360 / segCount;
+  const degPerSeg = 360 / segCount; // Ein Feld ist ca. 6.666 Grad breit
   
-  // Zielwinkel (Mitte des Segments)
-  const targetAngleInOneRotation = 360 - (segmentIndex * degPerSeg) - (degPerSeg / 2);
+  // 3. DIE NEUE MATHMATIK (Grenzen-Methode)
+  
+  // Wo beginnt das Feld auf dem Rad (0 bis 360)?
+  const fieldStart = segmentIndex * degPerSeg;
+  // Wo endet es?
+  const fieldEnd = (segmentIndex + 1) * degPerSeg;
+  
+  // Wir definieren einen SICHERHEITSABSTAND (Buffer) von den Rändern.
+  // Damit landen wir nie auf der Linie.
+  const buffer = 1.5; // 1.5 Grad Abstand zu jeder Seite
+  
+  // Wir wählen einen zufälligen Punkt ZWISCHEN den Puffern
+  // Min: Start + Buffer | Max: Ende - Buffer
+  const safeStart = fieldStart + buffer;
+  const safeEnd = fieldEnd - buffer;
+  
+  // Zufallswert innerhalb der sicheren Zone
+  const randomAngleInSegment = Math.random() * (safeEnd - safeStart) + safeStart;
+  
+  // 4. Rotation berechnen
+  // Da CSS im Uhrzeigersinn dreht, müssen wir 360 MINUS den Winkel rechnen,
+  // um den Punkt nach oben auf 12 Uhr zu holen.
+  const targetRotationSingle = 360 - randomAngleInSegment;
 
-  // Aktuelle Rotation
+  // Aktuelle Umdrehungen beibehalten und 5 neue hinzufügen
   let currentTotalRotation = ctState.rotation;
-  
-  // Mindestens 5 volle Runden draufrechnen
   let nextMinimumRotation = currentTotalRotation + (360 * 5);
   
+  // Modulo-Rechnung um den Anschluss zu finden
   const currentMod = nextMinimumRotation % 360;
-  let adjustment = targetAngleInOneRotation - currentMod;
+  let adjustment = targetRotationSingle - currentMod;
   
+  // Immer vorwärts drehen
   if (adjustment < 0) {
     adjustment += 360;
   }
   
+  // Finaler Wert
   let finalRotation = nextMinimumRotation + adjustment;
   
-  // --- ÄNDERUNG: Kalibrierung & Fein-Tuning ---
-  
-  // 1. Jitter (Zufall) sehr klein halten (+/- 1 Grad)
-  // Damit der Zeiger nicht aus Versehen auf die Linie rutscht
-  const maxWobble = 1.0; 
-  const jitter = (Math.random() * maxWobble * 2) - maxWobble;
-  finalRotation += jitter;
-
-  // 2. KALIBRIERUNG (+4 Grad)
-  // Das schiebt das Rad ein Stück weiter nach rechts (im Uhrzeigersinn).
-  // Dadurch wandert die "1" (die links von der 2 war) unter den Zeiger.
-  const CALIBRATION_OFFSET = 2; 
-  finalRotation += CALIBRATION_OFFSET;
-
-  // --- ANIMATION STARTEN ---
-
-  // Reset (Nuklear-Lösung)
-  wheel.style.transition = 'none';
-  wheel.style.transform = `rotate(${ctState.rotation}deg)`;
-  
-  void wheel.offsetWidth; // Force Reflow
-
-  // Neuen Wert setzen
+  // Speichern
   ctState.rotation = finalRotation;
 
-  // Start mit Verzögerung
+  // 5. Animation starten
   setTimeout(() => {
     wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
     wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   }, 50);
   
-  // Ergebnis auswerten
+  // 6. Ergebnis auswerten
   setTimeout(() => {
     evaluateCtResult(winningSegment);
   }, 5050);
