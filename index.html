@@ -3454,30 +3454,31 @@
       // ... further upgrades implied
     ];
 
-    /* --- GAME STATE --- */
+   /* --- GAME STATE --- */
     let game = {
-  score: 0, 
-  totalScore: 0, 
-  clicks: 0, 
-  clickLevel: 1,
-  buildings: new Array(BUILDINGS.length).fill(0), 
-  upgrades: [],
-  casinoHistory: [],
-  playerName: "Spieler" + Math.floor(Math.random() * 1000),
-  prestige: 0,
-  cases: 0,
-  skinsOwned: ['default'],
-  equippedSkin: 'default',
-  lastLogin: Date.now(),
-  
-  // --- NEU: DIE BIERCHEN ---
-  beers: 0,            
-  lastDailyBonus: 0    
-};
+      score: 0, 
+      totalScore: 0, 
+      clicks: 0, 
+      clickLevel: 1,
+      buildings: new Array(BUILDINGS.length).fill(0), 
+      upgrades: [],
+      casinoHistory: [],
+      playerName: "Spieler" + Math.floor(Math.random() * 1000),
+      prestige: 0,
+      cases: 0,
+      skinsOwned: ['default'],
+      equippedSkin: 'default',
+      lastLogin: Date.now(),
+      
+      // --- NEU: DIE BIERCHEN ---
+      beers: 0,            
+      lastDailyBonus: 0    
+    };
 
-// URL zu deinem Bier-Bild (Ich nutze hier den Platzhalter, du musst die URL einfügen, wo du das Bild hochgeladen hast, oder lokal speichern)
-// TIPP: Lade das Bild auf GitHub oder Imgur hoch und kopiere den Link hier rein.
-const BEER_ICON_SRC = "https://github.com/JanKlein25/Clicker/blob/main/Adobe%20Express%20-%20file%20(9).png?raw=true";
+    // HIER IST DER FIX: Variablen direkt am Anfang definieren!
+    let casinoCurrency = 'kleinis'; // Damit das Casino beim Start Bescheid weiß
+    const BEER_ICON_SRC = "https://github.com/JanKlein25/Clicker/blob/main/Adobe%20Express%20-%20file%20(9).png?raw=true"; // Korrekter Variablen-Name!
+    
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
     let clickHistory = [];
@@ -6269,6 +6270,7 @@ function resetCtGame() {
 
 // Initialisieren beim Laden
 initCrazyWheel();
+    init();
   
   function toggleCtHelp() {
   const el = document.getElementById('ct-help-overlay');
@@ -6323,9 +6325,6 @@ function doPrestige() {
   
   location.reload();
 }
-  
-  /* --- WÄHRUNGSLOGIK --- */
-let casinoCurrency = 'kleinis'; 
 
 function setCasinoCurrency(type) {
   casinoCurrency = type;
