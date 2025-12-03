@@ -5605,25 +5605,36 @@ function formatNum(num, decimals = 0) {
 
     /* --- SAVE --- */
     function saveGame() {
-      game.lastLogin = Date.now(); // HIER DIE ÄNDERUNG: ZULETZT GESPEICHERT JETZT
-      
-      const data = {
-        score: game.score,
-        totalScore: game.totalScore,
-        clicks: game.clicks,
-        clickLevel: game.clickLevel,
-        buildings: game.buildings,
-        upgrades: game.upgrades,
-        casinoHistory: game.casinoHistory,
-        playerName: game.playerName,
-        prestige: game.prestige || 0,
-        cases: game.cases,
-        skinsOwned: game.skinsOwned,
-        equippedSkin: game.equippedSkin,
-        lastLogin: game.lastLogin // HIER DIE ÄNDERUNG: MIT SPEICHERN
-      };
-      localStorage.setItem(SAVE_KEY, btoa(JSON.stringify(data)));
-    }
+  game.lastLogin = Date.now(); 
+  
+  // Sicherheitscheck vor dem Speichern
+  if (typeof game.beers === 'undefined') game.beers = 0;
+  if (typeof game.lastDailyBonus === 'undefined') game.lastDailyBonus = 0;
+
+  const data = {
+    score: game.score,
+    totalScore: game.totalScore,
+    clicks: game.clicks,
+    clickLevel: game.clickLevel,
+    buildings: game.buildings,
+    upgrades: game.upgrades,
+    casinoHistory: game.casinoHistory,
+    playerName: game.playerName,
+    prestige: game.prestige || 0,
+    cases: game.cases,
+    skinsOwned: game.skinsOwned,
+    equippedSkin: game.equippedSkin,
+    lastLogin: game.lastLogin,
+    
+    // WICHTIG: Diese beiden müssen explizit hier stehen!
+    beers: game.beers,
+    lastDailyBonus: game.lastDailyBonus
+  };
+  
+  // Speichern als Base64 String
+  localStorage.setItem(SAVE_KEY, btoa(JSON.stringify(data)));
+}
+    
     function loadGame() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
