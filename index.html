@@ -5009,6 +5009,26 @@ setTimeout(() => {
   updateTopPlayer(); // Einmal sofort nach Start (verzögert)
   setInterval(updateTopPlayer, 10000); // Dann alle 10 Sekunden aktualisieren
 }, 2000);
+  
+    // --- MINES PREVIEW LISTENER ---
+    // Aktualisiert den Multiplikator sofort bei Eingabe
+    const minesInput = document.getElementById('minesCountInput');
+    
+    if (minesInput) {
+      minesInput.addEventListener('input', function() {
+        let val = parseInt(this.value);
+        
+        // Begrenzung einhalten (1 bis 24)
+        if (isNaN(val) || val < 1) val = 1;
+        if (val > 24) val = 24;
+  
+        // Sofortige Berechnung des nächsten Multis (0 Felder aufgedeckt)
+        // Wir nutzen deine getMinesMultiplier Funktion
+        let nextM = getMinesMultiplier(val, 0);
+        
+        document.getElementById('mines-next-multi').textContent = nextM.toFixed(2) + "x";
+      });
+    }
   </script>
 
 </body>
