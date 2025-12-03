@@ -5741,12 +5741,12 @@ function getCtIcon(type) {
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
 
-  // 1. Aktuelle Rotation sicherstellen
+  // 1. Initialisierung sicherstellen
   if (typeof ctState.rotation === 'undefined') {
     ctState.rotation = 0;
   }
 
-  // 2. Ziel berechnen (Mathematik)
+  // 2. Ziel berechnen
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
@@ -5754,52 +5754,58 @@ function startWheelPhysics() {
   const degPerSeg = 360 / segCount;
   
   // Wo muss das Rad hin?
+  // Wir zielen genau auf die Mitte des Segments
   const targetAngleInOneRotation = 360 - (segmentIndex * degPerSeg) - (degPerSeg / 2);
 
-  // Aktueller Stand
+  // Aktuelle Gesamtrotation holen
   let currentTotalRotation = ctState.rotation;
   
-  // Mindestens 5 volle Runden (1800 Grad) draufrechnen
+  // Mindestens 5 volle Runden (1800 Grad) hinzufügen für den Effekt
   let nextMinimumRotation = currentTotalRotation + (360 * 5);
   
   const currentMod = nextMinimumRotation % 360;
   let adjustment = targetAngleInOneRotation - currentMod;
   
+  // Immer vorwärts drehen
   if (adjustment < 0) {
     adjustment += 360;
   }
   
   let finalRotation = nextMinimumRotation + adjustment;
   
-  // Jitter (Zufall) hinzufügen
-  const jitter = (Math.random() * degPerSeg * 0.8) - (degPerSeg * 0.4);
+  // --- ÄNDERUNG 1: Jitter reduziert ---
+  // Vorher 0.8 (80%), jetzt 0.5 (50%), damit er nicht am Rand kratzt
+  const jitter = (Math.random() * degPerSeg * 0.5) - (degPerSeg * 0.25);
   finalRotation += jitter;
 
-  // --- DER FIX: ZEITLICHE TRENNUNG ---
+  // --- ÄNDERUNG 2: Fein-Kalibrierung ---
+  // Falls das Rad optisch leicht daneben liegt (z.B. auf der 1 statt Cash Hunt),
+  // schieben wir es hier pauschal 2 Grad zurück.
+  finalRotation -= 2; 
 
-  // A. ZUERST: Animation ausschalten und Startposition festnageln
+  // --- ANIMATION STARTEN (Der "Nuklear-Fix" bleibt) ---
+
+  // A. Reset Position
   wheel.style.transition = 'none';
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
-  // Browser zwingen, das zu zeichnen
+  // Force Reflow
   void wheel.offsetWidth;
 
-  // B. DANACH: State updaten
+  // B. Neuen Wert speichern
   ctState.rotation = finalRotation;
 
-  // C. VERZÖGERTER START (50ms): Animation einschalten und drehen
-  // Dieser Timeout garantiert, dass der Browser den Startpunkt registriert hat.
+  // C. Start mit Verzögerung
   setTimeout(() => {
     wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
     wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   }, 50);
   
-  // D. Ergebnis auswerten (5000ms Animation + 50ms Verzögerung = 5050ms)
+  // D. Ergebnis
   setTimeout(() => {
     evaluateCtResult(winningSegment);
   }, 5050);
 }
-
 function evaluateCtResult(result) {
   let multiplier = 1;
   let isBonus = ['coin','pachinko','cash','crazy'].includes(result);
