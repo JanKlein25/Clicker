@@ -1855,18 +1855,22 @@
 
     /* BLACKJACK STYLES */
     .bj-table {
-      background: radial-gradient(circle, #27ae60 0%, #145a32 100%); /* Filz-Tisch Look */
-      border: 8px solid #3e2723; /* Holzrand */
-      border-radius: 50px;
-      padding: 20px;
-      margin-bottom: 20px;
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-      position: relative;
-    }
+  /* Neuer, tieferer Grünton für den Filz */
+  background: radial-gradient(circle at 50% 50%, #1e8449 0%, #115c2d 100%); 
+  /* Edlerer, dunklerer Holzrand mit leichtem Glanz */
+  border: 10px solid #5a3c2c; 
+  border-radius: 20px; /* Weniger runde Ecken, moderner */
+  padding: 30px; /* Mehr Innenabstand */
+  margin-bottom: 30px;
+  min-height: 350px; /* Etwas höher */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* Stärkerer Innenschatten für mehr Tiefe */
+  box-shadow: inset 0 0 80px rgba(0,0,0,0.7), 0 15px 30px rgba(0,0,0,0.4); 
+  position: relative;
+  transition: all 0.3s ease; /* Sanfte Übergänge für Animationen */
+}
 
     .bj-row {
       display: flex;
