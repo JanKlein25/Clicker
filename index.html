@@ -5772,7 +5772,7 @@ function getCtIcon(type) {
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
 
-  // 1. Initialisierung sicherstellen
+  // 1. Initialisierung
   if (typeof ctState.rotation === 'undefined') {
     ctState.rotation = 0;
   }
@@ -5782,60 +5782,58 @@ function startWheelPhysics() {
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
   const segCount = 54;
-  const degPerSeg = 360 / segCount; // ca. 6.66 Grad pro Feld
+  const degPerSeg = 360 / segCount;
   
-  // Wo muss das Rad hin? (Ziel ist 0 Grad oben)
+  // Zielwinkel (Mitte des Segments)
   const targetAngleInOneRotation = 360 - (segmentIndex * degPerSeg) - (degPerSeg / 2);
 
-  // Aktuelle Gesamtrotation holen
+  // Aktuelle Rotation
   let currentTotalRotation = ctState.rotation;
   
-  // Mindestens 5 volle Runden (1800 Grad) hinzufügen
+  // Mindestens 5 volle Runden draufrechnen
   let nextMinimumRotation = currentTotalRotation + (360 * 5);
   
   const currentMod = nextMinimumRotation % 360;
   let adjustment = targetAngleInOneRotation - currentMod;
   
-  // Immer vorwärts drehen
   if (adjustment < 0) {
     adjustment += 360;
   }
   
   let finalRotation = nextMinimumRotation + adjustment;
   
-  // --- ÄNDERUNG 1: "Sicherheits-Zone" (Jitter massiv reduziert) ---
-  // Wir erlauben nur noch Abweichungen von +/- 1 Grad (statt vorher 3-4 Grad).
-  // Das verhindert, dass er optisch ins Nachbarfeld rutscht.
-  const maxWobble = 1.0; // Grad
+  // --- ÄNDERUNG: Kalibrierung & Fein-Tuning ---
+  
+  // 1. Jitter (Zufall) sehr klein halten (+/- 1 Grad)
+  // Damit der Zeiger nicht aus Versehen auf die Linie rutscht
+  const maxWobble = 1.0; 
   const jitter = (Math.random() * maxWobble * 2) - maxWobble;
   finalRotation += jitter;
 
-  // --- ÄNDERUNG 2: Manuelle Kalibrierung ---
-  // Falls das Rad bei dir immer noch leicht versetzt ist, ändere diesen Wert.
-  // Positive Zahl = Dreht weiter nach rechts.
-  // Negative Zahl = Dreht zurück nach links.
-  const CALIBRATION_OFFSET = 0; 
+  // 2. KALIBRIERUNG (+4 Grad)
+  // Das schiebt das Rad ein Stück weiter nach rechts (im Uhrzeigersinn).
+  // Dadurch wandert die "1" (die links von der 2 war) unter den Zeiger.
+  const CALIBRATION_OFFSET = 4; 
   finalRotation += CALIBRATION_OFFSET;
 
-  // --- ANIMATION STARTEN (Der "Nuklear-Fix") ---
+  // --- ANIMATION STARTEN ---
 
-  // A. Reset Position (ohne Animation)
+  // Reset (Nuklear-Lösung)
   wheel.style.transition = 'none';
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
-  // Force Reflow
-  void wheel.offsetWidth;
+  void wheel.offsetWidth; // Force Reflow
 
-  // B. Neuen Wert speichern
+  // Neuen Wert setzen
   ctState.rotation = finalRotation;
 
-  // C. Start mit Verzögerung
+  // Start mit Verzögerung
   setTimeout(() => {
     wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
     wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   }, 50);
   
-  // D. Ergebnis
+  // Ergebnis auswerten
   setTimeout(() => {
     evaluateCtResult(winningSegment);
   }, 5050);
