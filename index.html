@@ -2162,35 +2162,119 @@
   text-shadow: 0 2px 0 #000;
 }
 
-/* DAS RAD */
+/* --- CRAZY WHEEL "REALISTIC" STYLES --- */
+
 .wheel-wrapper {
   position: relative;
-  width: 340px; /* Größer! */
-  height: 340px;
+  width: 360px; /* Schön groß */
+  height: 360px;
   margin: 0 auto;
-  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8));
-}
-
-.wheel-pointer {
-  position: absolute;
-  top: -25px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 3rem;
-  color: #f1c40f; /* Goldener Zeiger */
-  z-index: 10;
-  filter: drop-shadow(0 4px 0 #b38806);
+  /* Äußerer Metall-Ring mit Lichtern (simuliert durch Schatten) */
+  background: #222;
+  border-radius: 50%;
+  padding: 12px; /* Dicke des Rahmens */
+  box-shadow: 
+    0 0 0 2px #555,
+    inset 0 0 10px #000,
+    0 20px 50px rgba(0,0,0,0.8);
+  /* Metall-Effekt Verlauf für den Rahmen */
+  background: conic-gradient(
+    #444 0deg, #999 45deg, #444 90deg, #999 135deg, 
+    #444 180deg, #999 225deg, #444 270deg, #999 315deg, #444 360deg
+  );
 }
 
 .crazy-wheel {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  /* Edler Gold-Rahmen */
-  border: 12px solid #2c3e50;
-  outline: 4px solid #f1c40f;
-  box-shadow: inset 0 0 50px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #b8860b; /* Dunkles Gold innen */
   transition: transform 5s cubic-bezier(0.15, 0.85, 0.15, 1);
+  /* Das eigentliche Farbrad wird via JS als conic-gradient gesetzt */
+}
+
+/* Die Mitte (Nabe) */
+.crazy-wheel::after {
+  content: ''; /* Wir füllen den Text via HTML in der Mitte, daher hier leer */
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, #c0392b, #8e44ad);
+  border-radius: 50%;
+  border: 4px solid #ffd700; /* Goldener Rand */
+  box-shadow: 0 0 15px rgba(0,0,0,0.8);
+  z-index: 10;
+}
+
+/* Das Logo in der Mitte (steht fest im Rad und dreht sich mit) */
+.wheel-center-logo {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 11;
+  color: #ffd700;
+  font-family: 'Merriweather', serif;
+  font-weight: 900;
+  font-size: 0.8rem;
+  text-align: center;
+  line-height: 1.1;
+  text-shadow: 0 2px 0 #000;
+  pointer-events: none;
+}
+
+/* Trennlinien (Speichen) */
+.wheel-separator {
+  position: absolute;
+  top: 0; left: 50%;
+  width: 2px;
+  height: 50%; /* Geht bis zur Mitte */
+  background: linear-gradient(to bottom, #ffd700, #b8860b); /* Goldverlauf */
+  transform-origin: bottom center;
+  z-index: 5;
+}
+
+/* Die Texte auf den Segmenten */
+.wheel-text {
+  position: absolute;
+  top: 10px; /* Abstand vom Rand */
+  left: 50%;
+  transform-origin: bottom center;
+  /* Trickserei: Wir setzen die Höhe auf 50% des Rades minus Nabe */
+  height: 140px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 2px #000;
+  z-index: 6;
+  width: 20px;
+  margin-left: -10px; /* Zentrieren */
+  padding-top: 5px;
+}
+
+/* Spezielle Farben für Texte der Bonusrunden */
+.wt-coin { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
+.wt-cash { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
+.wt-pachinko { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
+.wt-crazy { color: #f1c40f; font-size: 0.6rem; text-transform: uppercase; text-shadow: 0 0 5px #f00; }
+
+.wheel-pointer {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3rem;
+  color: #e74c3c; /* Roter Zeiger wie im Original */
+  z-index: 20;
+  filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5));
+  /* Ein kleiner goldener Rand um den Zeiger */
+  -webkit-text-stroke: 1px #ffd700;
 }
 
 /* Der kleine Pin in der Mitte */
@@ -5520,19 +5604,70 @@ let ctState = {
   topSlot: { target: null, multi: 1 }
 };
 
-// Initialisiert das Rad (Zeichnet das Conic Gradient)
+// Farben angepasst an das echte Crazy Time Bild
+const CT_COLORS = {
+  '1': '#2980b9',      // Blau
+  '2': '#f1c40f',      // Gelb
+  '5': '#e91e63',      // Pink
+  '10': '#8e44ad',     // Lila
+  'coin': '#1c2833',   // Dunkelblau (Coinflip)
+  'pachinko': '#9b59b6', // Magenta
+  'cash': '#27ae60',   // Grün
+  'crazy': '#c0392b'   // Rot
+};
+
+// Initialisiert das Rad mit "echten" Segmenten
 function initCrazyWheel() {
   const wheel = document.getElementById('crazy-wheel');
+  wheel.innerHTML = ''; // Reset
+
+  // Logo in die Mitte setzen
+  const logo = document.createElement('div');
+  logo.className = 'wheel-center-logo';
+  logo.innerHTML = 'CRAZY<br>TIME';
+  wheel.appendChild(logo);
+
   let gradientStr = "";
-  const degPerSeg = 360 / 54;
+  const count = CT_SEGMENTS.length; // 54 Segmente
+  const degPerSeg = 360 / count;
   
   CT_SEGMENTS.forEach((seg, i) => {
+    // 1. Hintergrund-Farbe (Gradient Logik bleibt für Performance)
     const start = i * degPerSeg;
     const end = (i + 1) * degPerSeg;
     gradientStr += `${CT_COLORS[seg]} ${start}deg ${end}deg, `;
+
+    // 2. Goldene Speiche (Trennlinie)
+    const separator = document.createElement('div');
+    separator.className = 'wheel-separator';
+    // Drehe die Linie zum Start des Segments
+    separator.style.transform = `rotate(${start}deg)`; 
+    wheel.appendChild(separator);
+
+    // 3. Text/Zahl im Segment
+    const textEl = document.createElement('div');
+    textEl.className = 'wheel-text';
+    
+    // Icon oder Text bestimmen
+    let label = seg;
+    let specialClass = '';
+    
+    if(seg === 'coin') { label = 'COIN<br>FLIP'; specialClass = 'wt-coin'; }
+    else if(seg === 'pachinko') { label = 'PACH<br>INKO'; specialClass = 'wt-pachinko'; }
+    else if(seg === 'cash') { label = 'CASH<br>HUNT'; specialClass = 'wt-cash'; }
+    else if(seg === 'crazy') { label = 'CRAZY<br>TIME'; specialClass = 'wt-crazy'; }
+    
+    textEl.innerHTML = label;
+    if(specialClass) textEl.classList.add(specialClass);
+
+    // Positionieren: Wir drehen den Text in die MITTE des Segments
+    const midAngle = start + (degPerSeg / 2);
+    textEl.style.transform = `rotate(${midAngle}deg)`;
+    
+    wheel.appendChild(textEl);
   });
   
-  // Letztes Komma entfernen
+  // Hintergrund setzen
   gradientStr = "conic-gradient(" + gradientStr.slice(0, -2) + ")";
   wheel.style.background = gradientStr;
 }
