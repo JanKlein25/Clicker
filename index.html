@@ -2069,6 +2069,129 @@
     text-shadow: none;
 }
 
+/* CRAZY WHEEL STYLES */
+.crazy-container {
+  background: #1a0b2e; /* Dunkles Lila */
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #8e44ad;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* TOP SLOT */
+.crazy-top-slot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  background: #000;
+  padding: 10px;
+  border: 2px solid #f1c40f;
+  border-radius: 8px;
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.ct-slot-box {
+  width: 60px;
+  height: 60px;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border-radius: 4px;
+  color: #fff;
+}
+.ct-slot-x { color: #888; font-weight: bold; }
+
+/* WHEEL */
+.wheel-wrapper {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+}
+.crazy-wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 8px solid #444;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  transition: transform 5s cubic-bezier(0.1, 0.9, 0.2, 1);
+  /* Das Conic Gradient wird per JS generiert */
+}
+.wheel-pointer {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  color: #fff;
+  z-index: 10;
+  text-shadow: 0 2px 5px #000;
+}
+
+/* BETTING GRID */
+.ct-betting-grid {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ct-bet-group {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+.ct-bet-btn {
+  flex: 1;
+  padding: 15px 5px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9rem;
+  transition: transform 0.1s;
+}
+.ct-bet-btn:active { transform: scale(0.95); }
+.ct-bet-val { font-size: 0.75rem; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 10px; margin-top: 4px; }
+
+/* Button Colors */
+.btn-1 { background: #3498db; border-bottom: 4px solid #2980b9; }
+.btn-2 { background: #f1c40f; border-bottom: 4px solid #f39c12; color: #000; }
+.btn-5 { background: #e91e63; border-bottom: 4px solid #c2185b; }
+.btn-10 { background: #9b59b6; border-bottom: 4px solid #8e44ad; }
+
+.btn-coin { background: linear-gradient(to right, #2980b9 50%, #c0392b 50%); border-bottom: 4px solid #444; }
+.btn-pachinko { background: #e056fd; border-bottom: 4px solid #be2edd; }
+.btn-cash { background: #2ecc71; border-bottom: 4px solid #27ae60; }
+.btn-crazy { background: radial-gradient(circle, #e74c3c, #c0392b); border: 2px solid #f1c40f; border-bottom-width: 4px; }
+
+/* BONUS OVERLAY */
+.ct-bonus-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 20;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.ct-bonus-content { text-align: center; }
+#ct-bonus-title { font-size: 2rem; color: #f1c40f; text-transform: uppercase; margin-bottom: 20px; animation: pulse 1s infinite; }
+.active-slot-boost { border: 3px solid #f1c40f; box-shadow: 0 0 15px #f1c40f; transform: scale(1.05); }
+
     @media (max-width: 850px) {
       body {
         flex-direction: column;
@@ -2325,6 +2448,8 @@
           <button class="nav-btn" id="btn-tab-mines" onclick="switchCasinoTab('mines')">Mines 💣</button>
           <!-- NEU: BLACKJACK BUTTON -->
           <button class="nav-btn" id="btn-tab-blackjack" onclick="switchCasinoTab('blackjack')">Blackjack ♠️</button>
+          <!-- NEU: CRAZY WHEEL BUTTON -->
+          <button class="nav-btn" id="btn-tab-crazy" onclick="switchCasinoTab('crazy')">Crazy 🤪</button>
         </div>
 
         <div class="bet-row">
@@ -2621,6 +2746,57 @@
       <button class="control-btn" onclick="bjAction('stand')" style="background:#e74c3c; color:white; padding:15px; flex:1;">HALTEN (Stand)</button>
       <button class="control-btn" onclick="bjAction('double')" style="background:#f1c40f; color:black; padding:15px; flex:1;">DOPPELN (x2)</button>
     </div>
+  </div>
+</div>
+
+<!-- CRAZY WHEEL VIEW -->
+<div id="view-crazy" style="display:none;">
+  <div class="crazy-container">
+    
+    <!-- Top Slot (Der Multiplikator vor dem Dreh) -->
+    <div class="crazy-top-slot">
+      <div id="ct-slot-target" class="ct-slot-box">🎲</div>
+      <div class="ct-slot-x">X</div>
+      <div id="ct-slot-multi" class="ct-slot-box">???</div>
+    </div>
+
+    <!-- Das Rad -->
+    <div class="wheel-wrapper">
+      <div class="wheel-pointer">⬇</div>
+      <div id="crazy-wheel" class="crazy-wheel"></div>
+    </div>
+
+    <!-- Info Overlay für Bonus Games -->
+    <div id="ct-bonus-overlay" class="ct-bonus-overlay">
+      <div class="ct-bonus-content">
+        <h2 id="ct-bonus-title">BONUS!</h2>
+        <div id="ct-bonus-anim">...</div>
+        <div id="ct-bonus-result" style="font-size:2rem; margin-top:10px; color:#fff;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Betting Grid -->
+  <div class="ct-betting-grid">
+    <div class="ct-bet-group numbers">
+      <button class="ct-bet-btn btn-1" onclick="ctBet(1)">1 <span class="ct-bet-val" id="ct-bet-1">0</span></button>
+      <button class="ct-bet-btn btn-2" onclick="ctBet(2)">2 <span class="ct-bet-val" id="ct-bet-2">0</span></button>
+      <button class="ct-bet-btn btn-5" onclick="ctBet(5)">5 <span class="ct-bet-val" id="ct-bet-5">0</span></button>
+      <button class="ct-bet-btn btn-10" onclick="ctBet(10)">10 <span class="ct-bet-val" id="ct-bet-10">0</span></button>
+    </div>
+    <div class="ct-bet-group bonuses">
+      <button class="ct-bet-btn btn-coin" onclick="ctBet('coin')">🪙 Coin Flip <span class="ct-bet-val" id="ct-bet-coin">0</span></button>
+      <button class="ct-bet-btn btn-pachinko" onclick="ctBet('pachinko')">🟣 Pachinko <span class="ct-bet-val" id="ct-bet-pachinko">0</span></button>
+      <button class="ct-bet-btn btn-cash" onclick="ctBet('cash')">🎯 Cash Hunt <span class="ct-bet-val" id="ct-bet-cash">0</span></button>
+      <button class="ct-bet-btn btn-crazy" onclick="ctBet('crazy')">🤪 CRAZY <span class="ct-bet-val" id="ct-bet-crazy">0</span></button>
+    </div>
+  </div>
+
+  <div class="action-row" style="margin-top:15px;">
+    <button class="bet-btn" onclick="spinCrazyWheel()" id="btn-crazy-spin" style="background: linear-gradient(45deg, #8e44ad, #c0392b); width:100%;">
+      DREHEN (Total: <span id="ct-total-bet">0</span>)
+    </button>
+    <button class="control-btn" onclick="ctClearBets()" style="background:#444; width:auto; margin-left:10px;">🗑️</button>
   </div>
 </div>
 
@@ -2929,6 +3105,9 @@
       renderHistory();
       initVisuals();
       initProSlots(); // Init the new slots
+      // CRAZY WHEEL INIT
+      initCrazyWheel();
+      
       requestAnimationFrame(gameLoop);
       setInterval(slowLoop, 1000);
       scheduleGolden();
@@ -3148,7 +3327,8 @@
       document.getElementById('view-case-money').style.display = 'none';
       document.getElementById('view-crash').style.display = 'none'; 
       document.getElementById('view-mines').style.display = 'none'; 
-      document.getElementById('view-blackjack').style.display = 'none'; // <-- HINZUFÜGEN
+      document.getElementById('view-blackjack').style.display = 'none'; 
+      document.getElementById('view-crazy').style.display = 'none'; 
 
       // Alle Buttons zurücksetzen
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -3172,7 +3352,6 @@
         document.getElementById('btn-tab-moneycase').classList.add('active');
         updateMoneyCaseUI(); // Preis Text updaten
       }
-      // --- CRASH ---
       else if (mode === 'crash') {
         document.getElementById('view-crash').style.display = 'block';
         document.getElementById('btn-tab-crash').classList.add('active');
@@ -3182,16 +3361,18 @@
         c.height = c.parentElement.offsetHeight;
         drawCrashGraph(); // Leeren Graph zeichnen
       }
-      // --- MINES ---
       else if (mode === 'mines') {
         document.getElementById('view-mines').style.display = 'block';
         document.getElementById('btn-tab-mines').classList.add('active');
         updateMinesUI(); // Grid initialisieren
       }
-      // --- BLACKJACK ---
       else if (mode === 'blackjack') {
         document.getElementById('view-blackjack').style.display = 'block';
         document.getElementById('btn-tab-blackjack').classList.add('active');
+      }
+      else if (mode === 'crazy') {
+        document.getElementById('view-crazy').style.display = 'block';
+        document.getElementById('btn-tab-crazy').classList.add('active');
       }
     }
 
@@ -4594,7 +4775,10 @@ function getMinesMultiplier(minesCount, revealedCount) {
     }
 
     function startBlackjack() {
+      // --- NEU HINZUFÜGEN: Alte Nachricht verstecken ---
       document.getElementById('bj-message').classList.remove('show');
+      // -------------------------------------------------
+
       if(bjState.active) return;
       const bet = getBet();
       if(!bet) return;
@@ -4757,415 +4941,333 @@ function getMinesMultiplier(minesCount, revealedCount) {
       document.getElementById('btn-bj-start').style.display = 'block';
     }
 
-    /* --- INTERACTIONS --- */
-    const bigKlein = document.getElementById('bigKlein');
-    bigKlein.addEventListener('mousedown', (e) => handleInteraction(e.clientX, e.clientY));
-    bigKlein.addEventListener('touchstart', (e) => { e.preventDefault(); for (let i = 0; i < e.touches.length; i++) handleInteraction(e.touches[i].clientX, e.touches[i].clientY); });
-    function handleInteraction(x, y) {
-      // --- NEU: HIER BLOCKIEREN WIR ZU SCHNELLE KLICKS ---
-      clickCountSec++;
-      // Wenn mehr als 25 Klicks pro Sekunde -> Abbruch (Ignorieren)
-      if (clickCountSec > 25) return; 
-      // ---------------------------------------------------
+    /* --- CRAZY WHEEL LOGIC --- */
 
-      const power = getClickPower(); addScore(power); game.clicks++;
-      
-      // ... (hier geht der alte Code weiter: clickHistory.push, etc.)
-      clickHistory.push({ time: performance.now(), val: power });
+// Segmente definieren (Wie beim echten Spiel: 1 kommt oft vor, Crazy Time nur 1x)
+// 1 (21x), 2 (13x), 5 (7x), 10 (4x), Coin (4x), Pachinko (2x), Cash (2x), Crazy (1x) = 54 Total
+const CT_SEGMENTS = [
+  'crazy', '1', '2', '5', '1', '2', '1', 'cash', '1', '2', '5', '1', '2', 'coin', 
+  '1', '2', '1', 'pachinko', '1', '2', '5', '1', '2', 'coin', '1', '2', '1', 
+  'cash', '1', '2', '5', '1', '2', 'coin', '1', '2', '1', 'pachinko', '1', '2', 
+  '5', '1', '2', 'coin', '1', '2', '1', '10', '1', '2', '5', '1', '2', '10', '1'
+];
 
-      spawnFloatingText(x, y, `+${formatNum(power)} Kleini${power != 1 ? 's' : ''}`); spawnFallingFace(x, y);
+// Farben für die Grafik
+const CT_COLORS = {
+  '1': '#3498db', '2': '#f1c40f', '5': '#e91e63', '10': '#9b59b6',
+  'coin': '#34495e', 'pachinko': '#e056fd', 'cash': '#2ecc71', 'crazy': '#e74c3c'
+};
 
-      bigKlein.style.transform = "scale(0.94)"; setTimeout(() => bigKlein.style.transform = "scale(1)", 50);
-    }
-    function spawnFloatingText(x, y, text) {
-      const el = document.createElement('div'); el.className = 'click-text'; el.textContent = text;
-      el.style.left = (x - 20 + Math.random() * 40) + 'px'; el.style.top = y + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 800);
-    }
-    function spawnFallingFace(x, y) {
-      const currentSkin = SKINS.find(s => s.id === game.equippedSkin) || SKINS[0];
-      const img = document.createElement('img');
-      img.src = currentSkin.url;
-      img.className = 'falling-face';
-      img.style.filter = currentSkin.filter;
-      img.style.left = (x - 17) + 'px'; img.style.top = (y - 17) + 'px'; document.getElementById('clickPanel').appendChild(img); setTimeout(() => img.remove(), 1200);
-    }
+let ctState = {
+  bets: { '1':0, '2':0, '5':0, '10':0, 'coin':0, 'pachinko':0, 'cash':0, 'crazy':0 },
+  totalBet: 0,
+  spinning: false,
+  rotation: 0,
+  topSlot: { target: null, multi: 1 }
+};
 
-    // UPDATED FORMAT NUM (Handles up to Sextillions)
-    function formatNum(num, decimals = 0) {
-      if (num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
-
-      const units = [
-        { val: 1e36, suffix: " Sext" },
-        { val: 1e33, suffix: " Quintd" },
-        { val: 1e30, suffix: " Quint" },
-        { val: 1e27, suffix: " Quard" },
-        { val: 1e24, suffix: " Quad" },
-        { val: 1e21, suffix: " Trd" },
-        { val: 1e18, suffix: " Trio" },
-        { val: 1e15, suffix: " Brd" },
-        { val: 1e12, suffix: " Bio" },
-        { val: 1e9, suffix: " Mrd" },
-        { val: 1e6, suffix: " Mio" }
-      ];
-
-      for (const unit of units) {
-        if (num >= unit.val) {
-          return (num / unit.val).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + unit.suffix;
-        }
-      }
-      return num.toExponential(2);
-    }
-
-    /* --- SHOP --- */
-    function getBuildingCost(i) { return Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15, game.buildings[i])); }
-    function buyBuilding(i) {
-      const cost = getBuildingCost(i);
-      if (game.score >= cost) {
-        game.score -= cost;
-        game.buildings[i]++;
-        updateSingleBuildingUI(i);
-        renderUpgrades();
-        if (visualElements.length < MAX_VISUALS) spawnVisualIcon(BUILDINGS[i].icon);
-      }
-    }
-    function buildBuildingUI() {
-      const list = document.getElementById('buildingList'); list.innerHTML = '';
-      BUILDINGS.forEach((b, i) => {
-        const el = document.createElement('div'); el.className = 'building-row'; el.id = `build-row-${i}`; el.onclick = () => buyBuilding(i);
-        el.innerHTML = `<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-cps" id="b-cps-${i}">Prod: ...</div><div class="b-cost"><span id="cost-${i}">0 Kleinis</span> <span id="gain-${i}" style="color:#2ecc71; font-size:0.8rem; margin-left:6px; font-weight:normal;"></span></div></div><div class="b-count" id="count-${i}">0</div>`;
-        list.appendChild(el); updateSingleBuildingUI(i);
-      });
-    }
-    function updateSingleBuildingUI(i) {
-      document.getElementById(`count-${i}`).textContent = game.buildings[i];
-      document.getElementById(`cost-${i}`).textContent = formatNum(getBuildingCost(i)) + " Kleinis";
-
-      const realCps = getBuildingCPS(i);
-      document.getElementById(`b-cps-${i}`).textContent = `Prod: ${formatNum(realCps, 1)}/s`;
-      document.getElementById(`gain-${i}`).textContent = `(+${formatNum(realCps, 1)} CPS)`;
-    }
-    function updateBuildingStates() {
-      BUILDINGS.forEach((b, i) => {
-        const row = document.getElementById(`build-row-${i}`);
-        const costDiv = row.querySelector('.b-cost');
-
-        if (game.score >= getBuildingCost(i)) {
-          row.classList.add('can-afford');
-          costDiv.classList.add('affordable');
-        } else {
-          row.classList.remove('can-afford');
-          costDiv.classList.remove('affordable');
-        }
-      });
-    }
-
-    /* --- UPGRADES --- */
-    function buyUpgrade(uId) {
-      const u = UPGRADES.find(x => x.id === uId);
-      if (game.score >= u.cost) { game.score -= u.cost; game.upgrades.push(uId); renderUpgrades(); hideTooltip(); }
-    }
-    function showTooltip(u) {
-      ttName.textContent = u.name; ttPrice.textContent = formatNum(u.cost) + " Kleinis";
-      ttPrice.className = game.score >= u.cost ? 'tt-price affordable' : 'tt-price expensive';
-      ttEffect.textContent = "Effekt: " + u.text; ttDesc.textContent = u.desc;
-      let statsHTML = '';
-      if (u.type === 'build') {
-        const bIdx = u.target; const count = game.buildings[bIdx];
-        const currentMulti = getBuildingMultiplier(bIdx);
-        const base = BUILDINGS[bIdx].baseCps;
-        const currentSingleCPS = base * currentMulti;
-        const newSingleCPS = currentSingleCPS * u.multi;
-        const totalGain = (newSingleCPS - currentSingleCPS) * count;
-        statsHTML = `<div class="stat-line"><span>Einzeln:</span><span>${formatNum(currentSingleCPS, 1)} ➜ <span style="color:#2ecc71">${formatNum(newSingleCPS, 1)}</span></span></div><div class="stat-highlight">+${formatNum(totalGain, 1)} CPS Gesamt</div>`;
-      } else { statsHTML = `<div class="stat-highlight">Klickstärke wird verdoppelt!</div>`; }
-      ttStats.innerHTML = statsHTML; tooltipEl.style.display = 'block';
-    }
-    function hideTooltip() { tooltipEl.style.display = 'none'; }
-    function renderUpgrades() {
-      const container = document.getElementById('upgradeGrid'); container.innerHTML = '';
-      const available = UPGRADES.filter(u => {
-        if (game.upgrades.includes(u.id)) return false;
-        if (u.trigger.type === 'clicks' && game.clicks >= u.trigger.val) return true;
-        if (u.trigger.type === 'build' && game.buildings[u.trigger.id] >= u.trigger.val) return true;
-        return false;
-      });
-      available.forEach(u => {
-        const div = document.createElement('div'); div.className = 'upgrade-crate'; div.innerHTML = u.icon;
-        div.onmouseenter = () => showTooltip(u); div.onmouseleave = () => hideTooltip();
-        if (game.score >= u.cost) { div.onclick = () => buyUpgrade(u.id); }
-        else { div.style.opacity = 0.5; div.style.filter = "grayscale(1)"; }
-        container.appendChild(div);
-      });
-    }
-
-    /* --- GOLDEN --- */
-    function updateBuffs(dt) { if (buffs.frenzy.active) { buffs.frenzy.time -= dt; if (buffs.frenzy.time <= 0) { buffs.frenzy.active = false; renderBuffs(); } } }
-    function renderBuffs() { document.getElementById('buffArea').innerHTML = buffs.frenzy.active ? `<div class="buff-icon">🔥</div>` : ''; }
-    function scheduleGolden() { const delay = (Math.random() * 600000) + 600000; setTimeout(spawnGolden, delay); }
-    function spawnGolden() {
-      const g = document.getElementById('goldenKlein');
-      const maxX = document.getElementById('clickPanel').offsetWidth - 80; const maxY = document.getElementById('clickPanel').offsetHeight - 80;
-      g.style.left = Math.random() * maxX + 'px'; g.style.top = Math.random() * maxY + 'px'; g.style.display = 'block';
-      setTimeout(() => { if (g.style.display === 'block') { g.style.display = 'none'; scheduleGolden(); } }, 10000);
-    }
-    document.getElementById('goldenKlein').onmousedown = function (e) {
-      e.stopPropagation(); this.style.display = 'none'; buffs.frenzy.active = true; buffs.frenzy.time = 30; renderBuffs();
-      spawnFloatingText(parseInt(this.style.left), parseInt(this.style.top), "FRENZY! (x7 CPS)"); scheduleGolden();
-    };
-
-    /* --- SAVE --- */
-    function saveGame() {
-      game.lastLogin = Date.now(); // HIER DIE ÄNDERUNG: ZULETZT GESPEICHERT JETZT
-      
-      const data = {
-        score: game.score,
-        totalScore: game.totalScore,
-        clicks: game.clicks,
-        clickLevel: game.clickLevel,
-        buildings: game.buildings,
-        upgrades: game.upgrades,
-        casinoHistory: game.casinoHistory,
-        playerName: game.playerName,
-        prestige: game.prestige || 0,
-        cases: game.cases,
-        skinsOwned: game.skinsOwned,
-        equippedSkin: game.equippedSkin,
-        lastLogin: game.lastLogin // HIER DIE ÄNDERUNG: MIT SPEICHERN
-      };
-      localStorage.setItem(SAVE_KEY, btoa(JSON.stringify(data)));
-    }
-    function loadGame() {
-      try {
-  const raw = localStorage.getItem(SAVE_KEY);
-  // Falls es noch ein alter (nicht verschlüsselter) Save ist, normal laden:
-  if (raw && raw.startsWith("{")) {
-     var saved = JSON.parse(raw);
-  } else {
-     // Ansonsten entschlüsseln
-     var saved = JSON.parse(atob(raw));
-  }
-} catch(e) { console.log("Save error"); 
-           }
-    
-      if (saved) {
-        game.score = saved.score || 0;
-        game.totalScore = saved.totalScore || 0;
-        game.clicks = saved.clicks || 0;
-        game.clickLevel = saved.clickLevel || 1;
-        if (saved.buildings) game.buildings = saved.buildings;
-        game.upgrades = saved.upgrades || [];
-        game.casinoHistory = saved.casinoHistory || [];
-        if (saved.playerName) game.playerName = saved.playerName;
-        game.prestige = saved.prestige || 0;
-        game.cases = saved.cases || 0;
-        game.skinsOwned = saved.skinsOwned || ['default'];
-        game.equippedSkin = saved.equippedSkin || 'default';
-        // HIER DIE ÄNDERUNG: ZEIT LADEN
-        game.lastLogin = saved.lastLogin || Date.now(); 
-      }
-    }
-
-    /* --- PRESTIGE LOGIK --- */
-    function calculatePotentialPrestige() {
-      if (game.totalScore < 100000000) return 0;
-      return Math.floor(Math.pow(game.totalScore / 100000000, 0.25));
-    }
-
-    function openPrestige() {
-      const current = game.prestige;
-      const potentialTotal = calculatePotentialPrestige();
-      const gain = potentialTotal - current;
-
-      if (gain <= 0 && current === 0) return;
-
-      document.getElementById('modal-current-prestige').textContent = formatNum(current);
-      document.getElementById('modal-new-prestige').textContent = formatNum(potentialTotal);
-      document.getElementById('modal-gain-prestige').textContent = formatNum(gain);
-      document.getElementById('modal-gain-cases').textContent = formatNum(gain);
-
-      const btn = document.getElementById('confirmPrestigeBtn');
-      if (gain > 0) {
-        btn.disabled = false;
-        btn.innerHTML = `RESET & +${formatNum(gain)} LEVEL`;
-        btn.style.opacity = "1";
-      } else {
-        btn.disabled = true;
-        btn.innerHTML = "Du brauchst mehr Score!";
-        btn.style.opacity = "0.5";
-      }
-
-      document.getElementById('prestigeModal').style.display = 'flex';
-    }
-
-    function closePrestige() {
-      document.getElementById('prestigeModal').style.display = 'none';
-    }
-
-    function doPrestige() {
-      const potentialTotal = calculatePotentialPrestige();
-      if (potentialTotal <= game.prestige) return;
-
-      const gain = potentialTotal - game.prestige;
-
-      game.prestige = potentialTotal;
-      game.cases += gain;
-
-      game.score = 0;
-      game.clicks = 0;
-      game.clickLevel = 1;
-      game.buildings = new Array(BUILDINGS.length).fill(0);
-      game.upgrades = [];
-
-      saveGame();
-      location.reload();
-    }
-
-    function checkPrestigeUnlock() {
-      const potential = calculatePotentialPrestige();
-      const gain = potential - game.prestige;
-      const btn = document.getElementById('prestigeBtn');
-
-      if (gain > 0) {
-        btn.style.display = 'block';
-        btn.classList.add('win-pulse');
-        btn.innerHTML = `🚀 AUFSTEIGEN (+${gain} Level)`;
-      } else {
-        btn.style.display = 'none';
-      }
-
-      const badge = document.getElementById('prestige-badge');
-      if (game.prestige > 0 || game.totalScore > 10000) {
-        badge.style.display = 'block';
-        const currentProgressRank = Math.max(game.prestige, potential);
-        const nextTargetRank = currentProgressRank + 1;
-
-        const scoreNeededForNext = Math.pow(nextTargetRank, 4) * 100000000;
-        const scoreForCurrent = Math.pow(currentProgressRank, 4) * 100000000;
-
-        const remaining = scoreNeededForNext - game.totalScore;
-        const totalDistance = scoreNeededForNext - scoreForCurrent;
-        const coveredDistance = game.totalScore - scoreForCurrent;
-        let percent = (coveredDistance / totalDistance) * 100;
-        if (percent < 0) percent = 0;
-        if (percent > 100) percent = 100;
-
-        document.getElementById('prestige-level-display').textContent = formatNum(game.prestige);
-        document.getElementById('prestige-bonus-display').textContent = formatNum(game.prestige * 5);
-        document.getElementById('prestige-progress-bar').style.width = percent + "%";
-
-        if (remaining > 0) {
-          document.getElementById('prestige-next-req').textContent = formatNum(remaining) + " Kleinis";
-        } else {
-          document.getElementById('prestige-next-req').textContent = "Bereit zum Aufstieg!";
-        }
-      }
-    }
-
-    /* --- LEADERBOARD LOGIC --- */
-    function openLeaderboard() {
-      document.getElementById('leaderboardModal').style.display = 'flex';
-      fetchLeaderboard();
-    }
-
-    function closeLeaderboard() {
-      document.getElementById('leaderboardModal').style.display = 'none';
-    }
-
-    function fetchLeaderboard() {
-      const list = document.getElementById('lb-list');
-      if (!dbRef) {
-        list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Firebase nicht konfiguriert!<br><span style="font-size:0.8rem; color:#aaa;">Öffne index.html und füge deine Keys ein.</span></div>';
-        return;
-      }
-
-      list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Lade...</div>';
-
-      dbRef.orderByChild('prestige').limitToLast(20).once('value').then(snapshot => {
-        const scores = [];
-        snapshot.forEach(child => {
-          scores.push(child.val());
-        });
-        renderLeaderboard(scores.reverse());
-      }).catch(err => {
-        list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Fehler beim Laden :(</div>';
-      });
-    }
-
-    function renderLeaderboard(scores) {
-      const list = document.getElementById('lb-list');
-      list.innerHTML = '';
-
-      if (scores.length === 0) {
-        list.innerHTML = '<div style="text-align:center; padding:20px;">Noch keine Spieler. Sei der Erste!</div>';
-        return;
-      }
-
-      scores.forEach((s, index) => {
-        const rank = index + 1;
-        let rankClass = 'lb-rank';
-        if (rank === 1) rankClass += ' top-1';
-        if (rank === 2) rankClass += ' top-2';
-        if (rank === 3) rankClass += ' top-3';
-
-        const el = document.createElement('div');
-        el.className = 'lb-entry';
-        el.innerHTML = `
-          <div class="${rankClass}">#${rank}</div>
-          <div class="lb-name">${s.name}</div>
-          <div class="lb-score">Lvl ${formatNum(s.prestige || 0)}</div>
-        `;
-        list.appendChild(el);
-      });
-    }
-    init();
-  /* --- TOP PLAYER DISPLAY LOGIC --- */
-function updateTopPlayer() {
-  if (!dbRef) return;
-
-  // Wir holen uns den EINEN höchsten Eintrag (sortiert nach Prestige)
-  dbRef.orderByChild('prestige').limitToLast(1).once('value')
-    .then(snapshot => {
-      const val = snapshot.val();
-      if (val) {
-        // Firebase gibt ein Objekt zurück { "SpielerName": {score: ...} }
-        const keys = Object.keys(val);
-        const topKey = keys[0];
-        const topData = val[topKey];
-        
-        const el = document.getElementById('top-player-display');
-        
-        // Text setzen: Name + Prestige Level
-        el.innerHTML = `👑 Platz 1: ${topData.name} <span style="font-size:0.8em; color:#ccc;">(Lvl ${topData.prestige})</span>`;
-      }
-    })
-    .catch(err => console.log("Top Player fetch error", err));
+// Initialisiert das Rad (Zeichnet das Conic Gradient)
+function initCrazyWheel() {
+  const wheel = document.getElementById('crazy-wheel');
+  let gradientStr = "";
+  const degPerSeg = 360 / 54;
+  
+  CT_SEGMENTS.forEach((seg, i) => {
+    const start = i * degPerSeg;
+    const end = (i + 1) * degPerSeg;
+    gradientStr += `${CT_COLORS[seg]} ${start}deg ${end}deg, `;
+  });
+  
+  // Letztes Komma entfernen
+  gradientStr = "conic-gradient(" + gradientStr.slice(0, -2) + ")";
+  wheel.style.background = gradientStr;
 }
 
-// Startet die Abfrage
-setTimeout(() => {
-  updateTopPlayer(); // Einmal sofort nach Start (verzögert)
-  setInterval(updateTopPlayer, 10000); // Dann alle 10 Sekunden aktualisieren
-}, 2000);
+// Wett-Funktion
+function ctBet(type) {
+  if(ctState.spinning) return;
+  const baseBet = getBet(); // Deine existierende Funktion
+  if(!baseBet) return;
   
-    // --- MINES PREVIEW LISTENER ---
-    // Aktualisiert den Multiplikator sofort bei Eingabe
-    const minesInput = document.getElementById('minesCountInput');
+  if(game.score >= baseBet) {
+    game.score -= baseBet;
+    ctState.bets[type] += baseBet;
+    ctState.totalBet += baseBet;
+    updateCasinoUI();
+    updateCtUI();
+  }
+}
+
+function ctClearBets() {
+  if(ctState.spinning) return;
+  // Geld zurückgeben (optional, hier einfach reset für neue Wetten)
+  // Einfacher: Nur Anzeige nullen, Geld ist weg? Nein, besser:
+  // Wir erlauben Löschen nicht, oder wir erstatten. Hier: Reset vor Spin.
+  // Da game.score schon abgezogen wurde, müsste man es gutschreiben.
+  // Einfache Lösung: Löschen setzt nur neue Wetten auf 0, Geld ist "gesetzt".
+  // BESSER: Wir erlauben Löschen nur wenn wir das Geld zurückbuchen.
+  
+  for(let key in ctState.bets) {
+    game.score += ctState.bets[key];
+    ctState.bets[key] = 0;
+  }
+  ctState.totalBet = 0;
+  updateCasinoUI();
+  updateCtUI();
+}
+
+function updateCtUI() {
+  for(let key in ctState.bets) {
+    document.getElementById(`ct-bet-${key}`).textContent = formatNum(ctState.bets[key]);
+  }
+  document.getElementById('ct-total-bet').textContent = formatNum(ctState.totalBet);
+}
+
+function spinCrazyWheel() {
+  if(ctState.spinning || ctState.totalBet === 0) {
+    if(ctState.totalBet === 0) alert("Bitte erst wetten!");
+    return;
+  }
+
+  ctState.spinning = true;
+  disableButtons(true);
+  
+  // 1. TOP SLOT DREHEN
+  runTopSlot().then(() => {
+    // 2. RAD DREHEN NACHDEM SLOT FERTIG IST
+    setTimeout(startWheelPhysics, 500);
+  });
+}
+
+function runTopSlot() {
+  return new Promise(resolve => {
+    const slotTarget = document.getElementById('ct-slot-target');
+    const slotMulti = document.getElementById('ct-slot-multi');
     
-    if (minesInput) {
-      minesInput.addEventListener('input', function() {
-        let val = parseInt(this.value);
+    // Animation
+    let spins = 0;
+    let interval = setInterval(() => {
+      const types = ['1','2','5','10','coin','pachinko','cash','crazy'];
+      const rndType = types[Math.floor(Math.random() * types.length)];
+      const rndMulti = [2, 3, 4, 5, 10, 20, 50][Math.floor(Math.random() * 7)];
+      
+      slotTarget.textContent = getCtIcon(rndType);
+      slotMulti.textContent = rndMulti + "x";
+      spins++;
+      
+      if(spins > 20) {
+        clearInterval(interval);
+        // Final Result Top Slot
+        const finalType = types[Math.floor(Math.random() * types.length)];
+        // Chance auf Multiplikator ist nicht 100% im echten Spiel, aber hier machen wir es immer für Spaß
+        const finalMulti = [2, 3, 4, 5, 10, 15, 20, 25, 50][Math.floor(Math.random() * 9)];
         
-        // Begrenzung einhalten (1 bis 24)
-        if (isNaN(val) || val < 1) val = 1;
-        if (val > 24) val = 24;
+        ctState.topSlot = { target: finalType, multi: finalMulti };
+        
+        slotTarget.textContent = getCtIcon(finalType);
+        slotMulti.textContent = finalMulti + "x";
+        
+        // Highlight Betting Button if matches
+        document.querySelector(`.btn-${finalType}`).classList.add('active-slot-boost');
+        
+        resolve();
+      }
+    }, 100);
+  });
+}
+
+function getCtIcon(type) {
+  if(type === 'coin') return '🪙';
+  if(type === 'pachinko') return '🟣';
+  if(type === 'cash') return '🎯';
+  if(type === 'crazy') return '🤪';
+  return type;
+}
+
+function startWheelPhysics() {
+  const wheel = document.getElementById('crazy-wheel');
   
-        // Sofortige Berechnung des nächsten Multis (0 Felder aufgedeckt)
-        // Wir nutzen deine getMinesMultiplier Funktion
-        let nextM = getMinesMultiplier(val, 0);
-        
-        document.getElementById('mines-next-multi').textContent = nextM.toFixed(2) + "x";
-      });
+  // Ergebnis ermitteln (Zufall)
+  const segmentIndex = Math.floor(Math.random() * 54);
+  const winningSegment = CT_SEGMENTS[segmentIndex];
+  
+  // Berechnung der Rotation
+  // Ein Segment ist 6.66 Grad. 
+  // Wir müssen so drehen, dass das Segment OBEN (bei 0 Grad - Pointer) landet.
+  // Das CSS dreht im Uhrzeigersinn. 
+  // Um Segment X nach oben zu kriegen, müssen wir -(Index * Grad) drehen.
+  
+  const degPerSeg = 360 / 54;
+  // Offset damit es mittig im Segment landet (+ halbes Segment)
+  const targetRotation = (360 * 5) + (360 - (segmentIndex * degPerSeg)) - (degPerSeg / 2);
+  
+  // Add randomness within the segment
+  const jitter = (Math.random() * degPerSeg) - (degPerSeg/2);
+  
+  ctState.rotation += targetRotation + jitter;
+  
+  wheel.style.transform = `rotate(${ctState.rotation}deg)`;
+  
+  setTimeout(() => {
+    evaluateCtResult(winningSegment);
+  }, 5000);
+}
+
+function evaluateCtResult(result) {
+  // Check Top Slot Match
+  let multiplier = 1;
+  let isBonus = ['coin','pachinko','cash','crazy'].includes(result);
+  let slotMatch = (ctState.topSlot.target === result);
+  
+  if(slotMatch) multiplier = ctState.topSlot.multi;
+  
+  const playerBet = ctState.bets[result];
+  let totalWin = 0;
+  
+  if(playerBet > 0) {
+    if(!isBonus) {
+      // NUMBER WIN (1, 2, 5, 10)
+      // Payout = Bet + (Bet * Number * Multiplier)
+      // Normalerweise Bet * Odds. Bei 1 ist es 1:1.
+      const numVal = parseInt(result);
+      // Top Slot bei Zahlen: Multipliziert den Gewinn
+      const odds = numVal * multiplier;
+      
+      totalWin = playerBet + (playerBet * odds);
+      triggerWin(totalWin);
+      
+      // Kleines Popup
+      const msg = document.getElementById('bj-message'); // Wir nutzen das existierende Schild
+      msg.textContent = `${result} GEWONNEN!`;
+      msg.innerHTML += `<div style="font-size:0.6em; margin-top:5px;">+${formatNum(totalWin)}</div>`;
+      msg.classList.add('show');
+      setTimeout(()=>msg.classList.remove('show'), 2000);
+      
+    } else {
+      // BONUS GAME TRIGGER
+      playCtBonus(result, multiplier, playerBet);
+      return; // Bonus function handles reset
     }
+  } else {
+    // Verloren (oder anderes Feld gewonnen wo man nicht gesetzt hat)
+    const msg = document.getElementById('bj-message');
+    msg.textContent = `${result.toUpperCase()}!`;
+    msg.style.color = CT_COLORS[result];
+    msg.classList.add('show');
+    setTimeout(()=>msg.classList.remove('show'), 2000);
+  }
+  
+  resetCtGame();
+}
+
+function playCtBonus(gameType, slotMulti, bet) {
+  const overlay = document.getElementById('ct-bonus-overlay');
+  const title = document.getElementById('ct-bonus-title');
+  const anim = document.getElementById('ct-bonus-anim');
+  const resDiv = document.getElementById('ct-bonus-result');
+  
+  overlay.style.display = 'flex';
+  title.textContent = gameType.toUpperCase() + " BONUS!";
+  resDiv.textContent = "";
+  
+  let finalMulti = 0;
+  
+  // Simulation der Minispiele (Vereinfacht)
+  if(gameType === 'coin') {
+    anim.textContent = "Münze wird geworfen...";
+    // Coin Flip hat Rot/Blau seiten mit Multis.
+    // Wir simulieren einfach einen random Multiplikator zwischen 5x und 50x
+    setTimeout(() => {
+      let roll = [5, 10, 15, 20, 50][Math.floor(Math.random()*5)];
+      finalMulti = roll * slotMulti; // Slot Multiplikator wirkt auf den Bonus!
+      anim.textContent = `🔴 ${roll}x  vs  🔵 ${roll*2}x`; // Fake Spannung
+      setTimeout(() => {
+        let winColor = Math.random() > 0.5 ? "🔴" : "🔵";
+        let winM = (winColor === "🔵") ? roll*2 : roll;
+        finalMulti = winM * slotMulti;
+        anim.textContent = `${winColor} GEWINNT!`;
+        finishBonus(finalMulti, bet);
+      }, 1500);
+    }, 1000);
+    
+  } else if(gameType === 'pachinko') {
+    anim.textContent = "Puck fällt...";
+    // Pachinko kann Doubles haben. Wir simulieren einen Drop.
+    setTimeout(() => {
+      let drops = [10, 20, 50, 100, 200, "DOUBLE"];
+      // Einfache Logik:
+      let hit = drops[Math.floor(Math.random()*drops.length)];
+      if(hit === "DOUBLE") {
+        anim.textContent = "✨ DOUBLE! ✨";
+        let reHit = [20, 40, 100, 200, 500][Math.floor(Math.random()*5)];
+        finalMulti = reHit * slotMulti;
+        setTimeout(() => finishBonus(finalMulti, bet), 1000);
+      } else {
+        finalMulti = hit * slotMulti;
+        finishBonus(finalMulti, bet);
+      }
+    }, 2000);
+    
+  } else if(gameType === 'cash') {
+    anim.textContent = "Ziel auswählen! (Auto-Pick)";
+    // Cash Hunt ist ein Schießstand. 108 Symbole.
+    setTimeout(() => {
+      let hit = Math.floor(Math.random() * 50) + 10; // 10x bis 60x
+      finalMulti = hit * slotMulti;
+      finishBonus(finalMulti, bet);
+    }, 1500);
+    
+  } else if(gameType === 'crazy') {
+    title.style.color = "#e74c3c";
+    anim.textContent = "🚪 WELT WIRD GEÖFFNET...";
+    // Das große Rad. Multis bis zu 200x, Doubles, Triples.
+    setTimeout(() => {
+      let wheelRes = [20, 50, 100, 200, "DOUBLE", "TRIPLE"];
+      let hit = wheelRes[Math.floor(Math.random()*wheelRes.length)];
+      
+      if(hit === "DOUBLE" || hit === "TRIPLE") {
+         anim.textContent = `✨ ${hit} ✨`;
+         // Re-Spin logic simulated (einfach fetter Multi)
+         let reHit = Math.floor(Math.random() * 500) + 200;
+         finalMulti = reHit * slotMulti;
+         setTimeout(() => finishBonus(finalMulti, bet), 1500);
+      } else {
+         finalMulti = hit * slotMulti;
+         finishBonus(finalMulti, bet);
+      }
+    }, 2500);
+  }
+}
+
+function finishBonus(multi, bet) {
+  const resDiv = document.getElementById('ct-bonus-result');
+  resDiv.textContent = `${multi}x MULTIPLIKATOR!`;
+  
+  const win = bet * multi; // Im Bonus bekommt man Einsatz NICHT zurück, nur den Gewinn? 
+  // In Crazy Time: Ja, man gewinnt Multiplikator auf den Einsatz.
+  // Bsp: 10€ auf CoinFlip -> 10x Resultat = 100€ Gewinn.
+  
+  addScore(win);
+  triggerWin(win);
+  
+  setTimeout(() => {
+    document.getElementById('ct-bonus-overlay').style.display = 'none';
+    resetCtGame();
+  }, 3000);
+}
+
+function resetCtGame() {
+  ctState.spinning = false;
+  ctState.bets = { '1':0, '2':0, '5':0, '10':0, 'coin':0, 'pachinko':0, 'cash':0, 'crazy':0 };
+  ctState.totalBet = 0;
+  disableButtons(false);
+  updateCasinoUI();
+  updateCtUI();
+  document.querySelectorAll('.ct-bet-btn').forEach(b => b.classList.remove('active-slot-boost'));
+}
+
+// Initialisieren beim Laden
+initCrazyWheel();
   </script>
 
 </body>
