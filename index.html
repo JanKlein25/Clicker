@@ -2186,14 +2186,14 @@
 /* Speichen (Linien) */
 .wheel-separator {
   position: absolute;
-  top: 0; 
-  left: 50%;
-  width: 1px;
-  height: 50%; /* WICHTIG: Geht exakt bis zur Mitte */
-  background: rgba(0,0,0,0.4); 
-  transform-origin: bottom center; /* Drehpunkt exakt unten */
+  top: 0; left: 50%;
+  width: 2px;
+  height: 50%;
+  background: linear-gradient(to bottom, #ffd700, #b8860b);
+  transform-origin: bottom center;
   z-index: 5;
-  margin-left: -0.5px; /* Zentriert die Linie */
+  /* HIER IST DER FIX: */
+  margin-left: -1px; /* Zieht die 2px Linie genau in die Mitte */
 }
 
 /* Zahlen / Text-Container */
@@ -5772,56 +5772,54 @@ function getCtIcon(type) {
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
 
-  // 1. Initialisierung und Reset
+  // 1. Initialisierung und Reset (Nuklear-Methode)
   if (typeof ctState.rotation === 'undefined') {
     ctState.rotation = 0;
   }
 
-  // "Nuklear-Reset" der Position (Verhindert den "Erster-Spin-Bug")
+  // Animation ausschalten und Position fixieren
   wheel.style.transition = 'none';
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
-  void wheel.offsetWidth; // Browser zwingen, den Reset zu zeichnen
+  void wheel.offsetWidth; // Force Reflow (Wichtig!)
 
   // 2. Ziel bestimmen
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
+  // 3. EXAKTE MATHEMATIK (Keine manuellen Offsets mehr)
   const segCount = 54;
-  const degPerSeg = 360 / segCount; // Ein Feld ist ca. 6.666 Grad breit
+  const degPerSeg = 360 / segCount; // = 6.66666... Grad
   
-  // 3. DIE NEUE MATHMATIK (Grenzen-Methode)
-  
-  // Wo beginnt das Feld auf dem Rad (0 bis 360)?
-  const fieldStart = segmentIndex * degPerSeg;
-  // Wo endet es?
-  const fieldEnd = (segmentIndex + 1) * degPerSeg;
-  
-  // Wir definieren einen SICHERHEITSABSTAND (Buffer) von den Rändern.
-  // Damit landen wir nie auf der Linie.
-  const buffer = 1.5; // 1.5 Grad Abstand zu jeder Seite
-  
-  // Wir wählen einen zufälligen Punkt ZWISCHEN den Puffern
-  // Min: Start + Buffer | Max: Ende - Buffer
-  const safeStart = fieldStart + buffer;
-  const safeEnd = fieldEnd - buffer;
-  
-  // Zufallswert innerhalb der sicheren Zone
-  const randomAngleInSegment = Math.random() * (safeEnd - safeStart) + safeStart;
+  // Wir berechnen den Bereich des Feldes auf dem Kreis (0 bis 360)
+  // Segment 0 startet bei 0°. Segment 1 bei 6.66°.
+  const startOfSegment = segmentIndex * degPerSeg;
+  const endOfSegment = (segmentIndex + 1) * degPerSeg;
+
+  // SICHERHEITSZONE: Wir bleiben 1.5 Grad von jeder Linie weg.
+  // Das garantiert, dass wir niemals auf der Linie landen.
+  const safeStart = startOfSegment + 1.5; 
+  const safeEnd = endOfSegment - 1.5;
+
+  // Wähle einen zufälligen Punkt EXAKT in dieser sicheren Zone
+  const randomAngleInSegment = safeStart + Math.random() * (safeEnd - safeStart);
   
   // 4. Rotation berechnen
-  // Da CSS im Uhrzeigersinn dreht, müssen wir 360 MINUS den Winkel rechnen,
-  // um den Punkt nach oben auf 12 Uhr zu holen.
+  // Um den Punkt "randomAngle" nach oben (auf 0°) zu drehen, müssen wir
+  // das Rad um (360 - randomAngle) drehen.
   const targetRotationSingle = 360 - randomAngleInSegment;
 
-  // Aktuelle Umdrehungen beibehalten und 5 neue hinzufügen
+  // Aktuelle Umdrehungen holen
   let currentTotalRotation = ctState.rotation;
+  
+  // Mindestens 5 volle Runden (1800 Grad) draufrechnen für den Effekt
+  // Wir nutzen Math.ceil, um sicherzustellen, dass wir immer vorwärts drehen
   let nextMinimumRotation = currentTotalRotation + (360 * 5);
   
-  // Modulo-Rechnung um den Anschluss zu finden
+  // Den Anschluss finden (Modulo 360)
   const currentMod = nextMinimumRotation % 360;
   let adjustment = targetRotationSingle - currentMod;
   
-  // Immer vorwärts drehen
+  // Nur vorwärts drehen
   if (adjustment < 0) {
     adjustment += 360;
   }
