@@ -4732,6 +4732,10 @@ function getMinesMultiplier(minesCount, revealedCount) {
             setTimeout(() => document.getElementById('casinoWindow').classList.remove('win-pulse'), 500);
         }
       }
+
+      // --- NEU HINZUFÜGEN: Nachricht sichtbar machen ---
+  document.getElementById('bj-message').classList.add('show');
+  // -------------------------------------------------
       
       updateCasinoUI();
       saveGame();
