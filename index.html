@@ -2154,17 +2154,20 @@
 
 .ct-slot-x { color: #666; font-weight: 900; font-size: 1.5rem; z-index: 1; text-shadow: 0 2px 0 #000; }
 
-/* --- HIER BEGINNT DAS NEUE RAD --- */
+/* --- HIER BEGINNT DAS NEUE RAD (KORRIGIERT) --- */
 .wheel-wrapper {
   position: relative;
-  width: 360px; /* Schön groß */
+  width: 360px;
   height: 360px;
   margin: 0 auto;
-  background: #222;
   border-radius: 50%;
-  padding: 12px;
-  box-shadow: 0 0 0 2px #555, inset 0 0 10px #000, 0 20px 50px rgba(0,0,0,0.8);
-  /* Metall-Rahmen */
+  padding: 10px;
+  background: #222;
+  box-shadow: 
+    0 0 0 2px #555, 
+    inset 0 0 15px #000, 
+    0 20px 50px rgba(0,0,0,0.8);
+  /* Metall-Look Hintergrund */
   background: conic-gradient(#444 0deg, #999 45deg, #444 90deg, #999 135deg, #444 180deg, #999 225deg, #444 270deg, #999 315deg, #444 360deg);
 }
 
@@ -2174,103 +2177,91 @@
   border-radius: 50%;
   position: relative;
   overflow: hidden;
-  border: 2px solid #b8860b;
+  border: 4px solid #b8860b; /* Goldener Innenrand */
+  box-sizing: border-box;
   transition: transform 5s cubic-bezier(0.15, 0.85, 0.15, 1);
+  transform: translateZ(0); /* Performance Boost */
 }
 
-/* Nabe in der Mitte */
+/* Speichen (Linien) */
+.wheel-separator {
+  position: absolute;
+  top: 0; 
+  left: 50%;
+  width: 1px;
+  height: 50%; /* WICHTIG: Geht exakt bis zur Mitte */
+  background: rgba(0,0,0,0.4); 
+  transform-origin: bottom center; /* Drehpunkt exakt unten */
+  z-index: 5;
+  margin-left: -0.5px; /* Zentriert die Linie */
+}
+
+/* Zahlen / Text-Container */
+.wheel-text {
+  position: absolute;
+  top: 0; 
+  left: 50%;
+  width: 30px; 
+  height: 50%; /* WICHTIG: Geht exakt bis zur Mitte */
+  margin-left: -15px; /* Zentriert den Container */
+  transform-origin: bottom center; /* Drehpunkt exakt unten */
+  
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  
+  padding-top: 12px; /* Abstand der Zahl vom Rand */
+  
+  font-family: 'Roboto', sans-serif;
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* Spezielle Styles für die Bonus-Texte */
+.wt-coin { font-size: 0.55rem; line-height:1; }
+.wt-pachinko { font-size: 0.5rem; line-height:1; }
+.wt-cash { font-size: 0.55rem; line-height:1; }
+.wt-crazy { font-size: 0.5rem; line-height:1; text-shadow: 0 0 4px #c0392b; }
+
+/* Pointer (Der Pfeil oben) */
+.wheel-pointer {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3rem;
+  color: #e74c3c;
+  z-index: 30;
+  filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5));
+  -webkit-text-stroke: 1px #ffd700;
+}
+
+/* Die Nabe in der Mitte (Verdeckt die Spitzen) */
 .crazy-wheel::after {
   content: '';
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 80px; height: 80px;
-  background: radial-gradient(circle, #c0392b, #8e44ad);
+  width: 60px; height: 60px;
+  background: radial-gradient(circle, #f1c40f 20%, #b8860b 100%);
+  border: 4px solid #fff;
   border-radius: 50%;
-  border: 4px solid #ffd700;
   box-shadow: 0 0 15px rgba(0,0,0,0.8);
-  z-index: 10;
+  z-index: 20;
 }
 
-/* Logo Text */
+/* Das Logo/Emoji in der Mitte */
 .wheel-center-logo {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 11;
-  color: #ffd700;
-  font-family: 'Merriweather', serif;
-  font-weight: 900;
-  font-size: 0.8rem;
-  text-align: center;
-  line-height: 1.1;
-  text-shadow: 0 2px 0 #000;
+  z-index: 21;
+  font-size: 1.8rem;
   pointer-events: none;
-}
-
-/* Speichen */
-.wheel-separator {
-  position: absolute;
-  top: 0; left: 50%;
-  width: 2px;
-  height: 50%;
-  background: linear-gradient(to bottom, #ffd700, #b8860b);
-  transform-origin: bottom center;
-  z-index: 5;
-}
-
-/* Zahlen */
-.wheel-text {
-  position: absolute;
-  top: 10px; left: 50%;
-  transform-origin: bottom center;
-  height: 140px; 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  color: #fff;
-  font-weight: 900;
-  font-size: 0.9rem;
-  text-shadow: 0 1px 2px #000;
-  z-index: 6;
-  width: 20px;
-  margin-left: -10px;
-  padding-top: 5px;
-}
-
-.wt-coin { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
-.wt-cash { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
-.wt-pachinko { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
-.wt-crazy { color: #f1c40f; font-size: 0.6rem; text-transform: uppercase; text-shadow: 0 0 5px #f00; }
-
-.wheel-pointer {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 3rem;
-  color: #e74c3c;
-  z-index: 20;
-  filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5));
-  -webkit-text-stroke: 1px #ffd700;
-}
-
-/* Der kleine Pin in der Mitte */
-.crazy-wheel::after {
-  content: '🤪';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 50px; height: 50px;
-  background: #f1c40f;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  border: 4px solid #fff;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 /* BETTING GRID - Viel sauberer */
@@ -5594,35 +5585,34 @@ function initCrazyWheel() {
   if(!wheel) return;
   wheel.innerHTML = ''; 
 
-  // Logo in die Mitte
-  const logo = document.createElement('div');
-  logo.className = 'wheel-center-logo';
-  logo.innerHTML = 'CRAZY<br>TIME';
-  wheel.appendChild(logo);
-
+  // 1. Hintergrund via Conic Gradient erstellen
   let gradientStr = "";
-  const count = CT_SEGMENTS.length; 
+  const count = CT_SEGMENTS.length; // 54 Segmente
   const degPerSeg = 360 / count;
   
   CT_SEGMENTS.forEach((seg, i) => {
-    // 1. Hintergrund-Farbe
-    const start = i * degPerSeg;
-    const end = (i + 1) * degPerSeg;
-    gradientStr += `${CT_COLORS[seg]} ${start}deg ${end}deg, `;
+    // Farben berechnen
+    const startAngle = i * degPerSeg;
+    const endAngle = (i + 1) * degPerSeg;
+    gradientStr += `${CT_COLORS[seg]} ${startAngle}deg ${endAngle}deg, `;
 
-    // 2. Goldene Speiche
+    // 2. Elemente erzeugen (Text & Trennlinien)
+    
+    // a) Trennlinie (Rechts vom Segment)
     const separator = document.createElement('div');
     separator.className = 'wheel-separator';
-    separator.style.transform = `rotate(${start}deg)`; 
+    // Drehung auf das Ende des Segments setzen
+    separator.style.transform = `rotate(${endAngle}deg)`; 
     wheel.appendChild(separator);
 
-    // 3. Text/Zahl
+    // b) Text (Mitte des Segments)
     const textEl = document.createElement('div');
     textEl.className = 'wheel-text';
     
     let label = seg;
     let specialClass = '';
     
+    // Labels formatieren
     if(seg === 'coin') { label = 'COIN<br>FLIP'; specialClass = 'wt-coin'; }
     else if(seg === 'pachinko') { label = 'PACH<br>INKO'; specialClass = 'wt-pachinko'; }
     else if(seg === 'cash') { label = 'CASH<br>HUNT'; specialClass = 'wt-cash'; }
@@ -5630,15 +5620,31 @@ function initCrazyWheel() {
     
     textEl.innerHTML = label;
     if(specialClass) textEl.classList.add(specialClass);
+    
+    // Wichtig: Textfarbe für normale Zahlen (Weiß auf Dunkel, Schwarz auf Hell)
+    if(!specialClass) {
+        textEl.style.color = "#fff";
+        // Ausnahme: Auf Gelb (2) sieht Schwarz besser aus
+        if(seg === '2') textEl.style.color = "#000"; 
+        textEl.style.fontSize = "1rem"; // Zahlen etwas größer
+    }
 
-    const midAngle = start + (degPerSeg / 2);
+    // WICHTIG: Winkel genau in die Mitte des Segments
+    const midAngle = startAngle + (degPerSeg / 2);
     textEl.style.transform = `rotate(${midAngle}deg)`;
     
     wheel.appendChild(textEl);
   });
   
+  // Gradient String finalisieren und setzen
   gradientStr = "conic-gradient(" + gradientStr.slice(0, -2) + ")";
   wheel.style.background = gradientStr;
+
+  // Logo in die Mitte setzen (überlagert alles)
+  const logo = document.createElement('div');
+  logo.className = 'wheel-center-logo';
+  logo.innerHTML = '🤪'; // Emoji statt Text, passt oft besser in den kleinen Kreis
+  wheel.appendChild(logo);
 }
 
 function ctBet(type) {
