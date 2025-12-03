@@ -5741,6 +5741,16 @@ function getCtIcon(type) {
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
   
+  // --- HIER IST DER FIX (Ganz am Anfang!) ---
+  // Wir prüfen, ob das Rad schon einen Startwert hat. Wenn nicht, setzen wir ihn auf 0.
+  if (!wheel.style.transform) {
+    wheel.style.transform = 'rotate(0deg)';
+  }
+  // Diese Zeile zwingt den Browser, die Position SOFORT zu berechnen.
+  // Das verhindert das "Eiern" beim allerersten Dreh nach dem Neuladen.
+  void wheel.offsetHeight; 
+  // ------------------------------------------
+
   // 1. Zufälliges Segment bestimmen
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
@@ -5750,29 +5760,20 @@ function startWheelPhysics() {
   const degPerSeg = 360 / segCount;
   
   // 3. Wo muss das Rad stehen, damit das Segment oben ist?
-  // Das Rad dreht im Uhrzeigersinn. Um Segment X nach oben (0°) zu holen,
-  // müssen wir 360 minus die Position des Segments drehen.
-  // Minus (degPerSeg / 2) sorgt dafür, dass wir die MITTE des Segments treffen.
   const targetAngleInOneRotation = 360 - (segmentIndex * degPerSeg) - (degPerSeg / 2);
 
-  // 4. Aktuelle Rotation holen (wir speichern diese in ctState)
-  // Falls noch nie gedreht wurde, ist es 0.
+  // 4. Aktuelle Rotation holen
   let currentTotalRotation = ctState.rotation || 0;
   
   // 5. Mindestens 5 volle Runden (1800 Grad) hinzufügen
-  // Wir nehmen die aktuelle Rotation und rechnen 5 * 360 drauf.
   let nextMinimumRotation = currentTotalRotation + (360 * 5);
   
   // 6. Ausrichtung berechnen
-  // Wo würde das Rad stehen, wenn wir einfach nur die 5 Runden drehen?
-  // Wir schauen uns den Restwert (Mod 360) an.
   const currentMod = nextMinimumRotation % 360;
   
-  // Wir berechnen die Differenz zum gewünschten Ziel-Winkel
+  // Differenz zum Ziel berechnen
   let adjustment = targetAngleInOneRotation - currentMod;
   
-  // Falls die Anpassung negativ ist (wir müssten rückwärts drehen),
-  // drehen wir lieber noch eine Runde vorwärts (+360), damit es flüssig aussieht.
   if (adjustment < 0) {
     adjustment += 360;
   }
@@ -5781,19 +5782,16 @@ function startWheelPhysics() {
   let finalRotation = nextMinimumRotation + adjustment;
   
   // 8. Etwas Zufall (Jitter) hinzufügen
-  // Damit der Zeiger nicht immer roboterhaft exakt in der Mitte landet.
-  // Variiert um +/- 40% der Segmentbreite.
   const jitter = (Math.random() * degPerSeg * 0.8) - (degPerSeg * 0.4);
   finalRotation += jitter;
 
-  // 9. WICHTIG: Den neuen Gesamtwert im State speichern!
-  // Damit der nächste Spin von hier aus weiterrechnet.
+  // 9. State speichern
   ctState.rotation = finalRotation;
   
   // 10. Drehung ausführen
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
-  // Ergebnis auswerten nach 5 Sekunden (Dauer der CSS Transition)
+  // Ergebnis auswerten nach 5 Sekunden
   setTimeout(() => {
     evaluateCtResult(winningSegment);
   }, 5000);
