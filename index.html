@@ -2573,43 +2573,43 @@
 
           </div>
         </div>
-
+        
         <!-- BLACKJACK VIEW -->
-        <div id="view-blackjack" style="display:none;">
-          <div class="bj-table">
-            
-            <!-- Dealer Bereich -->
-            <div class="bj-row">
-              <div class="bj-score-bubble" id="dealer-score">0</div>
-              <div class="bj-hand" id="dealer-hand"></div>
-              <div style="font-size:0.8rem; color:#666; margin-top:5px;">DEALER</div>
-            </div>
+<div id="view-blackjack" style="display:none;">
+  <div class="bj-table">
+    
+    <!-- Dealer Bereich (Label nach OBEN verschoben) -->
+    <div class="bj-row">
+      <div style="font-size:0.9rem; color:#888; font-weight:bold; margin-bottom:5px; letter-spacing:1px;">DEALER</div>
+      <div class="bj-score-bubble" id="dealer-score">0</div>
+      <div class="bj-hand" id="dealer-hand"></div>
+    </div>
 
-            <!-- Mitte (Status) -->
-            <div id="bj-message" class="bj-message">Blackjack zahlt 3:2</div>
+    <!-- Mitte (Status) -->
+    <div id="bj-message" class="bj-message">Blackjack zahlt 3:2</div>
 
-            <!-- Spieler Bereich -->
-            <div class="bj-row">
-              <div style="font-size:0.8rem; color:#666; margin-bottom:5px;">DU</div>
-              <div class="bj-hand" id="player-hand"></div>
-              <div class="bj-score-bubble" id="player-score">0</div>
-            </div>
+    <!-- Spieler Bereich (Label nach UNTEN verschoben) -->
+    <div class="bj-row">
+      <div class="bj-hand" id="player-hand"></div>
+      <div class="bj-score-bubble" id="player-score">0</div>
+      <div style="font-size:0.9rem; color:#888; font-weight:bold; margin-top:5px; letter-spacing:1px;">DU</div>
+    </div>
 
-          </div>
+  </div>
 
-          <!-- Controls -->
-          <div class="bj-controls" id="bj-controls-area">
-            <button class="bet-btn" id="btn-bj-start" onclick="startBlackjack()" style="background: linear-gradient(45deg, #2ecc71, #27ae60); width:100%;">
-              AUSTEILEN
-            </button>
+  <!-- Controls -->
+  <div class="bj-controls" id="bj-controls-area">
+    <button class="bet-btn" id="btn-bj-start" onclick="startBlackjack()" style="background: linear-gradient(45deg, #2ecc71, #27ae60); width:100%;">
+      AUSTEILEN
+    </button>
 
-            <div id="bj-actions" style="display:none; gap:10px; width:100%; justify-content:center;">
-              <button class="control-btn" onclick="bjAction('hit')" style="background:#3498db; color:white; padding:15px; flex:1;">KARTE (Hit)</button>
-              <button class="control-btn" onclick="bjAction('stand')" style="background:#e74c3c; color:white; padding:15px; flex:1;">HALTEN (Stand)</button>
-              <button class="control-btn" onclick="bjAction('double')" style="background:#f1c40f; color:black; padding:15px; flex:1;">DOPPELN (x2)</button>
-            </div>
-          </div>
-        </div>
+    <div id="bj-actions" style="display:none; gap:10px; width:100%; justify-content:center;">
+      <button class="control-btn" onclick="bjAction('hit')" style="background:#3498db; color:white; padding:15px; flex:1;">KARTE (Hit)</button>
+      <button class="control-btn" onclick="bjAction('stand')" style="background:#e74c3c; color:white; padding:15px; flex:1;">HALTEN (Stand)</button>
+      <button class="control-btn" onclick="bjAction('double')" style="background:#f1c40f; color:black; padding:15px; flex:1;">DOPPELN (x2)</button>
+    </div>
+  </div>
+</div>
 
       </div>
     </div>
