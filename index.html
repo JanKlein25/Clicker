@@ -5397,30 +5397,43 @@ function getMinesMultiplier(minesCount, revealedCount) {
     }
 
     // UPDATED FORMAT NUM (Handles up to Sextillions)
-    function formatNum(num, decimals = 0) {
-      if (num < 1000000) return num.toLocaleString('de-DE', { maximumFractionDigits: decimals });
+    // UPDATED FORMAT NUM (Fix für wackelnde Zahlen)
+function formatNum(num, decimals = 0) {
+  // Wenn die Zahl klein ist (unter 1 Million)
+  if (num < 1000000) {
+    return num.toLocaleString('de-DE', { 
+      maximumFractionDigits: decimals,
+      minimumFractionDigits: decimals // Erzwingt Nullen auch bei kleinen Zahlen, falls gewünscht
+    });
+  }
 
-      const units = [
-        { val: 1e36, suffix: " Sext" },
-        { val: 1e33, suffix: " Quintd" },
-        { val: 1e30, suffix: " Quint" },
-        { val: 1e27, suffix: " Quard" },
-        { val: 1e24, suffix: " Quad" },
-        { val: 1e21, suffix: " Trd" },
-        { val: 1e18, suffix: " Trio" },
-        { val: 1e15, suffix: " Brd" },
-        { val: 1e12, suffix: " Bio" },
-        { val: 1e9, suffix: " Mrd" },
-        { val: 1e6, suffix: " Mio" }
-      ];
+  const units = [
+    { val: 1e36, suffix: " Sext" },
+    { val: 1e33, suffix: " Quintd" },
+    { val: 1e30, suffix: " Quint" },
+    { val: 1e27, suffix: " Quard" },
+    { val: 1e24, suffix: " Quad" },
+    { val: 1e21, suffix: " Trd" },
+    { val: 1e18, suffix: " Trio" },
+    { val: 1e15, suffix: " Brd" },
+    { val: 1e12, suffix: " Bio" },
+    { val: 1e9, suffix: " Mrd" },
+    { val: 1e6, suffix: " Mio" }
+  ];
 
-      for (const unit of units) {
-        if (num >= unit.val) {
-          return (num / unit.val).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + unit.suffix;
-        }
-      }
-      return num.toExponential(2);
+  for (const unit of units) {
+    if (num >= unit.val) {
+      // HIER IST DER FIX:
+      // Wir setzen 'minimumFractionDigits' auf 2.
+      // Das macht aus "80,1" -> "80,10" und das Wackeln hört auf.
+      return (num / unit.val).toLocaleString('de-DE', { 
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+      }) + unit.suffix;
     }
+  }
+  return num.toExponential(2);
+}
 
     /* --- SHOP --- */
     function getBuildingCost(i) { return Math.floor(BUILDINGS[i].baseCost * Math.pow(1.15, game.buildings[i])); }
