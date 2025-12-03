@@ -5736,19 +5736,58 @@ function getCtIcon(type) {
   return type;
 }
 
+/* --- ERSETZE DIE ALTE startWheelPhysics FUNKTION DAMIT: --- */
+
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
   
+  // 1. Zufälliges Segment auswählen (0 bis 53)
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
-  const degPerSeg = 360 / 54;
-  const targetRotation = (360 * 5) + (360 - (segmentIndex * degPerSeg)) - (degPerSeg / 2);
-  const jitter = (Math.random() * degPerSeg) - (degPerSeg/2);
+  // 2. Winkel berechnen
+  const segCount = 54;
+  const degPerSeg = 360 / segCount;
   
-  ctState.rotation += targetRotation + jitter;
+  // Wir wollen, dass das Segment oben (bei 0°) landet.
+  // Da CSS 'rotate' im Uhrzeigersinn dreht, müssen wir das Rad so weit drehen,
+  // bis das Segment von seiner Startposition einmal ganz rum bis oben gewandert ist.
+  // Position des Segments im Array * Grad pro Segment = Startwinkel des Segments.
+  // 360 - Startwinkel = Drehung nötig, damit es oben steht.
+  const targetBaseAngle = 360 - (segmentIndex * degPerSeg);
+
+  // 3. Aktuelle Rotation berücksichtigen
+  // Wir nehmen die aktuelle Rotation und rechnen den "Rest" (Modulo 360) raus, 
+  // um zu wissen, wo wir virtuell gerade stehen.
+  const currentRotationMod = ctState.rotation % 360;
+  
+  // Berechne die Distanz, die wir NOCH drehen müssen, um das Ziel zu erreichen.
+  let distanceToTarget = targetBaseAngle - currentRotationMod;
+  
+  // Wenn die Distanz negativ ist (wir müssten zurückdrehen), addieren wir 360,
+  // damit wir immer vorwärts drehen.
+  if (distanceToTarget < 0) {
+    distanceToTarget += 360;
+  }
+  
+  // 4. Zufall (Jitter) innerhalb des Segments hinzufügen
+  // Damit der Zeiger nicht immer exakt in der Mitte des Feldes landet.
+  // Wir variieren um +/- 40% der Feldbreite.
+  const jitter = (Math.random() * degPerSeg * 0.8) - (degPerSeg * 0.4);
+
+  // 5. Endgültige Drehung berechnen
+  // 5 volle Umdrehungen (1800°) + die Distanz zum Ziel + der Zufall + halbes Segment Korrektur (Zentrierung)
+  // Das "- (degPerSeg / 2)" sorgt dafür, dass wir die Mitte des Segments anpeilen, nicht den Rand.
+  const extraSpins = 360 * 5; 
+  const totalSpin = extraSpins + distanceToTarget + jitter - (degPerSeg / 2);
+
+  // Auf den globalen State addieren (WICHTIG: += nicht =)
+  ctState.rotation += totalSpin;
+  
+  // CSS anwenden
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
+  // Ergebnis auswerten nach der Animation (5 Sekunden)
   setTimeout(() => {
     evaluateCtResult(winningSegment);
   }, 5000);
