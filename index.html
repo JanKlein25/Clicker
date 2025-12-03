@@ -5751,16 +5751,15 @@ function startWheelPhysics() {
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
   const segCount = 54;
-  const degPerSeg = 360 / segCount;
+  const degPerSeg = 360 / segCount; // ca. 6.66 Grad pro Feld
   
-  // Wo muss das Rad hin?
-  // Wir zielen genau auf die Mitte des Segments
+  // Wo muss das Rad hin? (Ziel ist 0 Grad oben)
   const targetAngleInOneRotation = 360 - (segmentIndex * degPerSeg) - (degPerSeg / 2);
 
   // Aktuelle Gesamtrotation holen
   let currentTotalRotation = ctState.rotation;
   
-  // Mindestens 5 volle Runden (1800 Grad) hinzufügen für den Effekt
+  // Mindestens 5 volle Runden (1800 Grad) hinzufügen
   let nextMinimumRotation = currentTotalRotation + (360 * 5);
   
   const currentMod = nextMinimumRotation % 360;
@@ -5773,19 +5772,23 @@ function startWheelPhysics() {
   
   let finalRotation = nextMinimumRotation + adjustment;
   
-  // --- ÄNDERUNG 1: Jitter reduziert ---
-  // Vorher 0.8 (80%), jetzt 0.5 (50%), damit er nicht am Rand kratzt
-  const jitter = (Math.random() * degPerSeg * 0.5) - (degPerSeg * 0.25);
+  // --- ÄNDERUNG 1: "Sicherheits-Zone" (Jitter massiv reduziert) ---
+  // Wir erlauben nur noch Abweichungen von +/- 1 Grad (statt vorher 3-4 Grad).
+  // Das verhindert, dass er optisch ins Nachbarfeld rutscht.
+  const maxWobble = 1.0; // Grad
+  const jitter = (Math.random() * maxWobble * 2) - maxWobble;
   finalRotation += jitter;
 
-  // --- ÄNDERUNG 2: Fein-Kalibrierung ---
-  // Falls das Rad optisch leicht daneben liegt (z.B. auf der 1 statt Cash Hunt),
-  // schieben wir es hier pauschal 2 Grad zurück.
-  finalRotation -= 2; 
+  // --- ÄNDERUNG 2: Manuelle Kalibrierung ---
+  // Falls das Rad bei dir immer noch leicht versetzt ist, ändere diesen Wert.
+  // Positive Zahl = Dreht weiter nach rechts.
+  // Negative Zahl = Dreht zurück nach links.
+  const CALIBRATION_OFFSET = 0; 
+  finalRotation += CALIBRATION_OFFSET;
 
-  // --- ANIMATION STARTEN (Der "Nuklear-Fix" bleibt) ---
+  // --- ANIMATION STARTEN (Der "Nuklear-Fix") ---
 
-  // A. Reset Position
+  // A. Reset Position (ohne Animation)
   wheel.style.transition = 'none';
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
