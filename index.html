@@ -4594,6 +4594,7 @@ function getMinesMultiplier(minesCount, revealedCount) {
     }
 
     function startBlackjack() {
+      document.getElementById('bj-message').classList.remove('show');
       if(bjState.active) return;
       const bet = getBet();
       if(!bet) return;
