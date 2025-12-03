@@ -6285,17 +6285,34 @@ initCrazyWheel();
 
 function checkDailyBonus() {
   const now = Date.now();
-  const oneDay = 24 * 60 * 60 * 1000; 
+  const oneDay = 24 * 60 * 60 * 1000; // 24 Stunden in Millisekunden
   
+  // Sicherheits-Check: Falls Variable fehlt, auf 0 setzen (damit man den Bonus sofort kriegt)
+  if (!game.lastDailyBonus) game.lastDailyBonus = 0;
+  
+  // Prüfen, ob 24 Stunden vergangen sind
   if (now - game.lastDailyBonus > oneDay) {
-    const bonusAmount = 50; // Ein Kasten Bier pro Tag? ;)
-    game.beers += bonusAmount;
-    game.lastDailyBonus = now;
     
-    // Schönes Alert mit Bier-Emoji
-    alert(`🍻 PROST! TÄGLICHER BONUS! 🍻\n\nDu hast einen frischen Kasten mit ${bonusAmount} Bierchen erhalten!\nVerzocke sie weise im Casino.`);
+    // 1. Bonus berechnen und hinzufügen
+    const bonusAmount = 50; 
+    if (!game.beers) game.beers = 0;
+    game.beers += bonusAmount;
+    
+    // 2. WICHTIG: Zeitstempel JETZT aktualisieren
+    game.lastDailyBonus = now;
+
+    // 3. WICHTIG: SOFORT SPEICHERN!
+    // Wir speichern, BEVOR wir das Alert zeigen oder die UI updaten.
+    // Selbst wenn danach etwas abstürzt, weiß das Spiel beim nächsten Mal: "Bonus schon erhalten".
     saveGame();
-    updateCasinoUI(); 
+    
+    // 4. Jetzt erst dem Spieler Bescheid sagen
+    alert(`🍻 PROST! TÄGLICHER BONUS! 🍻\n\nDu hast einen frischen Kasten mit ${bonusAmount} Bierchen erhalten!\nVerzocke sie weise im Casino.`);
+    
+    // 5. UI aktualisieren (mit Sicherheitsabfrage)
+    if (typeof updateCasinoUI === "function") {
+        updateCasinoUI(); 
+    }
   }
 }
 
