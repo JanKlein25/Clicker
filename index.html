@@ -2775,6 +2775,41 @@
   text-shadow: 0 1px 2px #000;
 }
   
+  /* --- BIERCHEN WALLET AUF HAUPTSEITE --- */
+.beer-wallet {
+  margin-top: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #f1c40f; /* Bier-Gold */
+  padding: 8px 20px;
+  border-radius: 50px;
+  box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+  transition: transform 0.2s;
+}
+
+.beer-wallet:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+}
+
+.beer-wallet-icon {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+}
+
+#main-beer-display {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff;
+  /* Verhindert Wackeln der Zahlen */
+  font-variant-numeric: tabular-nums; 
+}
+  
   </style>
 
 </head>
@@ -3313,6 +3348,10 @@
       <div id="score">0</div>
       <div class="currency-label">KLEINIS</div>
       <div id="cps">0,0 Kleinis / Sekunde</div>
+        <div class="beer-wallet">
+          <img src="https://github.com/JanKlein25/Clicker/blob/main/Adobe%20Express%20-%20file%20(9).png?raw=true" class="beer-wallet-icon">
+          <span id="main-beer-display">0</span>
+        </div>
     </div>
 
     <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
@@ -3644,6 +3683,7 @@
 
       document.getElementById('score').textContent = formatNum(Math.floor(game.score));
       document.getElementById('cps').textContent = formatNum(displayCps, 1) + " Kleinis / Sekunde";
+      document.getElementById('main-beer-display').textContent = formatNum(Math.floor(game.beers || 0));
 
       updateDynamicBackground();
       updateClickUI();
