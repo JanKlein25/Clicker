@@ -2777,16 +2777,23 @@
   
   /* --- BIERCHEN WALLET AUF HAUPTSEITE --- */
 .beer-wallet {
-  margin-top: 15px;
-  display: inline-flex;
+  /* --- GRÖSSE & POSITON --- */
+  width: fit-content;      /* Nur so breit wie der Inhalt (macht es klein) */
+  margin: 10px auto 0 auto;/* Zentriert es und macht Abstand nach oben */
+  padding: 6px 15px;       /* Etwas weniger Polsterung als vorher */
+  
+  /* --- DESIGN (Gold & Glow bleiben erhalten) --- */
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #f1c40f; 
+  border-radius: 50px;     /* Schöne runde "Pillen"-Form */
+  box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
+  
+  /* --- INHALT --- */
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 2px solid #f1c40f; /* Bier-Gold */
-  padding: 8px 20px;
-  border-radius: 50px;
-  box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+  gap: 8px;
+  cursor: pointer;
   transition: transform 0.2s;
 }
 
@@ -2796,17 +2803,16 @@
 }
 
 .beer-wallet-icon {
-  width: 28px;
-  height: 28px;
+  width: 22px; /* Etwas kleineres Icon */
+  height: 22px;
   filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
 }
 
 #main-beer-display {
   font-family: 'Roboto', sans-serif;
-  font-size: 1.3rem;
+  font-size: 1.1rem; /* Schriftgröße passend, nicht zu riesig */
   font-weight: 900;
   color: #fff;
-  /* Verhindert Wackeln der Zahlen */
   font-variant-numeric: tabular-nums; 
 }
   
