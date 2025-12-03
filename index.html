@@ -4687,55 +4687,67 @@ function getMinesMultiplier(minesCount, revealedCount) {
       const msg = document.getElementById('bj-message');
       
       let winMult = 0;
+      let outcomeText = "";
+      let outcomeColor = "#fff";
       
       // 1. Player Bust
       if(pVal > 21) {
-        msg.textContent = "BUST! VERLOREN";
-        msg.style.color = "#e74c3c";
+        outcomeText = "BUST! VERLOREN";
+        outcomeColor = "#e74c3c";
       }
-      // 2. Blackjack (Natural) - nur wenn 2 Karten und 21
+      // 2. Blackjack (Natural)
       else if(pVal === 21 && bjState.playerHand.length === 2) {
          if(dVal === 21 && bjState.dealerHand.length === 2) {
-           msg.textContent = "PUSH (Unentschieden)";
+           outcomeText = "PUSH (Unentschieden)";
+           outcomeColor = "#ccc";
            winMult = 1; // Geld zurück
          } else {
-           msg.textContent = "BLACKJACK! (x2.5)";
-           msg.style.color = "#f1c40f"; // Gold
+           outcomeText = "BLACKJACK! (x2.5)";
+           outcomeColor = "#f1c40f"; // Gold
            winMult = 2.5;
          }
       }
       // 3. Dealer Bust or Player High
       else if(dVal > 21 || pVal > dVal) {
-        msg.textContent = "GEWONNEN!";
-        msg.style.color = "#2ecc71";
+        outcomeText = "GEWONNEN!";
+        outcomeColor = "#2ecc71";
         winMult = 2;
       }
       // 4. Tie
       else if(dVal === pVal) {
-        msg.textContent = "PUSH (Geld zurück)";
-        msg.style.color = "#ccc";
+        outcomeText = "PUSH (Geld zurück)";
+        outcomeColor = "#ccc";
         winMult = 1;
       }
       // 5. Dealer Wins
       else {
-        msg.textContent = "DEALER GEWINNT";
-        msg.style.color = "#e74c3c";
+        outcomeText = "DEALER GEWINNT";
+        outcomeColor = "#e74c3c";
       }
       
+      // Basis-Text setzen
+      msg.textContent = outcomeText;
+      msg.style.color = outcomeColor;
+
+      // Gewinn berechnen und anzeigen
       if(winMult > 0) {
         const winAmount = Math.floor(bjState.bet * winMult);
-        addScore(winAmount); // Nutze addScore für korrekte Statistik
-        // Kleines optisches Feedback
+        addScore(winAmount); 
+        
+        // HIER IST DER NEUE TEIL: Betrag unter den Text schreiben
+        // Wir nutzen innerHTML += um eine neue Zeile anzuhängen
+        msg.innerHTML += `<div style="font-size:0.6em; margin-top:8px; color:#fff;">+${formatNum(winAmount)}</div>`;
+
+        // Konfetti bei echtem Gewinn (mehr als Geld zurück)
         if(winMult > 1) {
             spawnConfetti(); 
             document.getElementById('casinoWindow').classList.add('win-pulse');
             setTimeout(() => document.getElementById('casinoWindow').classList.remove('win-pulse'), 500);
         }
       }
-
-      // --- NEU HINZUFÜGEN: Nachricht sichtbar machen ---
-  document.getElementById('bj-message').classList.add('show');
-  // -------------------------------------------------
+      
+      // Nachricht sichtbar machen (.show Klasse muss im CSS existieren, wie vorhin besprochen)
+      msg.classList.add('show');
       
       updateCasinoUI();
       saveGame();
