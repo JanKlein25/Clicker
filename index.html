@@ -1888,23 +1888,44 @@
 
     /* CSS CARDS */
     .bj-card {
-      width: 60px;
-      height: 84px;
-      background: #fff;
-      border-radius: 6px;
-      margin: 0 5px;
-      position: relative;
-      box-shadow: -2px 2px 5px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 4px;
-      font-family: 'Times New Roman', serif;
-      font-weight: bold;
-      font-size: 1.1rem;
-      transition: transform 0.3s, margin 0.3s;
-      animation: dealCard 0.4s ease-out backwards;
-    }
+  width: 70px; /* Etwas breiter */
+  height: 100px; /* Etwas höher */
+  background: #fff;
+  border-radius: 8px; /* Etwas runder */
+  margin: 0 3px; /* Engere Anordnung */
+  position: relative;
+  /* Stärkerer Schatten, leicht nach unten versetzt */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4), 0 0 5px rgba(0,0,0,0.2); 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+  font-family: 'Roboto', sans-serif; /* Modernere Schriftart */
+  font-weight: 700; /* Dicker */
+  font-size: 1.2rem; /* Etwas größer */
+  transition: transform 0.3s ease, margin 0.3s ease, box-shadow 0.2s ease;
+  animation: dealCard 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) backwards; /* Fluffigere Animation */
+}
+
+/* Anpassung der Rot/Schwarz-Farben */
+.bj-card.red { color: #e74c3c; } /* Standard Rot */
+.bj-card.black { color: #2c3e50; } /* Standard Schwarz (dunkelblau) */
+
+/* Spezifische Farben für die Symbole, falls die Kartensymbole nicht direkt gerendert werden */
+.bj-card .bj-card-top, .bj-card .bj-card-bot {
+    font-size: 0.9em; /* Kleiner als die Hauptzahl */
+}
+.bj-card .bj-card-mid {
+    font-size: 2.2rem; /* Größer für das Hauptsymbol */
+    line-height: 1; /* Anpassung der Zeilenhöhe */
+}
+
+/* Effekt für die verdeckte Karte */
+.bj-card-hidden {
+  background: linear-gradient(135deg, #34495e, #2c3e50); /* Dunkleres Blau/Grau */
+  border: 2px solid #fff;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* Innenschatten */
+}
 
     @keyframes dealCard {
       from { transform: translateY(-100px) rotate(20deg); opacity: 0; }
