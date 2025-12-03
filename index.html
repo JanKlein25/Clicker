@@ -2547,14 +2547,17 @@
   
   /* CRAZY TIME HELP STYLES */
 #ct-help-overlay {
-  position: fixed; /* WICHTIG: Fixed statt absolute */
+  position: fixed;
   top: 0; 
   left: 0; 
-  width: 100vw; /* Volle Bildschirmbreite */
-  height: 100vh; /* Volle Bildschirmhöhe */
-  background: rgba(0,0,0,0.92); /* Etwas dunklerer Hintergrund */
-  z-index: 99999; /* Muss höher sein als das Casino Modal (12000) */
-  display: flex;
+  width: 100vw; 
+  height: 100vh; 
+  background: rgba(0,0,0,0.92); 
+  
+  /* HIER IST DIE ÄNDERUNG: */
+  z-index: 200000 !important; /* Extrem hoch und mit Ausrufezeichen erzwungen */
+  
+  display: flex; 
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(8px);
