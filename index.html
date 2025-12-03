@@ -3477,7 +3477,7 @@
 
 // URL zu deinem Bier-Bild (Ich nutze hier den Platzhalter, du musst die URL einfügen, wo du das Bild hochgeladen hast, oder lokal speichern)
 // TIPP: Lade das Bild auf GitHub oder Imgur hoch und kopiere den Link hier rein.
-const BEER_IMG_URL = "https://i.imgur.com/DeineBierURL.png"; // <-- HIER DEINE URL REINPACKEN!
+const BEER_ICON_SRC = "https://github.com/JanKlein25/Clicker/blob/main/Adobe%20Express%20-%20file%20(9).png?raw=true";
     let buffs = { frenzy: { active: false, time: 0, multi: 7 } };
 
     let clickHistory = [];
@@ -4368,16 +4368,6 @@ const BEER_IMG_URL = "https://i.imgur.com/DeineBierURL.png"; // <-- HIER DEINE U
       poly.style.filter = "drop-shadow(0 0 5px " + color + ")";
 
       svg.appendChild(poly);
-    }
-
-    /* --- SHARED CASINO FUNCS --- */
-    function getBet() {
-      const betInput = document.getElementById('betAmount');
-      let bet = parseInt(betInput.value);
-      if (isNaN(bet) || bet <= 0) { alert("Bitte Einsatz eingeben!"); return null; }
-      if (bet > game.score) { bet = Math.floor(game.score); betInput.value = bet; }
-      if (bet <= 0) return null;
-      return bet;
     }
 
     function triggerWin(amount) {
@@ -6352,16 +6342,21 @@ function updateCasinoUI() {
   const balanceEl = document.getElementById('casino-balance');
   const iconEl = document.getElementById('balance-icon');
   
+  // Sicherheitscheck, falls Elemente fehlen
+  if (!balanceEl) return;
+
   if (casinoCurrency === 'kleinis') {
     balanceEl.textContent = formatNum(Math.floor(game.score));
     balanceEl.style.color = "#fff";
     if(iconEl) iconEl.style.display = 'none'; 
   } else {
-    balanceEl.textContent = formatNum(Math.floor(game.beers));
+    // Hier stürzte es ab, wenn game.beers undefined war
+    const beers = game.beers || 0; 
+    balanceEl.textContent = formatNum(Math.floor(beers));
     balanceEl.style.color = "#f1c40f"; 
+    
     if(iconEl) {
-      // HIER WAR DER FEHLER: Nimm BEER_IMG_URL
-      iconEl.src = BEER_IMG_URL; 
+      iconEl.src = BEER_ICON_SRC; // Jetzt stimmt der Name!
       iconEl.style.display = 'inline-block';
     }
   }
