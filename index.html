@@ -2094,8 +2094,10 @@
 
     /* --- CRAZY WHEEL PRO STYLES --- */
 
+/* --- CRAZY WHEEL "REALISTIC" STYLES --- */
+
+/* Container & Top Slot (Bleiben vom Pro-Style) */
 .crazy-container {
-  /* Bühnen-Atmosphäre */
   background: radial-gradient(circle at center, #36164d 0%, #1a0b2e 80%, #000 100%);
   padding: 30px 10px;
   border-radius: 20px;
@@ -2107,26 +2109,22 @@
   margin-bottom: 20px;
 }
 
-/* TOP SLOT - Der Monitor oben */
 .crazy-top-slot {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 15px;
   margin: 0 auto 25px auto;
-  
-  /* Monitor Look */
   background: #000;
   padding: 15px 30px;
   border: 4px solid #444;
-  border-bottom: 4px solid #222; /* 3D Kante */
+  border-bottom: 4px solid #222;
   border-radius: 12px;
   width: fit-content;
   box-shadow: 0 10px 20px rgba(0,0,0,0.6);
   position: relative;
 }
 
-/* Goldener Rahmen um den Monitor bei Aktivität */
 .crazy-top-slot::after {
   content: '';
   position: absolute;
@@ -2154,34 +2152,20 @@
   font-weight: 900;
 }
 
-.ct-slot-x { 
-  color: #666; 
-  font-weight: 900; 
-  font-size: 1.5rem; 
-  z-index: 1;
-  text-shadow: 0 2px 0 #000;
-}
+.ct-slot-x { color: #666; font-weight: 900; font-size: 1.5rem; z-index: 1; text-shadow: 0 2px 0 #000; }
 
-/* --- CRAZY WHEEL "REALISTIC" STYLES --- */
-
+/* --- HIER BEGINNT DAS NEUE RAD --- */
 .wheel-wrapper {
   position: relative;
   width: 360px; /* Schön groß */
   height: 360px;
   margin: 0 auto;
-  /* Äußerer Metall-Ring mit Lichtern (simuliert durch Schatten) */
   background: #222;
   border-radius: 50%;
-  padding: 12px; /* Dicke des Rahmens */
-  box-shadow: 
-    0 0 0 2px #555,
-    inset 0 0 10px #000,
-    0 20px 50px rgba(0,0,0,0.8);
-  /* Metall-Effekt Verlauf für den Rahmen */
-  background: conic-gradient(
-    #444 0deg, #999 45deg, #444 90deg, #999 135deg, 
-    #444 180deg, #999 225deg, #444 270deg, #999 315deg, #444 360deg
-  );
+  padding: 12px;
+  box-shadow: 0 0 0 2px #555, inset 0 0 10px #000, 0 20px 50px rgba(0,0,0,0.8);
+  /* Metall-Rahmen */
+  background: conic-gradient(#444 0deg, #999 45deg, #444 90deg, #999 135deg, #444 180deg, #999 225deg, #444 270deg, #999 315deg, #444 360deg);
 }
 
 .crazy-wheel {
@@ -2190,26 +2174,25 @@
   border-radius: 50%;
   position: relative;
   overflow: hidden;
-  border: 2px solid #b8860b; /* Dunkles Gold innen */
+  border: 2px solid #b8860b;
   transition: transform 5s cubic-bezier(0.15, 0.85, 0.15, 1);
-  /* Das eigentliche Farbrad wird via JS als conic-gradient gesetzt */
 }
 
-/* Die Mitte (Nabe) */
+/* Nabe in der Mitte */
 .crazy-wheel::after {
-  content: ''; /* Wir füllen den Text via HTML in der Mitte, daher hier leer */
+  content: '';
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   width: 80px; height: 80px;
   background: radial-gradient(circle, #c0392b, #8e44ad);
   border-radius: 50%;
-  border: 4px solid #ffd700; /* Goldener Rand */
+  border: 4px solid #ffd700;
   box-shadow: 0 0 15px rgba(0,0,0,0.8);
   z-index: 10;
 }
 
-/* Das Logo in der Mitte (steht fest im Rad und dreht sich mit) */
+/* Logo Text */
 .wheel-center-logo {
   position: absolute;
   top: 50%; left: 50%;
@@ -2225,24 +2208,22 @@
   pointer-events: none;
 }
 
-/* Trennlinien (Speichen) */
+/* Speichen */
 .wheel-separator {
   position: absolute;
   top: 0; left: 50%;
   width: 2px;
-  height: 50%; /* Geht bis zur Mitte */
-  background: linear-gradient(to bottom, #ffd700, #b8860b); /* Goldverlauf */
+  height: 50%;
+  background: linear-gradient(to bottom, #ffd700, #b8860b);
   transform-origin: bottom center;
   z-index: 5;
 }
 
-/* Die Texte auf den Segmenten */
+/* Zahlen */
 .wheel-text {
   position: absolute;
-  top: 10px; /* Abstand vom Rand */
-  left: 50%;
+  top: 10px; left: 50%;
   transform-origin: bottom center;
-  /* Trickserei: Wir setzen die Höhe auf 50% des Rades minus Nabe */
   height: 140px; 
   display: flex;
   flex-direction: column;
@@ -2254,11 +2235,10 @@
   text-shadow: 0 1px 2px #000;
   z-index: 6;
   width: 20px;
-  margin-left: -10px; /* Zentrieren */
+  margin-left: -10px;
   padding-top: 5px;
 }
 
-/* Spezielle Farben für Texte der Bonusrunden */
 .wt-coin { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
 .wt-cash { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
 .wt-pachinko { color: #fff; font-size: 0.6rem; text-transform: uppercase; }
@@ -2270,10 +2250,9 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 3rem;
-  color: #e74c3c; /* Roter Zeiger wie im Original */
+  color: #e74c3c;
   z-index: 20;
   filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5));
-  /* Ein kleiner goldener Rand um den Zeiger */
   -webkit-text-stroke: 1px #ffd700;
 }
 
@@ -5581,8 +5560,7 @@ setTimeout(() => {
     }
   /* --- CRAZY WHEEL LOGIC --- */
 
-// Segmente definieren (Wie beim echten Spiel: 1 kommt oft vor, Crazy Time nur 1x)
-// 1 (21x), 2 (13x), 5 (7x), 10 (4x), Coin (4x), Pachinko (2x), Cash (2x), Crazy (1x) = 54 Total
+// Segmente (54 Stück)
 const CT_SEGMENTS = [
   'crazy', '1', '2', '5', '1', '2', '1', 'cash', '1', '2', '5', '1', '2', 'coin', 
   '1', '2', '1', 'pachinko', '1', '2', '5', '1', '2', 'coin', '1', '2', '1', 
@@ -5590,21 +5568,7 @@ const CT_SEGMENTS = [
   '5', '1', '2', 'coin', '1', '2', '1', '10', '1', '2', '5', '1', '2', '10', '1'
 ];
 
-// Farben für die Grafik
-const CT_COLORS = {
-  '1': '#3498db', '2': '#f1c40f', '5': '#e91e63', '10': '#9b59b6',
-  'coin': '#34495e', 'pachinko': '#e056fd', 'cash': '#2ecc71', 'crazy': '#e74c3c'
-};
-
-let ctState = {
-  bets: { '1':0, '2':0, '5':0, '10':0, 'coin':0, 'pachinko':0, 'cash':0, 'crazy':0 },
-  totalBet: 0,
-  spinning: false,
-  rotation: 0,
-  topSlot: { target: null, multi: 1 }
-};
-
-// Farben angepasst an das echte Crazy Time Bild
+// Farben (Realistic)
 const CT_COLORS = {
   '1': '#2980b9',      // Blau
   '2': '#f1c40f',      // Gelb
@@ -5616,39 +5580,46 @@ const CT_COLORS = {
   'crazy': '#c0392b'   // Rot
 };
 
-// Initialisiert das Rad mit "echten" Segmenten
+let ctState = {
+  bets: { '1':0, '2':0, '5':0, '10':0, 'coin':0, 'pachinko':0, 'cash':0, 'crazy':0 },
+  totalBet: 0,
+  spinning: false,
+  rotation: 0,
+  topSlot: { target: null, multi: 1 }
+};
+
+// Initialisiert das Rad mit "echten" Segmenten (Goldene Speichen, Text)
 function initCrazyWheel() {
   const wheel = document.getElementById('crazy-wheel');
-  wheel.innerHTML = ''; // Reset
+  if(!wheel) return;
+  wheel.innerHTML = ''; 
 
-  // Logo in die Mitte setzen
+  // Logo in die Mitte
   const logo = document.createElement('div');
   logo.className = 'wheel-center-logo';
   logo.innerHTML = 'CRAZY<br>TIME';
   wheel.appendChild(logo);
 
   let gradientStr = "";
-  const count = CT_SEGMENTS.length; // 54 Segmente
+  const count = CT_SEGMENTS.length; 
   const degPerSeg = 360 / count;
   
   CT_SEGMENTS.forEach((seg, i) => {
-    // 1. Hintergrund-Farbe (Gradient Logik bleibt für Performance)
+    // 1. Hintergrund-Farbe
     const start = i * degPerSeg;
     const end = (i + 1) * degPerSeg;
     gradientStr += `${CT_COLORS[seg]} ${start}deg ${end}deg, `;
 
-    // 2. Goldene Speiche (Trennlinie)
+    // 2. Goldene Speiche
     const separator = document.createElement('div');
     separator.className = 'wheel-separator';
-    // Drehe die Linie zum Start des Segments
     separator.style.transform = `rotate(${start}deg)`; 
     wheel.appendChild(separator);
 
-    // 3. Text/Zahl im Segment
+    // 3. Text/Zahl
     const textEl = document.createElement('div');
     textEl.className = 'wheel-text';
     
-    // Icon oder Text bestimmen
     let label = seg;
     let specialClass = '';
     
@@ -5660,22 +5631,19 @@ function initCrazyWheel() {
     textEl.innerHTML = label;
     if(specialClass) textEl.classList.add(specialClass);
 
-    // Positionieren: Wir drehen den Text in die MITTE des Segments
     const midAngle = start + (degPerSeg / 2);
     textEl.style.transform = `rotate(${midAngle}deg)`;
     
     wheel.appendChild(textEl);
   });
   
-  // Hintergrund setzen
   gradientStr = "conic-gradient(" + gradientStr.slice(0, -2) + ")";
   wheel.style.background = gradientStr;
 }
 
-// Wett-Funktion
 function ctBet(type) {
   if(ctState.spinning) return;
-  const baseBet = getBet(); // Deine existierende Funktion
+  const baseBet = getBet(); 
   if(!baseBet) return;
   
   if(game.score >= baseBet) {
@@ -5689,13 +5657,6 @@ function ctBet(type) {
 
 function ctClearBets() {
   if(ctState.spinning) return;
-  // Geld zurückgeben (optional, hier einfach reset für neue Wetten)
-  // Einfacher: Nur Anzeige nullen, Geld ist weg? Nein, besser:
-  // Wir erlauben Löschen nicht, oder wir erstatten. Hier: Reset vor Spin.
-  // Da game.score schon abgezogen wurde, müsste man es gutschreiben.
-  // Einfache Lösung: Löschen setzt nur neue Wetten auf 0, Geld ist "gesetzt".
-  // BESSER: Wir erlauben Löschen nur wenn wir das Geld zurückbuchen.
-  
   for(let key in ctState.bets) {
     game.score += ctState.bets[key];
     ctState.bets[key] = 0;
@@ -5707,9 +5668,11 @@ function ctClearBets() {
 
 function updateCtUI() {
   for(let key in ctState.bets) {
-    document.getElementById(`ct-bet-${key}`).textContent = formatNum(ctState.bets[key]);
+    const el = document.getElementById(`ct-bet-${key}`);
+    if(el) el.textContent = formatNum(ctState.bets[key]);
   }
-  document.getElementById('ct-total-bet').textContent = formatNum(ctState.totalBet);
+  const total = document.getElementById('ct-total-bet');
+  if(total) total.textContent = formatNum(ctState.totalBet);
 }
 
 function spinCrazyWheel() {
@@ -5721,9 +5684,7 @@ function spinCrazyWheel() {
   ctState.spinning = true;
   disableButtons(true);
   
-  // 1. TOP SLOT DREHEN
   runTopSlot().then(() => {
-    // 2. RAD DREHEN NACHDEM SLOT FERTIG IST
     setTimeout(startWheelPhysics, 500);
   });
 }
@@ -5733,7 +5694,6 @@ function runTopSlot() {
     const slotTarget = document.getElementById('ct-slot-target');
     const slotMulti = document.getElementById('ct-slot-multi');
     
-    // Animation
     let spins = 0;
     let interval = setInterval(() => {
       const types = ['1','2','5','10','coin','pachinko','cash','crazy'];
@@ -5746,21 +5706,180 @@ function runTopSlot() {
       
       if(spins > 20) {
         clearInterval(interval);
-        // Final Result Top Slot
         const finalType = types[Math.floor(Math.random() * types.length)];
-        // Chance auf Multiplikator ist nicht 100% im echten Spiel, aber hier machen wir es immer für Spaß
         const finalMulti = [2, 3, 4, 5, 10, 15, 20, 25, 50][Math.floor(Math.random() * 9)];
         
         ctState.topSlot = { target: finalType, multi: finalMulti };
-        
         slotTarget.textContent = getCtIcon(finalType);
         slotMulti.textContent = finalMulti + "x";
         
-        // Highlight Betting Button if matches
-        document.querySelector(`.btn-${finalType}`).classList.add('active-slot-boost');
+        const btn = document.querySelector(`.btn-${finalType}`);
+        if(btn) btn.classList.add('active-slot-boost');
         
         resolve();
       }
+    }, 100);
+  });
+}
+
+function getCtIcon(type) {
+  if(type === 'coin') return '🪙';
+  if(type === 'pachinko') return '🟣';
+  if(type === 'cash') return '🎯';
+  if(type === 'crazy') return '🤪';
+  return type;
+}
+
+function startWheelPhysics() {
+  const wheel = document.getElementById('crazy-wheel');
+  
+  const segmentIndex = Math.floor(Math.random() * 54);
+  const winningSegment = CT_SEGMENTS[segmentIndex];
+  
+  const degPerSeg = 360 / 54;
+  const targetRotation = (360 * 5) + (360 - (segmentIndex * degPerSeg)) - (degPerSeg / 2);
+  const jitter = (Math.random() * degPerSeg) - (degPerSeg/2);
+  
+  ctState.rotation += targetRotation + jitter;
+  wheel.style.transform = `rotate(${ctState.rotation}deg)`;
+  
+  setTimeout(() => {
+    evaluateCtResult(winningSegment);
+  }, 5000);
+}
+
+function evaluateCtResult(result) {
+  let multiplier = 1;
+  let isBonus = ['coin','pachinko','cash','crazy'].includes(result);
+  let slotMatch = (ctState.topSlot.target === result);
+  
+  if(slotMatch) multiplier = ctState.topSlot.multi;
+  
+  const playerBet = ctState.bets[result];
+  let totalWin = 0;
+  
+  if(playerBet > 0) {
+    if(!isBonus) {
+      const numVal = parseInt(result);
+      const odds = numVal * multiplier;
+      totalWin = playerBet + (playerBet * odds);
+      triggerWin(totalWin);
+      
+      const msg = document.getElementById('bj-message');
+      msg.textContent = `${result} GEWONNEN!`;
+      msg.innerHTML += `<div style="font-size:0.6em; margin-top:5px;">+${formatNum(totalWin)}</div>`;
+      msg.classList.add('show');
+      setTimeout(()=>msg.classList.remove('show'), 2000);
+      
+    } else {
+      playCtBonus(result, multiplier, playerBet);
+      return; 
+    }
+  } else {
+    const msg = document.getElementById('bj-message');
+    msg.textContent = `${result.toUpperCase()}!`;
+    msg.style.color = CT_COLORS[result];
+    msg.classList.add('show');
+    setTimeout(()=>msg.classList.remove('show'), 2000);
+  }
+  
+  resetCtGame();
+}
+
+function playCtBonus(gameType, slotMulti, bet) {
+  const overlay = document.getElementById('ct-bonus-overlay');
+  const title = document.getElementById('ct-bonus-title');
+  const anim = document.getElementById('ct-bonus-anim');
+  const resDiv = document.getElementById('ct-bonus-result');
+  
+  overlay.style.display = 'flex';
+  title.textContent = gameType.toUpperCase() + " BONUS!";
+  resDiv.textContent = "";
+  
+  let finalMulti = 0;
+  
+  if(gameType === 'coin') {
+    anim.textContent = "Münze wird geworfen...";
+    setTimeout(() => {
+      let roll = [5, 10, 15, 20, 50][Math.floor(Math.random()*5)];
+      finalMulti = roll * slotMulti; 
+      anim.textContent = `🔴 ${roll}x  vs  🔵 ${roll*2}x`;
+      setTimeout(() => {
+        let winColor = Math.random() > 0.5 ? "🔴" : "🔵";
+        let winM = (winColor === "🔵") ? roll*2 : roll;
+        finalMulti = winM * slotMulti;
+        anim.textContent = `${winColor} GEWINNT!`;
+        finishBonus(finalMulti, bet);
+      }, 1500);
+    }, 1000);
+    
+  } else if(gameType === 'pachinko') {
+    anim.textContent = "Puck fällt...";
+    setTimeout(() => {
+      let drops = [10, 20, 50, 100, 200, "DOUBLE"];
+      let hit = drops[Math.floor(Math.random()*drops.length)];
+      if(hit === "DOUBLE") {
+        anim.textContent = "✨ DOUBLE! ✨";
+        let reHit = [20, 40, 100, 200, 500][Math.floor(Math.random()*5)];
+        finalMulti = reHit * slotMulti;
+        setTimeout(() => finishBonus(finalMulti, bet), 1000);
+      } else {
+        finalMulti = hit * slotMulti;
+        finishBonus(finalMulti, bet);
+      }
+    }, 2000);
+    
+  } else if(gameType === 'cash') {
+    anim.textContent = "Ziel auswählen! (Auto-Pick)";
+    setTimeout(() => {
+      let hit = Math.floor(Math.random() * 50) + 10; 
+      finalMulti = hit * slotMulti;
+      finishBonus(finalMulti, bet);
+    }, 1500);
+    
+  } else if(gameType === 'crazy') {
+    title.style.color = "#e74c3c";
+    anim.textContent = "🚪 WELT WIRD GEÖFFNET...";
+    setTimeout(() => {
+      let wheelRes = [20, 50, 100, 200, "DOUBLE", "TRIPLE"];
+      let hit = wheelRes[Math.floor(Math.random()*wheelRes.length)];
+      
+      if(hit === "DOUBLE" || hit === "TRIPLE") {
+         anim.textContent = `✨ ${hit} ✨`;
+         let reHit = Math.floor(Math.random() * 500) + 200;
+         finalMulti = reHit * slotMulti;
+         setTimeout(() => finishBonus(finalMulti, bet), 1500);
+      } else {
+         finalMulti = hit * slotMulti;
+         finishBonus(finalMulti, bet);
+      }
+    }, 2500);
+  }
+}
+
+function finishBonus(multi, bet) {
+  const resDiv = document.getElementById('ct-bonus-result');
+  resDiv.textContent = `${multi}x MULTIPLIKATOR!`;
+  
+  const win = bet * multi; 
+  addScore(win);
+  triggerWin(win);
+  
+  setTimeout(() => {
+    document.getElementById('ct-bonus-overlay').style.display = 'none';
+    resetCtGame();
+  }, 3000);
+}
+
+function resetCtGame() {
+  ctState.spinning = false;
+  ctState.bets = { '1':0, '2':0, '5':0, '10':0, 'coin':0, 'pachinko':0, 'cash':0, 'crazy':0 };
+  ctState.totalBet = 0;
+  disableButtons(false);
+  updateCasinoUI();
+  updateCtUI();
+  document.querySelectorAll('.ct-bet-btn').forEach(b => b.classList.remove('active-slot-boost'));
+}
     }, 100);
   });
 }
