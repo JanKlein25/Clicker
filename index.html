@@ -5740,17 +5740,24 @@ function getCtIcon(type) {
 
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
-  
-  // --- FIX START: Browser zwingen, die aktuelle Position zu erkennen ---
-  // Falls das Rad noch keinen Transform hat, setzen wir ihn hart auf 0
-  if (!wheel.style.transform) {
-    wheel.style.transform = 'rotate(0deg)';
-  }
-  // Diese Zeile ist magisch: Sie zwingt den Browser, den Style zu "lesen". 
-  // Das verhindert den Fehler beim ersten Spin.
-  void wheel.offsetHeight; 
-  // --- FIX ENDE ---
 
+  // --- SCHRITT 1: Aktuelle Rotation sicherstellen ---
+  // Falls undefined, auf 0 setzen
+  if (typeof ctState.rotation === 'undefined') {
+    ctState.rotation = 0;
+  }
+
+  // --- SCHRITT 2: "Reset" durchführen (Die Nuklear-Lösung) ---
+  // Wir schalten die Animation KURZZEITIG AUS, damit der Browser
+  // die aktuelle Position (Startpunkt) sofort akzeptiert.
+  wheel.style.transition = 'none';
+  wheel.style.transform = `rotate(${ctState.rotation}deg)`;
+  
+  // Reflow erzwingen (Browser zum Zeichnen zwingen)
+  // Das ist der wichtigste Trick!
+  void wheel.offsetHeight; 
+
+  // --- SCHRITT 3: Ziel berechnen (Deine Logik) ---
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
@@ -5759,10 +5766,10 @@ function startWheelPhysics() {
   
   const targetAngleInOneRotation = 360 - (segmentIndex * degPerSeg) - (degPerSeg / 2);
 
-  // Sicherstellen, dass rotation eine Zahl ist
-  let currentTotalRotation = ctState.rotation || 0;
+  // Wir rechnen immer von der aktuellen Rotation weiter
+  let currentTotalRotation = ctState.rotation;
   
-  // Mindestens 5 volle Runden (1800 Grad)
+  // Mindestens 5 volle Runden (1800 Grad) draufrechnen
   let nextMinimumRotation = currentTotalRotation + (360 * 5);
   
   const currentMod = nextMinimumRotation % 360;
@@ -5774,14 +5781,22 @@ function startWheelPhysics() {
   
   let finalRotation = nextMinimumRotation + adjustment;
   
-  // Jitter
+  // Jitter (Zufall)
   const jitter = (Math.random() * degPerSeg * 0.8) - (degPerSeg * 0.4);
   finalRotation += jitter;
 
+  // Neuen Wert im State speichern
   ctState.rotation = finalRotation;
   
+  // --- SCHRITT 4: Animation wieder EINSCHALTEN und drehen ---
+  // Wir setzen die Transition jetzt per JS, damit sie frisch ist.
+  wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
+  
+  // Da wir vorhin einen Reflow erzwungen haben, animiert er jetzt 
+  // garantiert von der Start- zur Endposition.
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
+  // Ergebnis auswerten
   setTimeout(() => {
     evaluateCtResult(winningSegment);
   }, 5000);
