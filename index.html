@@ -2183,35 +2183,35 @@
   transform: translateZ(0); /* Performance Boost */
 }
 
-/* Speichen (Linien) */
+/* Speichen (Linien) - EXAKT ZENTRIERT */
 .wheel-separator {
   position: absolute;
-  top: 0; left: 50%;
-  width: 2px;
-  height: 50%;
-  background: linear-gradient(to bottom, #ffd700, #b8860b);
-  transform-origin: bottom center;
+  top: 0; 
+  left: 50%;
+  width: 2px; /* Liniendicke */
+  height: 50%; 
+  background: rgba(0,0,0,0.5); /* Etwas dunkler für besseren Kontrast */
+  transform-origin: bottom center; 
   z-index: 5;
-  /* HIER IST DER FIX: */
-  margin-left: -1px; /* Zieht die 2px Linie genau in die Mitte */
+  margin-left: -1px; /* WICHTIG: Hälfte der Breite nach links, damit es mittig sitzt */
 }
 
-/* Zahlen / Text-Container */
+/* Zahlen / Text-Container - EXAKT ZENTRIERT */
 .wheel-text {
   position: absolute;
   top: 0; 
   left: 50%;
-  width: 30px; 
-  height: 50%; /* WICHTIG: Geht exakt bis zur Mitte */
-  margin-left: -15px; /* Zentriert den Container */
-  transform-origin: bottom center; /* Drehpunkt exakt unten */
+  width: 40px; 
+  height: 50%; 
+  margin-left: -20px; /* WICHTIG: Hälfte der Breite nach links */
+  transform-origin: bottom center; 
   
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
   
-  padding-top: 12px; /* Abstand der Zahl vom Rand */
+  padding-top: 15px; /* Text etwas weiter reinziehen */
   
   font-family: 'Roboto', sans-serif;
   font-weight: 900;
@@ -5606,72 +5606,72 @@ let ctState = {
   topSlot: { target: null, multi: 1 }
 };
 
-// Initialisiert das Rad mit "echten" Segmenten (Goldene Speichen, Text)
 function initCrazyWheel() {
   const wheel = document.getElementById('crazy-wheel');
   if(!wheel) return;
   wheel.innerHTML = ''; 
 
-  // 1. Hintergrund via Conic Gradient erstellen
-  let gradientStr = "";
-  const count = CT_SEGMENTS.length; // 54 Segmente
-  const degPerSeg = 360 / count;
-  
-  CT_SEGMENTS.forEach((seg, i) => {
-    // Farben berechnen
-    const startAngle = i * degPerSeg;
-    const endAngle = (i + 1) * degPerSeg;
-    gradientStr += `${CT_COLORS[seg]} ${startAngle}deg ${endAngle}deg, `;
+  // Logo in die Mitte
+  const logo = document.createElement('div');
+  logo.className = 'wheel-center-logo';
+  logo.innerHTML = '🤪'; 
+  wheel.appendChild(logo);
 
-    // 2. Elemente erzeugen (Text & Trennlinien)
+  let gradientParts = [];
+  const count = 54;
+  const degPerSeg = 360 / count; // Exakt 6.66666... Grad
+  
+  // Wir erstellen alles in EINER Schleife, damit es synchron ist
+  for (let i = 0; i < count; i++) {
+    const segType = CT_SEGMENTS[i];
     
-    // a) Trennlinie (Rechts vom Segment)
+    // 1. Winkel berechnen
+    const startDeg = i * degPerSeg;
+    const endDeg = (i + 1) * degPerSeg;
+    const centerDeg = startDeg + (degPerSeg / 2);
+
+    // 2. Hintergrund-Teil für CSS Gradient speichern
+    // WICHTIG: Harte Kanten definieren! "Farbe StartGrad EndGrad"
+    gradientParts.push(`${CT_COLORS[segType]} ${startDeg}deg ${endDeg}deg`);
+
+    // 3. Trennlinie (Rechts vom Segment)
+    // Die Linie muss genau am Ende des Segments sitzen
     const separator = document.createElement('div');
     separator.className = 'wheel-separator';
-    // Drehung auf das Ende des Segments setzen
-    separator.style.transform = `rotate(${endAngle}deg)`; 
+    separator.style.transform = `rotate(${endDeg}deg)`; 
     wheel.appendChild(separator);
 
-    // b) Text (Mitte des Segments)
+    // 4. Text (Mitte des Segments)
     const textEl = document.createElement('div');
     textEl.className = 'wheel-text';
     
-    let label = seg;
+    let label = segType;
     let specialClass = '';
     
-    // Labels formatieren
-    if(seg === 'coin') { label = 'COIN<br>FLIP'; specialClass = 'wt-coin'; }
-    else if(seg === 'pachinko') { label = 'PACH<br>INKO'; specialClass = 'wt-pachinko'; }
-    else if(seg === 'cash') { label = 'CASH<br>HUNT'; specialClass = 'wt-cash'; }
-    else if(seg === 'crazy') { label = 'CRAZY<br>TIME'; specialClass = 'wt-crazy'; }
+    if(segType === 'coin') { label = 'COIN<br>FLIP'; specialClass = 'wt-coin'; }
+    else if(segType === 'pachinko') { label = 'PACH<br>INKO'; specialClass = 'wt-pachinko'; }
+    else if(segType === 'cash') { label = 'CASH<br>HUNT'; specialClass = 'wt-cash'; }
+    else if(segType === 'crazy') { label = 'CRAZY<br>TIME'; specialClass = 'wt-crazy'; }
     
     textEl.innerHTML = label;
     if(specialClass) textEl.classList.add(specialClass);
     
-    // Wichtig: Textfarbe für normale Zahlen (Weiß auf Dunkel, Schwarz auf Hell)
     if(!specialClass) {
         textEl.style.color = "#fff";
-        // Ausnahme: Auf Gelb (2) sieht Schwarz besser aus
-        if(seg === '2') textEl.style.color = "#000"; 
-        textEl.style.fontSize = "1rem"; // Zahlen etwas größer
+        if(segType === '2') textEl.style.color = "#000"; 
+        textEl.style.fontSize = "1rem";
     }
 
-    // WICHTIG: Winkel genau in die Mitte des Segments
-    const midAngle = startAngle + (degPerSeg / 2);
-    textEl.style.transform = `rotate(${midAngle}deg)`;
-    
+    textEl.style.transform = `rotate(${centerDeg}deg)`;
     wheel.appendChild(textEl);
-  });
+  }
   
-  // Gradient String finalisieren und setzen
-  gradientStr = "conic-gradient(" + gradientStr.slice(0, -2) + ")";
-  wheel.style.background = gradientStr;
-
-  // Logo in die Mitte setzen (überlagert alles)
-  const logo = document.createElement('div');
-  logo.className = 'wheel-center-logo';
-  logo.innerHTML = '🤪'; // Emoji statt Text, passt oft besser in den kleinen Kreis
-  wheel.appendChild(logo);
+  // 5. Den perfekten Gradient setzen
+  const gradientString = "conic-gradient(" + gradientParts.join(", ") + ")";
+  wheel.style.background = gradientString;
+  
+  // Initialen Reset sicherstellen
+  wheel.style.transform = 'rotate(0deg)';
 }
 
 function ctBet(type) {
@@ -5772,71 +5772,61 @@ function getCtIcon(type) {
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
 
-  // 1. Initialisierung und Reset (Nuklear-Methode)
+  // 1. State Check
   if (typeof ctState.rotation === 'undefined') {
     ctState.rotation = 0;
   }
 
-  // Animation ausschalten und Position fixieren
+  // 2. HARD RESET (Animation aus, zeichnen, Animation an)
   wheel.style.transition = 'none';
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
-  void wheel.offsetWidth; // Force Reflow (Wichtig!)
+  void wheel.offsetWidth; // Force Reflow
 
-  // 2. Ziel bestimmen
+  // 3. Ziel-Berechnung
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
-  // 3. EXAKTE MATHEMATIK (Keine manuellen Offsets mehr)
-  const segCount = 54;
-  const degPerSeg = 360 / segCount; // = 6.66666... Grad
+  const count = 54;
+  const degPerSeg = 360 / count;
   
-  // Wir berechnen den Bereich des Feldes auf dem Kreis (0 bis 360)
-  // Segment 0 startet bei 0°. Segment 1 bei 6.66°.
-  const startOfSegment = segmentIndex * degPerSeg;
-  const endOfSegment = (segmentIndex + 1) * degPerSeg;
-
-  // SICHERHEITSZONE: Wir bleiben 1.5 Grad von jeder Linie weg.
-  // Das garantiert, dass wir niemals auf der Linie landen.
-  const safeStart = startOfSegment + 1.5; 
-  const safeEnd = endOfSegment - 1.5;
-
-  // Wähle einen zufälligen Punkt EXAKT in dieser sicheren Zone
+  // Wo fängt das Feld an, wo hört es auf?
+  const segStart = segmentIndex * degPerSeg;
+  const segEnd = (segmentIndex + 1) * degPerSeg;
+  
+  // SICHERHEITS-ZONE: Wir halten 1 Grad Abstand zu den Linien
+  const safeStart = segStart + 1.0;
+  const safeEnd = segEnd - 1.0;
+  
+  // Zufälliger Punkt IM sicheren Bereich
   const randomAngleInSegment = safeStart + Math.random() * (safeEnd - safeStart);
   
-  // 4. Rotation berechnen
-  // Um den Punkt "randomAngle" nach oben (auf 0°) zu drehen, müssen wir
-  // das Rad um (360 - randomAngle) drehen.
+  // Ziel-Rotation für das Rad (Rad dreht sich, Pfeil ist oben bei 0/360)
   const targetRotationSingle = 360 - randomAngleInSegment;
 
-  // Aktuelle Umdrehungen holen
+  // 4. Runden addieren
   let currentTotalRotation = ctState.rotation;
+  let nextMinimumRotation = currentTotalRotation + (360 * 5); // 5 volle Runden
   
-  // Mindestens 5 volle Runden (1800 Grad) draufrechnen für den Effekt
-  // Wir nutzen Math.ceil, um sicherzustellen, dass wir immer vorwärts drehen
-  let nextMinimumRotation = currentTotalRotation + (360 * 5);
-  
-  // Den Anschluss finden (Modulo 360)
   const currentMod = nextMinimumRotation % 360;
   let adjustment = targetRotationSingle - currentMod;
   
-  // Nur vorwärts drehen
+  // Immer vorwärts
   if (adjustment < 0) {
     adjustment += 360;
   }
   
-  // Finaler Wert
   let finalRotation = nextMinimumRotation + adjustment;
   
   // Speichern
   ctState.rotation = finalRotation;
 
-  // 5. Animation starten
+  // 5. Starten
   setTimeout(() => {
     wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
     wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   }, 50);
   
-  // 6. Ergebnis auswerten
+  // 6. Auswerten
   setTimeout(() => {
     evaluateCtResult(winningSegment);
   }, 5050);
