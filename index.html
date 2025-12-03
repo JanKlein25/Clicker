@@ -2626,6 +2626,40 @@
 .ct-help-desc { font-size: 0.75rem; color: #aaa; }
 .ct-help-desc strong { color: #fff; display: block; font-size: 0.85rem; }
   
+  /* --- CRAZY TIME HELP OVERLAY STYLES (Hatte gefehlt) --- */
+#ct-help-overlay {
+  position: fixed; /* WICHTIG: Fixed, damit es über allem schwebt */
+  top: 0; 
+  left: 0; 
+  width: 100vw; /* Volle Breite */
+  height: 100vh; /* Volle Höhe */
+  background: rgba(0,0,0,0.92); /* Dunkler Hintergrund */
+  z-index: 99999; /* Muss der höchste Wert sein */
+  display: flex; /* Zentriert die Box */
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.ct-help-box {
+  background: #18181b;
+  width: 95%;
+  max-width: 550px; 
+  max-height: 85vh; /* Damit man scrollen kann, falls der Bildschirm klein ist */
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 0 80px rgba(0,0,0,1);
+  animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+  
   </style>
 
 </head>
