@@ -5741,32 +5741,22 @@ function getCtIcon(type) {
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
 
-  // --- SCHRITT 1: Aktuelle Rotation sicherstellen ---
-  // Falls undefined, auf 0 setzen
+  // 1. Aktuelle Rotation sicherstellen
   if (typeof ctState.rotation === 'undefined') {
     ctState.rotation = 0;
   }
 
-  // --- SCHRITT 2: "Reset" durchführen (Die Nuklear-Lösung) ---
-  // Wir schalten die Animation KURZZEITIG AUS, damit der Browser
-  // die aktuelle Position (Startpunkt) sofort akzeptiert.
-  wheel.style.transition = 'none';
-  wheel.style.transform = `rotate(${ctState.rotation}deg)`;
-  
-  // Reflow erzwingen (Browser zum Zeichnen zwingen)
-  // Das ist der wichtigste Trick!
-  void wheel.offsetHeight; 
-
-  // --- SCHRITT 3: Ziel berechnen (Deine Logik) ---
+  // 2. Ziel berechnen (Mathematik)
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
   const segCount = 54;
   const degPerSeg = 360 / segCount;
   
+  // Wo muss das Rad hin?
   const targetAngleInOneRotation = 360 - (segmentIndex * degPerSeg) - (degPerSeg / 2);
 
-  // Wir rechnen immer von der aktuellen Rotation weiter
+  // Aktueller Stand
   let currentTotalRotation = ctState.rotation;
   
   // Mindestens 5 volle Runden (1800 Grad) draufrechnen
@@ -5781,25 +5771,33 @@ function startWheelPhysics() {
   
   let finalRotation = nextMinimumRotation + adjustment;
   
-  // Jitter (Zufall)
+  // Jitter (Zufall) hinzufügen
   const jitter = (Math.random() * degPerSeg * 0.8) - (degPerSeg * 0.4);
   finalRotation += jitter;
 
-  // Neuen Wert im State speichern
-  ctState.rotation = finalRotation;
-  
-  // --- SCHRITT 4: Animation wieder EINSCHALTEN und drehen ---
-  // Wir setzen die Transition jetzt per JS, damit sie frisch ist.
-  wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
-  
-  // Da wir vorhin einen Reflow erzwungen haben, animiert er jetzt 
-  // garantiert von der Start- zur Endposition.
+  // --- DER FIX: ZEITLICHE TRENNUNG ---
+
+  // A. ZUERST: Animation ausschalten und Startposition festnageln
+  wheel.style.transition = 'none';
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
-  // Ergebnis auswerten
+  // Browser zwingen, das zu zeichnen
+  void wheel.offsetWidth;
+
+  // B. DANACH: State updaten
+  ctState.rotation = finalRotation;
+
+  // C. VERZÖGERTER START (50ms): Animation einschalten und drehen
+  // Dieser Timeout garantiert, dass der Browser den Startpunkt registriert hat.
+  setTimeout(() => {
+    wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
+    wheel.style.transform = `rotate(${ctState.rotation}deg)`;
+  }, 50);
+  
+  // D. Ergebnis auswerten (5000ms Animation + 50ms Verzögerung = 5050ms)
   setTimeout(() => {
     evaluateCtResult(winningSegment);
-  }, 5000);
+  }, 5050);
 }
 
 function evaluateCtResult(result) {
