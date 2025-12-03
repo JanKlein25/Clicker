@@ -5802,23 +5802,23 @@ function startWheelPhysics() {
   
   let finalRotation = nextMinimumRotation + adjustment;
   
-  // --- ÄNDERUNG: Kalibrierung zurücksetzen ---
+  // --- ÄNDERUNG: Kalibrierung & Fein-Tuning ---
   
-  // 1. Jitter (Zufall) minimal halten (+/- 1 Grad)
+  // 1. Jitter (Zufall) sehr klein halten (+/- 1 Grad)
+  // Damit der Zeiger nicht aus Versehen auf die Linie rutscht
   const maxWobble = 1.0; 
   const jitter = (Math.random() * maxWobble * 2) - maxWobble;
   finalRotation += jitter;
 
-  // 2. KALIBRIERUNG (JETZT NEGATIV)
-  // Wir müssen das Rad ein Stück zurück (gegen den Uhrzeigersinn) drehen,
-  // damit der rechte Nachbar (Crazy Time) unter den Zeiger rutscht.
-  // -3 Grad korrigiert die vorherige Verschiebung.
-  const CALIBRATION_OFFSET = -3; 
+  // 2. KALIBRIERUNG (+4 Grad)
+  // Das schiebt das Rad ein Stück weiter nach rechts (im Uhrzeigersinn).
+  // Dadurch wandert die "1" (die links von der 2 war) unter den Zeiger.
+  const CALIBRATION_OFFSET = 4; 
   finalRotation += CALIBRATION_OFFSET;
 
   // --- ANIMATION STARTEN ---
 
-  // Reset
+  // Reset (Nuklear-Lösung)
   wheel.style.transition = 'none';
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
@@ -5827,7 +5827,7 @@ function startWheelPhysics() {
   // Neuen Wert setzen
   ctState.rotation = finalRotation;
 
-  // Start
+  // Start mit Verzögerung
   setTimeout(() => {
     wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
     wheel.style.transform = `rotate(${ctState.rotation}deg)`;
