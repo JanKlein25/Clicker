@@ -5741,53 +5741,59 @@ function getCtIcon(type) {
 function startWheelPhysics() {
   const wheel = document.getElementById('crazy-wheel');
   
-  // 1. Zufälliges Segment auswählen (0 bis 53)
+  // 1. Zufälliges Segment bestimmen
   const segmentIndex = Math.floor(Math.random() * 54);
   const winningSegment = CT_SEGMENTS[segmentIndex];
   
-  // 2. Winkel berechnen
+  // 2. Winkel-Mathematik
   const segCount = 54;
   const degPerSeg = 360 / segCount;
   
-  // Wir wollen, dass das Segment oben (bei 0°) landet.
-  // Da CSS 'rotate' im Uhrzeigersinn dreht, müssen wir das Rad so weit drehen,
-  // bis das Segment von seiner Startposition einmal ganz rum bis oben gewandert ist.
-  // Position des Segments im Array * Grad pro Segment = Startwinkel des Segments.
-  // 360 - Startwinkel = Drehung nötig, damit es oben steht.
-  const targetBaseAngle = 360 - (segmentIndex * degPerSeg);
+  // 3. Wo muss das Rad stehen, damit das Segment oben ist?
+  // Das Rad dreht im Uhrzeigersinn. Um Segment X nach oben (0°) zu holen,
+  // müssen wir 360 minus die Position des Segments drehen.
+  // Minus (degPerSeg / 2) sorgt dafür, dass wir die MITTE des Segments treffen.
+  const targetAngleInOneRotation = 360 - (segmentIndex * degPerSeg) - (degPerSeg / 2);
 
-  // 3. Aktuelle Rotation berücksichtigen
-  // Wir nehmen die aktuelle Rotation und rechnen den "Rest" (Modulo 360) raus, 
-  // um zu wissen, wo wir virtuell gerade stehen.
-  const currentRotationMod = ctState.rotation % 360;
+  // 4. Aktuelle Rotation holen (wir speichern diese in ctState)
+  // Falls noch nie gedreht wurde, ist es 0.
+  let currentTotalRotation = ctState.rotation || 0;
   
-  // Berechne die Distanz, die wir NOCH drehen müssen, um das Ziel zu erreichen.
-  let distanceToTarget = targetBaseAngle - currentRotationMod;
+  // 5. Mindestens 5 volle Runden (1800 Grad) hinzufügen
+  // Wir nehmen die aktuelle Rotation und rechnen 5 * 360 drauf.
+  let nextMinimumRotation = currentTotalRotation + (360 * 5);
   
-  // Wenn die Distanz negativ ist (wir müssten zurückdrehen), addieren wir 360,
-  // damit wir immer vorwärts drehen.
-  if (distanceToTarget < 0) {
-    distanceToTarget += 360;
+  // 6. Ausrichtung berechnen
+  // Wo würde das Rad stehen, wenn wir einfach nur die 5 Runden drehen?
+  // Wir schauen uns den Restwert (Mod 360) an.
+  const currentMod = nextMinimumRotation % 360;
+  
+  // Wir berechnen die Differenz zum gewünschten Ziel-Winkel
+  let adjustment = targetAngleInOneRotation - currentMod;
+  
+  // Falls die Anpassung negativ ist (wir müssten rückwärts drehen),
+  // drehen wir lieber noch eine Runde vorwärts (+360), damit es flüssig aussieht.
+  if (adjustment < 0) {
+    adjustment += 360;
   }
   
-  // 4. Zufall (Jitter) innerhalb des Segments hinzufügen
-  // Damit der Zeiger nicht immer exakt in der Mitte des Feldes landet.
-  // Wir variieren um +/- 40% der Feldbreite.
-  const jitter = (Math.random() * degPerSeg * 0.8) - (degPerSeg * 0.4);
-
-  // 5. Endgültige Drehung berechnen
-  // 5 volle Umdrehungen (1800°) + die Distanz zum Ziel + der Zufall + halbes Segment Korrektur (Zentrierung)
-  // Das "- (degPerSeg / 2)" sorgt dafür, dass wir die Mitte des Segments anpeilen, nicht den Rand.
-  const extraSpins = 360 * 5; 
-  const totalSpin = extraSpins + distanceToTarget + jitter - (degPerSeg / 2);
-
-  // Auf den globalen State addieren (WICHTIG: += nicht =)
-  ctState.rotation += totalSpin;
+  // 7. Finale Rotation berechnen
+  let finalRotation = nextMinimumRotation + adjustment;
   
-  // CSS anwenden
+  // 8. Etwas Zufall (Jitter) hinzufügen
+  // Damit der Zeiger nicht immer roboterhaft exakt in der Mitte landet.
+  // Variiert um +/- 40% der Segmentbreite.
+  const jitter = (Math.random() * degPerSeg * 0.8) - (degPerSeg * 0.4);
+  finalRotation += jitter;
+
+  // 9. WICHTIG: Den neuen Gesamtwert im State speichern!
+  // Damit der nächste Spin von hier aus weiterrechnet.
+  ctState.rotation = finalRotation;
+  
+  // 10. Drehung ausführen
   wheel.style.transform = `rotate(${ctState.rotation}deg)`;
   
-  // Ergebnis auswerten nach der Animation (5 Sekunden)
+  // Ergebnis auswerten nach 5 Sekunden (Dauer der CSS Transition)
   setTimeout(() => {
     evaluateCtResult(winningSegment);
   }, 5000);
