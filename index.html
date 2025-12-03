@@ -2518,6 +2518,33 @@
   border: 1px solid #444;
   pointer-events: none;
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  
+  /* --- NEU: Style für die Ergebnisanzeige --- */
+.ct-result-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: rgba(0, 0, 0, 0.95);
+  border: 3px solid #f1c40f;
+  padding: 20px 40px;
+  border-radius: 15px;
+  text-align: center;
+  z-index: 100;
+  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ct-result-popup.show {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.ct-res-icon { font-size: 3rem; margin-bottom: 5px; display: block; }
+.ct-res-text { font-size: 1.5rem; font-weight: 900; color: #fff; text-transform: uppercase; }
+.ct-res-win { font-size: 1.2rem; font-weight: bold; color: #2ecc71; margin-top: 5px; }
+.ct-res-loss { font-size: 1rem; color: #aaa; margin-top: 5px; }
+  
   </style>
 
 </head>
@@ -5729,6 +5756,10 @@ function runTopSlot() {
 }
 
 function getCtIcon(type) {
+  if(type === '1') return '1️⃣'; // Blau
+  if(type === '2') return '2️⃣'; // Gelb
+  if(type === '5') return '5️⃣'; // Pink
+  if(type === '10') return '🔟'; // Lila
   if(type === 'coin') return '🪙';
   if(type === 'pachinko') return '🟣';
   if(type === 'cash') return '🎯';
@@ -5812,39 +5843,78 @@ function startWheelPhysics() {
 function evaluateCtResult(result) {
   let multiplier = 1;
   let isBonus = ['coin','pachinko','cash','crazy'].includes(result);
-  let slotMatch = (ctState.topSlot.target === result);
   
+  // Prüfen, ob der Top Slot (der Kasten oben) passt
+  let slotMatch = (ctState.topSlot.target === result);
   if(slotMatch) multiplier = ctState.topSlot.multi;
   
   const playerBet = ctState.bets[result];
   let totalWin = 0;
   
-  if(playerBet > 0) {
-    if(!isBonus) {
-      const numVal = parseInt(result);
-      const odds = numVal * multiplier;
-      totalWin = playerBet + (playerBet * odds);
-      triggerWin(totalWin);
-      
-      const msg = document.getElementById('bj-message');
-      msg.textContent = `${result} GEWONNEN!`;
-      msg.innerHTML += `<div style="font-size:0.6em; margin-top:5px;">+${formatNum(totalWin)}</div>`;
-      msg.classList.add('show');
-      setTimeout(()=>msg.classList.remove('show'), 2000);
-      
-    } else {
-      playCtBonus(result, multiplier, playerBet);
-      return; 
-    }
-  } else {
-    const msg = document.getElementById('bj-message');
-    msg.textContent = `${result.toUpperCase()}!`;
-    msg.style.color = CT_COLORS[result];
-    msg.classList.add('show');
-    setTimeout(()=>msg.classList.remove('show'), 2000);
+  // --- BONUS RUNDE ---
+  if(playerBet > 0 && isBonus) {
+    // Wenn Bonus getroffen, startet das Minigame (Anzeige kommt danach)
+    playCtBonus(result, multiplier, playerBet);
+    return; 
   }
+
+  // --- NORMALE ZAHLEN ---
+  let winText = "";
+  let isWin = false;
+
+  if (playerBet > 0) {
+    // GEWONNEN
+    const numVal = parseInt(result);
+    // Formel: Einsatz + (Einsatz * Multiplikator)
+    // Beispiel: 10 gesetzt auf 2. Gewinn = 10 + (10*2) = 30.
+    // Wenn Slot-Multiplikator 5x ist: 10 + (10 * 2 * 5) = 110.
+    const odds = numVal * multiplier;
+    totalWin = playerBet + (playerBet * odds);
+    
+    triggerWin(totalWin);
+    isWin = true;
+    winText = `+${formatNum(totalWin)} Kleinis`;
+  } else {
+    // NICHT GEWETTET
+    winText = "Kein Einsatz";
+  }
+
+  // --- ANZEIGE AUFRUFEN ---
+  showCtResultPopup(result, winText, isWin);
   
+  // Spiel zurücksetzen
   resetCtGame();
+}
+
+// 3. Neue Hilfsfunktion für das Popup (muss auch ins Script)
+function showCtResultPopup(result, subText, isWin) {
+  // Wir erzeugen das Popup dynamisch, damit du nichts am HTML ändern musst
+  let popup = document.getElementById('ct-result-popup-dynamic');
+  
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'ct-result-popup-dynamic';
+    popup.className = 'ct-result-popup';
+    // In den Container einfügen
+    document.querySelector('.crazy-container').appendChild(popup);
+  }
+
+  const icon = getCtIcon(result);
+  const subClass = isWin ? 'ct-res-win' : 'ct-res-loss';
+
+  popup.innerHTML = `
+    <span class="ct-res-icon">${icon}</span>
+    <div class="ct-res-text">${result.toUpperCase()}</div>
+    <div class="${subClass}">${subText}</div>
+  `;
+
+  // Anzeigen
+  setTimeout(() => popup.classList.add('show'), 10);
+
+  // Nach 3 Sekunden ausblenden
+  setTimeout(() => {
+    popup.classList.remove('show');
+  }, 3000);
 }
 
 function playCtBonus(gameType, slotMulti, bet) {
