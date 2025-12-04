@@ -3416,7 +3416,19 @@
       <button id="skinsBtn" onclick="openSkins()">🎒 SKINS</button>
     </div>
     <button id="leaderboardBtn" onclick="openLeaderboard()">🏆 LEADERBOARD</button>
-
+    <button id="lotteryBtn" onclick="openLottery()" style="
+      margin-top: 10px;
+      background: linear-gradient(45deg, #d35400, #e67e22);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(211, 84, 0, 0.4);
+      z-index: 25;
+    ">🎰 JACKPOT</button>
     <!-- PRESTIGE BUTTON (NEU) -->
     <button id="prestigeBtn" onclick="openPrestige()" style="display:none;">
       🚀 AUFSTEIGEN
@@ -3483,6 +3495,52 @@
     <div class="buildings-list" id="buildingList"></div>
   </div>
 
+  <!-- LOTTERY MODAL -->
+<div id="lotteryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:17000; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+  <div class="lb-window" style="width:95%; max-width:500px; border-color:#e67e22; display:flex; flex-direction:column;">
+    <button class="close-btn" onclick="closeLottery()">×</button>
+    
+    <div class="lb-header" style="background:linear-gradient(to right, #d35400, #e67e22);">
+      <div class="lb-title">🎰 TÄGLICHER BIER-POT</div>
+    </div>
+
+    <div style="padding:20px; text-align:center; background:#111; display:flex; flex-direction:column; align-items:center;">
+      
+      <!-- Der Countdown -->
+      <div style="font-size:0.9rem; color:#aaa; margin-bottom:5px;">Nächste Ziehung: 20:00 Uhr</div>
+      <div id="lottery-timer" style="font-size:1.5rem; font-weight:bold; color:#fff; font-family:monospace;">--:--:--</div>
+
+      <!-- Das Glücksrad (Canvas) -->
+      <div style="position:relative; margin:20px 0; width:250px; height:250px;">
+        <canvas id="lotteryCanvas" width="250" height="250" style="border-radius:50%; box-shadow:0 0 20px rgba(230, 126, 34, 0.2);"></canvas>
+        <div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:2rem; color:#fff; text-shadow:0 2px 2px #000;">⬇</div>
+      </div>
+
+      <!-- Der Pot Wert -->
+      <div style="background:rgba(255,255,255,0.05); padding:10px 20px; border-radius:10px; margin-bottom:15px; width:100%;">
+        <div style="font-size:0.8rem; color:#aaa;">IM POT</div>
+        <div style="font-size:2rem; color:#f1c40f; font-weight:900;">🍺 <span id="lottery-pot-display">0</span></div>
+      </div>
+
+      <!-- Liste der Teilnehmer -->
+      <div id="lottery-list" style="width:100%; max-height:100px; overflow-y:auto; background:#1a1a1a; border:1px solid #333; border-radius:6px; margin-bottom:15px; padding:5px;">
+        <!-- Wird per JS gefüllt -->
+      </div>
+
+      <!-- Einsatz Controls -->
+      <div id="lottery-controls" style="display:flex; gap:10px; width:100%;">
+        <input type="number" id="lotteryInput" placeholder="Menge" style="flex:1; padding:10px; background:#222; border:1px solid #444; color:#fff; border-radius:6px; font-weight:bold;">
+        <button onclick="enterLottery()" style="background:#e67e22; border:none; padding:10px 20px; color:#fff; font-weight:bold; border-radius:6px; cursor:pointer;">REINSETZEN</button>
+      </div>
+
+      <div id="lottery-winner-msg" style="display:none; margin-top:15px; color:#2ecc71; font-weight:bold; border:1px solid #2ecc71; padding:10px; border-radius:6px; background:rgba(46, 204, 113, 0.1);">
+        Letzter Gewinner:<br><span id="last-winner-name" style="color:#fff;">Niemand</span> (+<span id="last-winner-amt">0</span>)
+      </div>
+
+    </div>
+  </div>
+</div>
+  
   <script>
     /* --- CONFIG & ASSETS --- */
     const SAVE_KEY = 'KleinClicker_Precision_V20';
@@ -3725,6 +3783,9 @@
           tooltipEl.style.top = top + 'px'; tooltipEl.style.left = left + 'px';
         }
       });
+
+      checkLotteryWins();
+      
     }
 
     function gameLoop(now) {
@@ -6619,6 +6680,281 @@ function updateBeerTimer() {
     el.textContent = `${hStr}:${mStr}:${sStr}`;
     el.style.color = "#f1c40f"; // Gold
   }
+}
+  
+  /* --- JACKPOT / LOTTERY SYSTEM --- */
+
+let lotteryData = {
+  bets: {},   // { "Jan": 100, "Malte": 50 }
+  total: 0,
+  lastDraw: 0 // Timestamp der letzten Ziehung
+};
+
+let lotteryTimerInterval;
+const LOTTERY_HOUR = 20; // 20:00 Uhr
+
+function openLottery() {
+  document.getElementById('lotteryModal').style.display = 'flex';
+  syncLottery(); // Daten laden
+  
+  if(lotteryTimerInterval) clearInterval(lotteryTimerInterval);
+  lotteryTimerInterval = setInterval(updateLotteryTimer, 1000);
+  updateLotteryTimer();
+}
+
+function closeLottery() {
+  document.getElementById('lotteryModal').style.display = 'none';
+}
+
+// 1. Daten aus Firebase laden & UI updaten
+function syncLottery() {
+  if(!db) return;
+  const ref = db.ref('lottery');
+  
+  ref.on('value', (snapshot) => {
+    const val = snapshot.val();
+    if(val) {
+      lotteryData = val;
+      if(!lotteryData.bets) lotteryData.bets = {};
+      
+      // UI Update
+      document.getElementById('lottery-pot-display').textContent = formatNum(lotteryData.total || 0);
+      renderLotteryList();
+      drawLotteryWheel();
+
+      // Letzten Gewinner anzeigen
+      if(lotteryData.lastWinnerName) {
+         document.getElementById('lottery-winner-msg').style.display = 'block';
+         document.getElementById('last-winner-name').textContent = lotteryData.lastWinnerName;
+         document.getElementById('last-winner-amt').textContent = formatNum(lotteryData.lastWinnerAmt);
+      }
+    }
+  });
+}
+
+// 2. Bierchen in den Pot setzen
+function enterLottery() {
+  const input = document.getElementById('lotteryInput');
+  const amount = parseInt(input.value);
+  
+  if(isNaN(amount) || amount <= 0) return;
+  if(game.beers < amount) {
+    alert("Nicht genug Bierchen!");
+    return;
+  }
+
+  // Bezahlen
+  game.beers -= amount;
+  updateCasinoUI(); // Bier Anzeige main updaten
+  saveGame();
+
+  // Firebase Update (Transaction für Sicherheit)
+  const ref = db.ref('lottery');
+  ref.transaction((currentData) => {
+    if (currentData === null) {
+        // Initialsierung falls leer
+        return { total: amount, bets: { [game.playerName]: amount }, lastDraw: Date.now() };
+    } else {
+        if (!currentData.bets) currentData.bets = {};
+        if (!currentData.total) currentData.total = 0;
+        
+        // Addieren
+        const oldBet = currentData.bets[game.playerName] || 0;
+        currentData.bets[game.playerName] = oldBet + amount;
+        currentData.total += amount;
+        
+        return currentData;
+    }
+  }, (error, committed, snapshot) => {
+    if (error) {
+      alert('Fehler beim Setzen! Geld zurück.');
+      game.beers += amount; // Refund bei Fehler
+      saveGame();
+    } else {
+      input.value = '';
+      alert(`${amount} Bierchen in den Pot geworfen!`);
+    }
+  });
+}
+
+// 3. Liste der Spieler anzeigen
+function renderLotteryList() {
+  const list = document.getElementById('lottery-list');
+  list.innerHTML = '';
+  
+  if(!lotteryData.bets || Object.keys(lotteryData.bets).length === 0) {
+    list.innerHTML = '<div style="color:#555; text-align:center;">Noch keine Einsätze.</div>';
+    return;
+  }
+
+  // Sortieren nach Einsatz
+  const players = Object.keys(lotteryData.bets).sort((a,b) => lotteryData.bets[b] - lotteryData.bets[a]);
+  
+  players.forEach(p => {
+    const amt = lotteryData.bets[p];
+    const chance = ((amt / lotteryData.total) * 100).toFixed(1);
+    
+    const row = document.createElement('div');
+    row.style.display = 'flex'; row.style.justifyContent = 'space-between';
+    row.style.borderBottom = '1px solid #333'; row.style.padding = '4px'; row.style.fontSize = '0.8rem';
+    
+    // Deinen Namen hervorheben
+    const color = (p === game.playerName) ? '#e67e22' : '#ccc';
+    
+    row.innerHTML = `
+      <span style="color:${color}; font-weight:bold;">${p}</span>
+      <span>${formatNum(amt)} 🍺 <span style="color:#555">(${chance}%)</span></span>
+    `;
+    list.appendChild(row);
+  });
+}
+
+// 4. Das Rad zeichnen (Canvas)
+function drawLotteryWheel() {
+  const canvas = document.getElementById('lotteryCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w/2; const cy = h/2; const r = w/2 - 5;
+  
+  ctx.clearRect(0,0,w,h);
+  
+  if(!lotteryData.bets || lotteryData.total === 0) {
+    // Leeres Rad
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+    ctx.fillStyle = "#222"; ctx.fill(); ctx.strokeStyle="#444"; ctx.stroke();
+    ctx.fillStyle="#555"; ctx.font="20px Arial"; ctx.textAlign="center"; 
+    ctx.fillText("Leer", cx, cy+5);
+    return;
+  }
+
+  let startAngle = 0; // Oben starten (bzw. Canvas startet rechts, wir drehen es gleich)
+  const players = Object.keys(lotteryData.bets);
+  
+  // Zufällige Farben basierend auf Namen (damit sie gleich bleiben)
+  const stringToColor = (str) => {
+    let hash = 0; for(let i=0; i<str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    let c = '#'; for(let i=0; i<3; i++) { let val = (hash >> (i*8)) & 0xFF; c += ('00' + val.toString(16)).substr(-2); }
+    return c;
+  }
+
+  players.forEach(p => {
+    const amt = lotteryData.bets[p];
+    const sliceAngle = (amt / lotteryData.total) * 2 * Math.PI;
+    
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    
+    ctx.fillStyle = stringToColor(p);
+    ctx.fill();
+    ctx.stroke(); // Trennlinie
+    
+    startAngle += sliceAngle;
+  });
+}
+
+// 5. Timer & Ziehung Logik
+function updateLotteryTimer() {
+  const timerEl = document.getElementById('lottery-timer');
+  const now = new Date();
+  
+  // Ziel: Heute 20:00
+  let target = new Date();
+  target.setHours(LOTTERY_HOUR, 0, 0, 0);
+  
+  // Wenn schon vorbei, dann Ziel: Morgen 20:00
+  if (now > target) {
+    target.setDate(target.getDate() + 1);
+  }
+  
+  const diff = target - now;
+  
+  // Formatierung
+  const h = Math.floor(diff / (1000 * 60 * 60));
+  const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const s = Math.floor((diff % (1000 * 60)) / 1000);
+  
+  timerEl.textContent = 
+    (h<10?'0':'')+h + ":" + (m<10?'0':'')+m + ":" + (s<10?'0':'')+s;
+
+  // --- DER TRIGGER ---
+  // Wenn heute noch NICHT gezogen wurde und es nach 20 Uhr ist:
+  if (lotteryData.lastDraw) {
+    const lastDrawDate = new Date(lotteryData.lastDraw);
+    const isToday = (lastDrawDate.getDate() === now.getDate() && lastDrawDate.getMonth() === now.getMonth());
+    
+    if ((!isToday && now.getHours() >= LOTTERY_HOUR) && lotteryData.total > 0) {
+      performLotteryDraw();
+    }
+  }
+}
+
+function performLotteryDraw() {
+  if(Math.random() > 0.1) return; // Kleine Verzögerung um Spam zu verhindern
+
+  console.log("Führe Ziehung durch...");
+
+  const ref = db.ref('lottery');
+  ref.transaction((data) => {
+    if(!data || !data.bets || data.total === 0) return data;
+    
+    const now = new Date();
+    const last = new Date(data.lastDraw || 0);
+    if(last.getDate() === now.getDate() && now.getHours() >= LOTTERY_HOUR) {
+        return; // Schon passiert
+    }
+
+    // GEWINNER ERMITTELN
+    let r = Math.random() * data.total;
+    let winnerName = null;
+    let accumulated = 0;
+    
+    const players = Object.keys(data.bets);
+    for(let p of players) {
+      accumulated += data.bets[p];
+      if(r <= accumulated) {
+        winnerName = p;
+        break;
+      }
+    }
+    
+    if(!winnerName) winnerName = players[players.length-1];
+
+    const winAmount = data.total;
+
+    return {
+      bets: {},
+      total: 0,
+      lastDraw: Date.now(),
+      lastWinnerName: winnerName,
+      lastWinnerAmt: winAmount,
+      pendingPayout: { user: winnerName, amount: winAmount }
+    };
+
+  });
+}
+
+// 6. Gewinn abholen (muss in init() laufen)
+function checkLotteryWins() {
+  if(!db || !game.playerName) return;
+  
+  const ref = db.ref('lottery/pendingPayout');
+  ref.once('value', (snapshot) => {
+    const pay = snapshot.val();
+    if(pay && pay.user === game.playerName) {
+        // ICH HABE GEWONNEN!
+        ref.remove().then(() => {
+            game.beers += pay.amount;
+            saveGame();
+            updateCasinoUI();
+            
+            alert(`🎉 GLÜCKWUNSCH! 🎉\n\nDu hast den Jackpot geknackt!\nGewinn: ${formatNum(pay.amount)} Bierchen.`);
+            spawnConfetti();
+        });
+    }
+  });
 }
   
   </script>
