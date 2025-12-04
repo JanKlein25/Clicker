@@ -2880,6 +2880,101 @@
   font-variant-numeric: tabular-nums; 
 }
   
+  /* --- NOTFALL-FIX FÜR KLEINE LAPTOPS --- */
+    @media screen and (max-width: 1600px) {
+      
+      /* 1. Titel ganz klein und nach oben */
+      .bakery-name {
+        font-size: 1.2rem !important;
+        top: 5px !important;
+      }
+
+      /* 2. Top-Player Anzeige direkt darunter */
+      #top-player-display {
+        top: 35px !important;
+        font-size: 0.8rem !important;
+      }
+
+      /* 3. Score-Bereich nach oben ziehen und verkleinern */
+      .score-container {
+        margin-top: 60px !important; /* Zieht alles hoch unter den Titel */
+        margin-bottom: 5px !important;
+      }
+
+      #score {
+        font-size: 2rem !important; /* Zahl deutlich kleiner */
+      }
+
+      .currency-label {
+        font-size: 0.9rem !important;
+        margin-top: 0 !important;
+      }
+
+      /* CPS Anzeige kompakt */
+      #cps {
+        margin-top: 2px !important;
+        font-size: 0.8rem !important;
+        padding: 2px 10px !important;
+        min-width: auto !important; /* Breite automatisch anpassen */
+      }
+
+      /* Bierchen Wallet kleiner */
+      .beer-wallet {
+        margin-top: 5px !important;
+        padding: 2px 10px !important;
+      }
+      .beer-wallet-icon { width: 16px !important; height: 16px !important; }
+      #main-beer-display { font-size: 0.9rem !important; }
+
+      /* 4. ALLE Buttons kleiner machen */
+      #casinoBtn, #skinsBtn, #leaderboardBtn, #lotteryBtn, #prestigeBtn, .nav-btn {
+        padding: 5px 12px !important;
+        font-size: 0.8rem !important;
+        margin-top: 4px !important;
+        min-height: 0 !important; /* Verhindert Mindesthöhe */
+      }
+      
+      /* 5. Das Gesicht (Hauptbild) massiv verkleinern */
+      #bigKlein {
+        width: 130px !important;  /* Viel kleiner */
+        height: 130px !important;
+        margin-top: 10px !important;
+      }
+
+      /* 6. Rechte Seite (Shop) kompakter machen */
+      .store-header {
+        padding: 5px !important;
+        font-size: 0.75rem !important;
+        min-height: 0 !important;
+      }
+      
+      .click-booster { padding: 5px !important; }
+      .cb-card { padding: 5px !important; }
+      
+      /* Upgrade Boxen kleiner */
+      .upgrades-container {
+        min-height: 50px !important;
+        max-height: 100px !important;
+        padding: 5px !important;
+      }
+      .upgrade-crate {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 1.2rem !important;
+      }
+
+      /* Gebäude Liste */
+      .building-row {
+        height: 50px !important; /* Sehr flach */
+        padding: 0 5px !important;
+      }
+      .b-icon { font-size: 1.4rem !important; width: 30px !important; margin-right: 5px !important; }
+      .b-name { font-size: 0.8rem !important; margin-bottom: 0 !important; }
+      .b-cps { font-size: 0.6rem !important; }
+      .b-cost { font-size: 0.7rem !important; }
+      .b-count { font-size: 1.1rem !important; }
+    }
+  
   </style>
 
 </head>
