@@ -2930,6 +2930,57 @@
     </div>
   </div>
 
+  <!-- BIERCHEN INFO MODAL -->
+<div id="beerModal" style="
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 15000;
+    display: none;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+">
+  <div class="lb-window" style="border-color: #f1c40f; box-shadow: 0 0 80px rgba(241, 196, 15, 0.4);">
+    <button class="close-btn" onclick="closeBeerModal()">×</button>
+    
+    <div class="lb-header" style="background: linear-gradient(to right, #d35400, #f1c40f);">
+      <div class="lb-title" style="color:#fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">🍺 BIERCHEN DEPOT</div>
+    </div>
+
+    <div class="lb-list" style="text-align:center; padding:30px; display:flex; flex-direction:column; align-items:center; gap:15px;">
+      
+      <!-- Großes Bild -->
+      <img src="https://github.com/JanKlein25/Clicker/blob/main/Adobe%20Express%20-%20file%20(9).png?raw=true" 
+           style="width: 120px; filter: drop-shadow(0 0 20px rgba(241, 196, 15, 0.6)); animation: floatAround 4s infinite ease-in-out;">
+
+      <div style="font-size:1.5rem; font-weight:900; color:#fff;">
+        Guthaben: <span id="modal-beer-amount" style="color:#f1c40f;">0</span>
+      </div>
+
+      <div style="width:100%; border-top:1px solid #444; margin:10px 0;"></div>
+
+      <!-- Info 1: Prestige -->
+      <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; width:100%;">
+        <div style="color:#aaa; font-size:0.8rem; text-transform:uppercase;">Prestige Bonus</div>
+        <div style="color:#fff; font-weight:bold;">+25 Bierchen <span style="font-weight:normal; color:#888;">pro Level</span></div>
+      </div>
+
+      <!-- Info 2: Täglicher Bonus & Timer -->
+      <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; width:100%;">
+        <div style="color:#aaa; font-size:0.8rem; text-transform:uppercase;">Täglicher Login</div>
+        <div style="color:#fff; font-weight:bold; margin-bottom:5px;">+50 Bierchen <span style="font-weight:normal; color:#888;">alle 24h</span></div>
+        
+        <div style="margin-top:5px; font-size:0.9rem;">
+          Nächster Bonus in:<br>
+          <span id="beer-timer-display" style="font-size:1.3rem; font-weight:900; color:#f1c40f; font-variant-numeric: tabular-nums;">Lade...</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+  
   <div id="casinoModal">
     <div class="casino-window" id="casinoWindow">
       <button class="close-btn" onclick="closeCasino()">×</button>
@@ -3354,7 +3405,7 @@
       <div id="score">0</div>
       <div class="currency-label">KLEINIS</div>
       <div id="cps">0,0 Kleinis / Sekunde</div>
-        <div class="beer-wallet">
+        <div class="beer-wallet" onclick="openBeerModal()">
           <img src="https://github.com/JanKlein25/Clicker/blob/main/Adobe%20Express%20-%20file%20(9).png?raw=true" class="beer-wallet-icon">
           <span id="main-beer-display">0</span>
         </div>
@@ -6515,6 +6566,59 @@ function getBet() {
       return null;
   }
   return bet;
+}
+  
+  /* --- BIERCHEN MODAL LOGIC --- */
+let beerTimerInterval;
+
+function openBeerModal() {
+  document.getElementById('beerModal').style.display = 'flex';
+  
+  // Aktuellen Stand im Modal anzeigen
+  document.getElementById('modal-beer-amount').textContent = formatNum(Math.floor(game.beers || 0));
+  
+  // Timer sofort starten
+  updateBeerTimer();
+  // Timer jede Sekunde aktualisieren
+  beerTimerInterval = setInterval(updateBeerTimer, 1000);
+}
+
+function closeBeerModal() {
+  document.getElementById('beerModal').style.display = 'none';
+  // Performance: Timer stoppen wenn Fenster zu ist
+  if(beerTimerInterval) clearInterval(beerTimerInterval);
+}
+
+function updateBeerTimer() {
+  const el = document.getElementById('beer-timer-display');
+  if(!el) return;
+
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000;
+  
+  // Wann war der letzte Bonus? (Fallback auf 0)
+  const last = game.lastDailyBonus || 0;
+  
+  // Wann ist der nächste fällig?
+  const nextBonusTime = last + oneDay;
+  const diff = nextBonusTime - now;
+
+  if (diff <= 0) {
+    el.innerHTML = "<span style='color:#2ecc71'>JETZT VERFÜGBAR!</span>";
+  } else {
+    // Zeit umrechnen
+    const h = Math.floor(diff / (1000 * 60 * 60));
+    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+    // Formatierung mit führenden Nullen (z.B. 04:05:01)
+    const hStr = h < 10 ? "0" + h : h;
+    const mStr = m < 10 ? "0" + m : m;
+    const sStr = s < 10 ? "0" + s : s;
+
+    el.textContent = `${hStr}:${mStr}:${sStr}`;
+    el.style.color = "#f1c40f"; // Gold
+  }
 }
   
   </script>
