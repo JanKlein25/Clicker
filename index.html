@@ -2416,37 +2416,101 @@
   text-shadow: 0 0 20px #f1c40f;
 }
     
-  /* --- FIX FÜR MACBOOK / LAPTOP DISPLAYS (1512px und ähnlich) --- */
+ /* --- FIX FÜR MACBOOK / LAPTOP DISPLAYS (NEU & VERBESSERT) --- */
     @media screen and (max-width: 1600px) {
+      /* 1. Linkes Panel: Abstände verringern */
       .bakery-name {
-        font-size: 1.6rem; /* Titel etwas kleiner machen */
-        top: 20px;         /* Etwas höher an den Rand schieben */
+        font-size: 1.5rem; /* Titel kleiner */
+        top: 15px;         /* Ganz nach oben */
+      }
+
+      #top-player-display {
+        top: 55px;         /* Direkt unter den Titel */
+        font-size: 0.9rem;
       }
 
       .score-container {
-        /* Erzwingt einen Abstand nach oben, damit der Score 
-           nicht hinter dem absoluten Titel verschwindet */
-        margin-top: 120px; 
-        margin-bottom: 20px; /* Unteren Abstand verringern */
+        margin-top: 90px;  /* Weniger Abstand nach oben */
+        margin-bottom: 15px;
       }
 
       #score {
-        font-size: 2.5rem; /* Die Zahl etwas kleiner skalieren */
+        font-size: 2.2rem; /* Zahl kleiner */
       }
 
+      .currency-label {
+        font-size: 1.1rem;
+        margin-top: 0;
+      }
+
+      #cps {
+        font-size: 0.9rem;
+        padding: 4px 15px;
+        min-width: 200px;
+        margin-top: 5px;
+      }
+
+      /* 2. Hauptbild deutlich kleiner machen */
       #bigKlein {
-        /* Das Hauptbild etwas verkleinern, damit alles auf den Screen passt */
-        width: 220px;
-        height: 220px;
+        width: 180px;
+        height: 180px;
+        margin: 10px 0; /* Weniger Platz drumherum */
       }
       
-      /* Falls Buttons zu viel Platz wegnehmen */
-      #casinoBtn, #skinsBtn, #leaderboardBtn, #prestigeBtn {
-        padding: 8px 20px;
-        font-size: 0.9rem;
-        margin-top: 10px;
+      /* 3. Buttons kompakter machen */
+      #casinoBtn, #skinsBtn, #leaderboardBtn, #lotteryBtn, #prestigeBtn {
+        padding: 6px 15px;
+        font-size: 0.85rem;
+        margin-top: 6px;
       }
+
+      /* 4. Rechtes Panel (Shop) schmaler & kleiner machen */
+      .right-panel {
+        width: 340px; /* Schmaler */
+      }
+
+      .store-header {
+        padding: 10px;
+        font-size: 0.8rem;
+      }
+
+      /* Upgrade Kisten kleiner */
+      .upgrades-container {
+        max-height: 120px;
+        min-height: 60px;
+        padding: 8px;
+      }
+      
+      .upgrade-crate {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+      }
+
+      /* Gebäude-Liste niedriger machen */
+      .building-row {
+        height: 60px; /* Deutlich flacher */
+        padding: 0 10px;
+      }
+
+      .b-icon {
+        font-size: 1.6rem;
+        width: 40px;
+        margin-right: 10px;
+      }
+
+      .b-name { font-size: 0.85rem; }
+      .b-cps { font-size: 0.65rem; }
+      .b-cost { font-size: 0.75rem; }
+      .b-count { font-size: 1.3rem; }
+      
+      /* Click Booster kleiner */
+      .click-booster { padding: 8px; }
+      .cb-card { padding: 8px; }
+      .cb-title { font-size: 0.85rem; }
+      .cb-btn { padding: 4px 10px; min-width: 80px; }
     }
+    
   #top-player-display {
   position: absolute;
   top: 85px; /* Etwas unter dem Titel */
