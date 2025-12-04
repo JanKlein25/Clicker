@@ -4051,16 +4051,29 @@
     }
 
     function setBetMultiplier(multi) {
-      const input = document.getElementById('betAmount');
-      if (multi === 'max') input.value = Math.floor(game.score);
-      else {
-        let val = parseInt(input.value) || 0;
-        if (val === 0) val = 100;
-        input.value = Math.floor(val * multi);
-      }
-      updateUpgraderCalc();
-      updateMoneyCaseUI();
+  const input = document.getElementById('betAmount');
+  
+  if (multi === 'max') {
+    // HIER IST DER FIX:
+    // Wir prüfen, welche Währung gerade an ist
+    if (casinoCurrency === 'kleinis') {
+       input.value = Math.floor(game.score);
+    } else {
+       // Wenn Bierchen an sind, nehmen wir game.beers
+       input.value = Math.floor(game.beers || 0);
     }
+  } 
+  else {
+    // Das hier bleibt gleich (für x2, /2 Buttons)
+    let val = parseInt(input.value) || 0;
+    if (val === 0) val = 100;
+    input.value = Math.floor(val * multi);
+  }
+  
+  // UI Updates aufrufen
+  updateUpgraderCalc();
+  updateMoneyCaseUI();
+}
 
     /* --- ROULETTE ENGINE --- */
     function generateStrip(count, winningColor) {
