@@ -3727,6 +3727,7 @@
           name: game.playerName,
           score: Math.floor(game.totalScore),
           prestige: game.prestige || 0,
+          beers: Math.floor(game.beers || 0),
           timestamp: firebase.database.ServerValue.TIMESTAMP
         }).catch(err => console.log("Sync error", err));
       }
@@ -5851,7 +5852,7 @@ function formatNum(num, decimals = 0) {
 
       list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Lade...</div>';
 
-      dbRef.orderByChild('prestige').limitToLast(20).once('value').then(snapshot => {
+      dbRef.orderByChild('beers').limitToLast(20).once('value').then(snapshot => {
         const scores = [];
         snapshot.forEach(child => {
           scores.push(child.val());
@@ -5881,10 +5882,10 @@ function formatNum(num, decimals = 0) {
         const el = document.createElement('div');
         el.className = 'lb-entry';
         el.innerHTML = `
-          <div class="${rankClass}">#${rank}</div>
-          <div class="lb-name">${s.name}</div>
-          <div class="lb-score">Lvl ${formatNum(s.prestige || 0)}</div>
-        `;
+      <div class="${rankClass}">#${rank}</div>
+      <div class="lb-name">${s.name}</div>
+      <div class="lb-score" style="color:#f1c40f;">${formatNum(s.beers || 0)} 🍺</div>
+    `;
         list.appendChild(el);
       });
     }
@@ -5894,11 +5895,10 @@ function updateTopPlayer() {
   if (!dbRef) return;
 
   // Wir holen uns den EINEN höchsten Eintrag (sortiert nach Prestige)
-  dbRef.orderByChild('prestige').limitToLast(1).once('value')
+  dbRef.orderByChild('beers').limitToLast(1).once('value')
     .then(snapshot => {
       const val = snapshot.val();
       if (val) {
-        // Firebase gibt ein Objekt zurück { "SpielerName": {score: ...} }
         const keys = Object.keys(val);
         const topKey = keys[0];
         const topData = val[topKey];
@@ -5906,7 +5906,7 @@ function updateTopPlayer() {
         const el = document.getElementById('top-player-display');
         
         // Text setzen: Name + Prestige Level
-        el.innerHTML = `👑 Platz 1: ${topData.name} <span style="font-size:0.8em; color:#ccc;">(Lvl ${topData.prestige})</span>`;
+        el.innerHTML = `👑 Platz 1: ${topData.name} <span style="font-size:0.8em; color:#f1c40f;">(${formatNum(topData.beers || 0)} 🍺)</span>`;
       }
     })
     .catch(err => console.log("Top Player fetch error", err));
