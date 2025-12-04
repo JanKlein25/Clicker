@@ -3517,7 +3517,9 @@
       
       // --- NEU: DIE BIERCHEN ---
       beers: 0,            
-      lastDailyBonus: 0    
+      lastDailyBonus: 0  
+
+      hasClaimedRetroBeers: false
     };
 
     // HIER IST DER FIX: Variablen direkt am Anfang definieren!
@@ -5675,6 +5677,7 @@ function formatNum(num, decimals = 0) {
     // WICHTIG: Diese beiden müssen explizit hier stehen!
     beers: game.beers,
     lastDailyBonus: game.lastDailyBonus
+    hasClaimedRetroBeers: game.hasClaimedRetroBeers
   };
   
   // Speichern als Base64 String
@@ -5714,6 +5717,28 @@ function formatNum(num, decimals = 0) {
   } catch(e) { 
     console.log("Save error or new game", e); 
   }
+      // --- NACHZAHLUNG FÜR BEREITS ERREICHTE PRESTIGE LEVEL ---
+    // Wir prüfen: Hat er Prestige > 0? Hat er die Nachzahlung noch NICHT bekommen?
+    if (game.prestige > 0 && !game.hasClaimedRetroBeers) {
+      
+      // Hier legen wir fest, wie viel man rückwirkend pro Level kriegt (z.B. 50)
+      const retroRate = 50; 
+      const retroAmount = game.prestige * retroRate;
+      
+      if (!game.beers) game.beers = 0;
+      game.beers += retroAmount;
+      
+      // Markieren, dass wir bezahlt haben (damit man es nicht bei jedem Neuladen kriegt)
+      game.hasClaimedRetroBeers = true;
+      
+      saveGame();
+      
+      // Kurze Info an den Spieler
+      setTimeout(() => {
+        alert(`🍻 TREUE-BONUS! 🍻\n\nDa du schon Prestige-Level ${game.prestige} bist, erhältst du nachträglich:\n+${retroAmount} Bierchen gutgeschrieben!`);
+        updateCasinoUI(); // Anzeige aktualisieren
+      }, 1000);
+    }
 }
 
     /* --- PRESTIGE LOGIK --- */
