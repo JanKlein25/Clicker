@@ -6841,7 +6841,7 @@ function updateBeerTimer() {
   }
 }
   
-/* --- JACKPOT / LOTTERY SYSTEM (BANK VAULT ARCHITECTURE) --- */
+/* --- JACKPOT / LOTTERY SYSTEM (FINAL SAFE VERSION) --- */
 
 let lotteryData = {
   bets: {},
@@ -6854,6 +6854,8 @@ let lotteryData = {
 
 let lotteryTimerInterval;
 let lotteryAnimFrame;
+// NEU: Verhindert, dass man während der Verarbeitung nochmal klickt
+let isProcessingPayout = false; 
 
 const LOTTERY_PALETTE = [
   '#e74c3c', '#3498db', '#f1c40f', '#9b59b6', '#2ecc71', 
@@ -6866,8 +6868,6 @@ function getPlayerColor(index) {
 
 function openLottery() {
   document.getElementById('lotteryModal').style.display = 'flex';
-  
-  // Wir synchronisieren beides: Das Spiel und den Safe
   syncLottery(); 
   
   if(lotteryTimerInterval) clearInterval(lotteryTimerInterval);
@@ -6880,21 +6880,22 @@ function closeLottery() {
   if(lotteryAnimFrame) cancelAnimationFrame(lotteryAnimFrame);
 }
 
-// 1. SYNC: Spielstatus überwachen
+// 1. SYNC
 function syncLottery() {
   if(!db) return;
   const ref = db.ref('lottery');
   
+  // WICHTIG: Alte Listener entfernen, damit wir nicht doppelt hören!
   ref.off();
+  
   ref.on('value', (snapshot) => {
     const val = snapshot.val();
     const oldStatus = lotteryData.status;
 
-    // NOT-AUS: Wenn das Rad länger als 15 Sekunden "dreht", ist es abgestürzt.
-    // Wir zwingen das Geld in den Safe und resetten das Spiel.
+    // NOT-AUS
     if (val && val.status === 'spinning' && val.spinStart) {
         if (Date.now() - val.spinStart > 15000) {
-            console.log("Jackpot hängt -> Force Payout & Reset");
+            console.log("Jackpot Reset (Timeout)");
             forcePayoutAndReset(val.winner, val.total);
             return;
         }
@@ -6904,7 +6905,6 @@ function syncLottery() {
       lotteryData = val;
       if(!lotteryData.bets) lotteryData.bets = {};
       
-      // UI Updates
       const potEl = document.getElementById('lottery-pot-display');
       if(potEl) potEl.textContent = formatNum(lotteryData.total || 0);
       
@@ -6914,12 +6914,10 @@ function syncLottery() {
           drawLotteryWheel(0); 
       }
 
-      // Animation starten
       if (oldStatus !== 'spinning' && lotteryData.status === 'spinning') {
           startLotteryAnimation(lotteryData.winner);
       }
     } else {
-      // Leere DB -> Standardwerte
       lotteryData = { bets: {}, total: 0, status: 'waiting', drawTime: 0, spinStart: 0 };
       renderLotteryList();
       drawLotteryWheel(0);
@@ -6927,31 +6925,51 @@ function syncLottery() {
   });
 }
 
-// 2. PAYOUT LISTENER (Der "Safe")
-// Diese Funktion läuft IMMER im Hintergrund und holt dein Geld ab.
+// 2. PAYOUT LISTENER (Der "Safe" - JETZT KUGELSICHER)
 function initPayoutListener() {
     if(!db || !game.playerName) return;
 
-    // Wir lauschen auf: lottery_payouts/MeinName
     const payoutRef = db.ref('lottery_payouts/' + game.playerName);
+    
+    // 1. Alte Listener entfernen (Fix für doppelte Popups)
+    payoutRef.off();
     
     payoutRef.on('value', (snapshot) => {
         const amount = snapshot.val();
         
-        if (amount && amount > 0) {
-            // Geld gefunden!
+        // Wenn kein Geld da ist oder wir gerade schon verarbeiten -> Abbruch
+        if (!amount || amount <= 0) return;
+        if (isProcessingPayout) return; 
+
+        // Riegel vorschieben
+        isProcessingPayout = true;
+
+        // 2. Transaktion nutzen: "Löschen nur, wenn es noch existiert"
+        payoutRef.transaction((currentVal) => {
+            if (currentVal === amount) {
+                return null; // Löschen!
+            }
+            return; // Abbrechen (jemand anderes war schneller / Fehler)
+        }, (error, committed, snapshot) => {
             
-            // 1. Sofort in der DB löschen (damit wir es nicht doppelt kriegen)
-            payoutRef.set(null).then(() => {
-                // 2. Wenn Löschen erfolgreich -> Gutschreiben
+            // Erst wenn committed == true, gehört das Geld wirklich uns
+            if (committed) {
                 game.beers += amount;
                 saveGame();
                 updateCasinoUI();
                 
                 spawnConfetti();
-                alert(`🎉 JACKPOT AUSGEZAHLT! 🎉\n\nDu hast +${formatNum(amount)} Bierchen erhalten!`);
-            });
-        }
+                
+                // Kurze Pause, damit UI rendern kann vor dem Alert
+                setTimeout(() => {
+                    alert(`🎉 JACKPOT AUSGEZAHLT! 🎉\n\nDu hast +${formatNum(amount)} Bierchen erhalten!`);
+                    isProcessingPayout = false; // Riegel wieder öffnen
+                }, 100);
+            } else {
+                // Falls es fehlgeschlagen ist, Riegel wieder öffnen
+                isProcessingPayout = false;
+            }
+        });
     });
 }
 
@@ -6961,7 +6979,6 @@ function enterLottery() {
   const amount = parseInt(input.value);
   
   if(isNaN(amount) || amount <= 0) { alert("Ungültige Menge"); return; }
-  
   if (lotteryData.status === 'spinning') { alert("Rad dreht bereits!"); return; }
   if(game.beers < amount) { alert("Nicht genug Bierchen!"); return; }
 
@@ -6971,31 +6988,26 @@ function enterLottery() {
 
   const ref = db.ref('lottery');
   ref.transaction((current) => {
-    // Falls DB leer oder fehlerhaft -> Neu aufbauen
     if (!current || typeof current !== 'object') {
         current = { bets: {}, total: 0, status: 'waiting', drawTime: 0, spinStart: 0 };
     }
-    
     if (!current.bets) current.bets = {};
     
-    // Betrag addieren
     const oldBet = current.bets[game.playerName] || 0;
     current.bets[game.playerName] = oldBet + amount;
     current.total = (current.total || 0) + amount;
     
-    // Timer Starten
     const uniquePlayers = Object.keys(current.bets).length;
     if (uniquePlayers >= 2 && current.status === 'waiting') {
         current.status = 'countdown';
         current.drawTime = Date.now() + 60000; 
     }
-    
     return current;
   }, (error, committed) => {
     if (error) {
-      game.beers += amount; // Refund
+      game.beers += amount; 
       saveGame();
-      alert("Fehler bei der Wette. Bierchen erstattet.");
+      alert("Fehler bei der Wette.");
     } else {
       input.value = '';
     }
@@ -7186,31 +7198,29 @@ function startLotteryAnimation(winnerName) {
     lotteryAnimFrame = requestAnimationFrame(animate);
 }
 
-// 9. ABSCHLUSS DER RUNDE
+// 9. ABSCHLUSS
 function finishLottery(winnerName) {
     const winAmt = lotteryData.total;
-    
-    // UI Feedback
     const msgBox = document.getElementById('lottery-winner-msg');
+    
     if(msgBox) {
         msgBox.style.display = 'block';
         document.getElementById('last-winner-name').textContent = winnerName;
         document.getElementById('last-winner-amt').textContent = formatNum(winAmt);
     }
     
-    // Nach 4 Sekunden: Geld in den Safe schieben und Spiel resetten
-    // Das probiert jeder Client, aber Firebase lässt es nur einmal zu.
+    // Nach 4 Sekunden: Geld in den Safe und Reset
     setTimeout(() => {
         forcePayoutAndReset(winnerName, winAmt);
     }, 4000);
 }
 
-// 10. FORCE PAYOUT & RESET (Der entscheidende Fix)
+// 10. PAYOUT & RESET
 function forcePayoutAndReset(winnerName, winAmt) {
-    // Schritt A: Geld in den "Safe" (lottery_payouts) legen
+    // A) Safe
     db.ref('lottery_payouts/' + winnerName).set(winAmt);
 
-    // Schritt B: Das Spiel komplett säubern für die nächste Runde
+    // B) Spiel neu
     db.ref('lottery').set({
         bets: {},
         total: 0,
