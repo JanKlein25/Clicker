@@ -6841,7 +6841,7 @@ function updateBeerTimer() {
   }
 }
   
-/* --- JACKPOT / LOTTERY SYSTEM (VISUAL UPGRADE) --- */
+/* --- JACKPOT / LOTTERY SYSTEM (PERFECT COLORS) --- */
 
 let lotteryData = {
   bets: {},
@@ -6855,14 +6855,24 @@ let lotteryData = {
 let lotteryTimerInterval;
 let lotteryAnimFrame;
 
-// HILFSFUNKTION: Generiert immer dieselbe Farbe für denselben Namen
-const stringToColor = (str) => {
-  let hash = 0; 
-  for(let i=0; i<str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  
-  // Sättigung und Helligkeit hochhalten für leuchtende Farben
-  let h = hash % 360;
-  return `hsl(${h}, 70%, 50%)`; 
+// DEFINIERTE PALETTE: Starke Kontraste statt Zufall
+const LOTTERY_PALETTE = [
+  '#e74c3c', // Rot
+  '#3498db', // Blau
+  '#f1c40f', // Gelb/Gold
+  '#9b59b6', // Lila
+  '#2ecc71', // Grün
+  '#e67e22', // Orange
+  '#1abc9c', // Türkis
+  '#ecf0f1', // Weiß
+  '#34495e', // Dunkelblau
+  '#d35400'  // Dunkelorange
+];
+
+function getPlayerColor(index) {
+  // Wählt Farbe basierend auf Position in der Liste (0, 1, 2...)
+  // Modulo (%) sorgt dafür, dass es bei mehr als 10 Spielern wieder von vorne anfängt
+  return LOTTERY_PALETTE[index % LOTTERY_PALETTE.length];
 }
 
 function openLottery() {
@@ -6879,7 +6889,7 @@ function closeLottery() {
   if(lotteryAnimFrame) cancelAnimationFrame(lotteryAnimFrame);
 }
 
-// 1. Daten laden (Sync)
+// 1. Daten laden
 function syncLottery() {
   if(!db) return;
   const ref = db.ref('lottery');
@@ -6887,7 +6897,7 @@ function syncLottery() {
   ref.on('value', (snapshot) => {
     const val = snapshot.val();
     
-    // Not-Aus Check
+    // Not-Aus Check (falls es hängt)
     if (val && val.status === 'spinning' && val.spinStart) {
         if (Date.now() - val.spinStart > 15000) {
             console.log("Jackpot Reset (Timeout)");
@@ -6955,7 +6965,7 @@ function enterLottery() {
   });
 }
 
-// 3. LISTE RENDERN (MIT FARB-INDIKATOR)
+// 3. LISTE RENDERN (Farben nach Index)
 function renderLotteryList() {
   const list = document.getElementById('lottery-list');
   list.innerHTML = '';
@@ -6965,14 +6975,23 @@ function renderLotteryList() {
     return;
   }
 
-  const players = Object.keys(lotteryData.bets).sort((a,b) => lotteryData.bets[b] - lotteryData.bets[a]);
+  // Sortieren nach Alphabet für Konsistenz zwischen Spielern
+  const players = Object.keys(lotteryData.bets).sort();
   
-  players.forEach(p => {
+  // Sortieren für die Anzeige nach Einsatzhöhe (optional, aber schöner)
+  // Wir müssen aber die Farbe basierend auf dem ALPHABETISCHEN Index behalten, 
+  // damit Liste und Rad übereinstimmen!
+  
+  // Kopie zum Anzeigen sortieren
+  const displayPlayers = [...players].sort((a,b) => lotteryData.bets[b] - lotteryData.bets[a]);
+  
+  displayPlayers.forEach(p => {
     const amt = lotteryData.bets[p];
     const chance = ((amt / lotteryData.total) * 100).toFixed(1);
     
-    // Farbe holen
-    const playerColor = stringToColor(p);
+    // WICHTIG: Index aus der alphabetischen Liste holen für die Farbe
+    const colorIndex = players.indexOf(p);
+    const playerColor = getPlayerColor(colorIndex);
     
     const row = document.createElement('div');
     row.style.display = 'flex'; 
@@ -6982,13 +7001,11 @@ function renderLotteryList() {
     row.style.padding = '6px'; 
     row.style.fontSize = '0.85rem';
     
-    // Highlight für eigenen Namen
     const nameColor = (p === game.playerName) ? '#fff' : '#ccc';
     const fontWeight = (p === game.playerName) ? '900' : 'normal';
     
     row.innerHTML = `
       <div style="display:flex; align-items:center;">
-        <!-- Farb-Punkt -->
         <div style="width:12px; height:12px; background:${playerColor}; border-radius:50%; margin-right:8px; border:1px solid #fff;"></div>
         <span style="color:${nameColor}; font-weight:${fontWeight};">${p}</span>
       </div>
@@ -6998,7 +7015,7 @@ function renderLotteryList() {
   });
 }
 
-// 4. Timer
+// 4. Timer Update
 function updateLotteryLoop() {
   const timerEl = document.getElementById('lottery-timer');
   const uniquePlayers = lotteryData.bets ? Object.keys(lotteryData.bets).length : 0;
@@ -7023,7 +7040,7 @@ function updateLotteryLoop() {
   }
 }
 
-// 5. Ziehung triggern
+// 5. Ziehung Logik
 function performLotteryDraw() {
   if (Math.random() > 0.1) return; 
 
@@ -7049,7 +7066,7 @@ function performLotteryDraw() {
   });
 }
 
-// 6. RAD ZEICHNEN (MIT NAMEN)
+// 6. RAD ZEICHNEN (Farben nach Index)
 function drawLotteryWheel(rotationOffset) {
   const canvas = document.getElementById('lotteryCanvas');
   const ctx = canvas.getContext('2d');
@@ -7069,45 +7086,39 @@ function drawLotteryWheel(rotationOffset) {
     return;
   }
 
+  // WICHTIG: Alphabetisch sortieren, damit die Reihenfolge immer gleich ist
   const players = Object.keys(lotteryData.bets).sort();
   let startAngle = 0;
 
-  players.forEach(p => {
+  players.forEach((p, index) => {
     const amt = lotteryData.bets[p];
     const sliceAngle = (amt / lotteryData.total) * 2 * Math.PI;
     
-    // Tortenstück zeichnen
     ctx.beginPath(); 
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, r, startAngle, startAngle + sliceAngle); 
     ctx.closePath();
     
-    ctx.fillStyle = stringToColor(p); 
+    // HIER: Farbe basierend auf dem Index (0=Rot, 1=Blau, etc.)
+    ctx.fillStyle = getPlayerColor(index); 
     ctx.fill();
     ctx.strokeStyle = "#111"; 
     ctx.lineWidth = 2; 
     ctx.stroke();
     
-    // --- TEXT RENDERN (NAME) ---
-    // Nur zeichnen, wenn das Stück groß genug ist (> 5 Grad)
+    // Text zeichnen
     if (sliceAngle > 0.08) { 
         ctx.save();
-        // Zum Mittelpunkt des Tortenstücks drehen
         ctx.rotate(startAngle + sliceAngle / 2);
-        
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = "#fff"; // Immer weißer Text
         ctx.font = "bold 14px Arial";
-        
-        // Text-Schatten für bessere Lesbarkeit
         ctx.shadowColor = "rgba(0,0,0,0.8)";
         ctx.shadowBlur = 4;
         
-        // Name schreiben (Max 12 Zeichen)
         let displayName = p.length > 12 ? p.substring(0, 10) + ".." : p;
         ctx.fillText(displayName, r - 10, 0);
-        
         ctx.restore();
     }
     
@@ -7193,7 +7204,7 @@ function forceLotteryReset(winnerName, winAmt) {
     });
 }
 
-// 10. Gewinn prüfen
+// 10. Check Wins
 function checkLotteryWins() {
   if(!db || !game.playerName) return;
   const ref = db.ref('lottery/pendingPayout');
