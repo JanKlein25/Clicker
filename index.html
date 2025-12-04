@@ -7050,22 +7050,31 @@ function updateLotteryTimer() {
   }
 }
 
-function performLotteryDraw() {
-  if(Math.random() > 0.1) return; // Kleine Verzögerung um Spam zu verhindern
+function performLotteryDraw(force = false) {
+  // Spam-Schutz: Nur aktiv, wenn NICHT erzwungen (force == false)
+  // Wir senken die Abbruchrate drastisch auf 10% (vorher 90%), damit es zuverlässiger auslöst
+  if (!force && Math.random() > 0.9) return; 
 
-  console.log("Führe Ziehung durch...");
+  console.log("Versuche Ziehung durchzuführen...");
 
   const ref = db.ref('lottery');
   ref.transaction((data) => {
+    // Wenn keine Daten da sind oder der Pot leer ist
     if(!data || !data.bets || data.total === 0) return data;
     
+    // Zeit-Check (Sicherheitsnetz)
     const now = new Date();
     const last = new Date(data.lastDraw || 0);
-    if(last.getDate() === now.getDate() && now.getHours() >= LOTTERY_HOUR) {
-        return; // Schon passiert
+    
+    // Wenn heute schon gezogen wurde (und wir es nicht erzwingen) -> Abbrechen
+    const isToday = (last.getDate() === now.getDate() && last.getMonth() === now.getMonth() && last.getFullYear() === now.getFullYear());
+    
+    if (!force && isToday && now.getHours() >= 20) {
+        console.log("Heute schon gezogen.");
+        return; // Abbruch, Transaktion wird nicht durchgeführt
     }
 
-    // GEWINNER ERMITTELN
+    // --- GEWINNER ERMITTELN ---
     let r = Math.random() * data.total;
     let winnerName = null;
     let accumulated = 0;
@@ -7079,10 +7088,13 @@ function performLotteryDraw() {
       }
     }
     
+    // Fallback falls Rundungsfehler
     if(!winnerName) winnerName = players[players.length-1];
 
     const winAmount = data.total;
+    console.log("GEWINNER ERMITTELT:", winnerName, winAmount);
 
+    // Datenbank Update
     return {
       bets: {},
       total: 0,
@@ -7091,7 +7103,16 @@ function performLotteryDraw() {
       lastWinnerAmt: winAmount,
       pendingPayout: { user: winnerName, amount: winAmount }
     };
-
+  }, (error, committed, snapshot) => {
+    if(error) {
+      console.error("Fehler bei der Ziehung:", error);
+    } else if (!committed) {
+      console.log("Ziehung abgebrochen (evtl. schon passiert oder Datenkonflikt).");
+    } else {
+      console.log("ZIEHUNG ERFOLGREICH!");
+      // UI Update erzwingen
+      updateCasinoUI();
+    }
   });
 }
 
