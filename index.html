@@ -5722,7 +5722,7 @@ function formatNum(num, decimals = 0) {
     if (game.prestige > 0 && !game.hasClaimedRetroBeers) {
       
       // Hier legen wir fest, wie viel man rückwirkend pro Level kriegt (z.B. 50)
-      const retroRate = 50; 
+      const retroRate = 25; 
       const retroAmount = game.prestige * retroRate;
       
       if (!game.beers) game.beers = 0;
