@@ -6841,19 +6841,29 @@ function updateBeerTimer() {
   }
 }
   
-/* --- JACKPOT / LOTTERY SYSTEM (FIXED & ROBUST) --- */
+/* --- JACKPOT / LOTTERY SYSTEM (VISUAL UPGRADE) --- */
 
 let lotteryData = {
   bets: {},
   total: 0,
-  status: 'waiting', // waiting, countdown, spinning
+  status: 'waiting', 
   drawTime: 0,       
   winner: null,
-  spinStart: 0       // NEU: Zeitstempel wann die Drehung begann
+  spinStart: 0       
 };
 
 let lotteryTimerInterval;
 let lotteryAnimFrame;
+
+// HILFSFUNKTION: Generiert immer dieselbe Farbe für denselben Namen
+const stringToColor = (str) => {
+  let hash = 0; 
+  for(let i=0; i<str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  
+  // Sättigung und Helligkeit hochhalten für leuchtende Farben
+  let h = hash % 360;
+  return `hsl(${h}, 70%, 50%)`; 
+}
 
 function openLottery() {
   document.getElementById('lotteryModal').style.display = 'flex';
@@ -6869,7 +6879,7 @@ function closeLottery() {
   if(lotteryAnimFrame) cancelAnimationFrame(lotteryAnimFrame);
 }
 
-// 1. Daten aus Firebase laden & UI updaten
+// 1. Daten laden (Sync)
 function syncLottery() {
   if(!db) return;
   const ref = db.ref('lottery');
@@ -6877,17 +6887,14 @@ function syncLottery() {
   ref.on('value', (snapshot) => {
     const val = snapshot.val();
     
-    // --- SICHERHEITS-CHECK: Hängt das Rad? ---
+    // Not-Aus Check
     if (val && val.status === 'spinning' && val.spinStart) {
-        const now = Date.now();
-        // Wenn die Drehung vor mehr als 15 Sekunden begann, ist es abgestürzt.
-        if (now - val.spinStart > 15000) {
-            console.log("Jackpot hängt! Erzwinge Reset...");
+        if (Date.now() - val.spinStart > 15000) {
+            console.log("Jackpot Reset (Timeout)");
             forceLotteryReset(val.winner, val.total);
-            return; // Wir brechen hier ab, damit keine Animation startet
+            return;
         }
     }
-    // -----------------------------------------
 
     const oldStatus = lotteryData.status;
     
@@ -6895,16 +6902,12 @@ function syncLottery() {
       lotteryData = val;
       if(!lotteryData.bets) lotteryData.bets = {};
       
-      // UI Update
       document.getElementById('lottery-pot-display').textContent = formatNum(lotteryData.total || 0);
       renderLotteryList();
       
-      // Statisches Rad zeichnen, wenn nicht gedreht wird
       if (lotteryData.status !== 'spinning') {
           drawLotteryWheel(0); 
       }
-
-      // Animation starten, wenn Status frisch auf "spinning" wechselt
       if (oldStatus !== 'spinning' && lotteryData.status === 'spinning') {
           startLotteryAnimation(lotteryData.winner);
       }
@@ -6920,16 +6923,8 @@ function enterLottery() {
   const amount = parseInt(input.value);
   
   if(isNaN(amount) || amount <= 0) return;
-  
-  if (lotteryData.status === 'spinning') {
-      alert("Zu spät! Das Rad dreht sich bereits.");
-      return;
-  }
-
-  if(game.beers < amount) {
-    alert("Nicht genug Bierchen!");
-    return;
-  }
+  if (lotteryData.status === 'spinning') { alert("Rad dreht bereits!"); return; }
+  if(game.beers < amount) { alert("Zu wenig Bierchen!"); return; }
 
   game.beers -= amount;
   updateCasinoUI(); 
@@ -6945,17 +6940,13 @@ function enterLottery() {
     current.total = (current.total || 0) + amount;
     
     const uniquePlayers = Object.keys(current.bets).length;
-    
-    // Countdown Start bei 2 Spielern
     if (uniquePlayers >= 2 && current.status === 'waiting') {
         current.status = 'countdown';
-        current.drawTime = Date.now() + 60000; // 60 Sekunden
+        current.drawTime = Date.now() + 60000; 
     }
-    
     return current;
-  }, (error, committed, snapshot) => {
+  }, (error, committed) => {
     if (error) {
-      alert('Fehler! Geld zurück.');
       game.beers += amount;
       saveGame();
     } else {
@@ -6964,7 +6955,7 @@ function enterLottery() {
   });
 }
 
-// 3. Liste rendern
+// 3. LISTE RENDERN (MIT FARB-INDIKATOR)
 function renderLotteryList() {
   const list = document.getElementById('lottery-list');
   list.innerHTML = '';
@@ -6979,21 +6970,35 @@ function renderLotteryList() {
   players.forEach(p => {
     const amt = lotteryData.bets[p];
     const chance = ((amt / lotteryData.total) * 100).toFixed(1);
-    const row = document.createElement('div');
-    row.style.display = 'flex'; row.style.justifyContent = 'space-between';
-    row.style.borderBottom = '1px solid #333'; row.style.padding = '4px'; row.style.fontSize = '0.8rem';
     
-    const color = (p === game.playerName) ? '#e67e22' : '#ccc';
+    // Farbe holen
+    const playerColor = stringToColor(p);
+    
+    const row = document.createElement('div');
+    row.style.display = 'flex'; 
+    row.style.justifyContent = 'space-between';
+    row.style.alignItems = 'center';
+    row.style.borderBottom = '1px solid #333'; 
+    row.style.padding = '6px'; 
+    row.style.fontSize = '0.85rem';
+    
+    // Highlight für eigenen Namen
+    const nameColor = (p === game.playerName) ? '#fff' : '#ccc';
+    const fontWeight = (p === game.playerName) ? '900' : 'normal';
     
     row.innerHTML = `
-      <span style="color:${color}; font-weight:bold;">${p}</span>
-      <span>${formatNum(amt)} 🍺 <span style="color:#555">(${chance}%)</span></span>
+      <div style="display:flex; align-items:center;">
+        <!-- Farb-Punkt -->
+        <div style="width:12px; height:12px; background:${playerColor}; border-radius:50%; margin-right:8px; border:1px solid #fff;"></div>
+        <span style="color:${nameColor}; font-weight:${fontWeight};">${p}</span>
+      </div>
+      <span>${formatNum(amt)} <span style="color:#555; font-size:0.75rem;">(${chance}%)</span></span>
     `;
     list.appendChild(row);
   });
 }
 
-// 4. Timer Loop
+// 4. Timer
 function updateLotteryLoop() {
   const timerEl = document.getElementById('lottery-timer');
   const uniquePlayers = lotteryData.bets ? Object.keys(lotteryData.bets).length : 0;
@@ -7003,17 +7008,12 @@ function updateLotteryLoop() {
       timerEl.style.color = "#aaa";
   } 
   else if (lotteryData.status === 'countdown') {
-      const now = Date.now();
-      const left = lotteryData.drawTime - now;
-      
+      const left = lotteryData.drawTime - Date.now();
       if (left <= 0) {
           timerEl.textContent = "ZIEHUNG LÄUFT...";
-          if (left < -2000) { 
-              performLotteryDraw(); 
-          }
+          if (left < -2000) performLotteryDraw(); 
       } else {
-          const secs = (left / 1000).toFixed(1);
-          timerEl.textContent = `START IN: ${secs}s`;
+          timerEl.textContent = `START IN: ${(left/1000).toFixed(1)}s`;
           timerEl.style.color = "#f1c40f";
       }
   } 
@@ -7025,7 +7025,7 @@ function updateLotteryLoop() {
 
 // 5. Ziehung triggern
 function performLotteryDraw() {
-  if (Math.random() > 0.1) return; // Lastverteilung
+  if (Math.random() > 0.1) return; 
 
   const ref = db.ref('lottery');
   ref.transaction((data) => {
@@ -7034,27 +7034,22 @@ function performLotteryDraw() {
     let r = Math.random() * data.total;
     let winner = null;
     let accum = 0;
-    
     const players = Object.keys(data.bets).sort();
     
     for (let p of players) {
         accum += data.bets[p];
-        if (r <= accum) {
-            winner = p;
-            break;
-        }
+        if (r <= accum) { winner = p; break; }
     }
     if(!winner) winner = players[0];
 
     data.status = 'spinning';
     data.winner = winner;
-    data.spinStart = Date.now(); // WICHTIG: Zeitstempel für den Not-Aus
-    
+    data.spinStart = Date.now();
     return data;
   });
 }
 
-// 6. Rad zeichnen
+// 6. RAD ZEICHNEN (MIT NAMEN)
 function drawLotteryWheel(rotationOffset) {
   const canvas = document.getElementById('lotteryCanvas');
   const ctx = canvas.getContext('2d');
@@ -7076,22 +7071,45 @@ function drawLotteryWheel(rotationOffset) {
 
   const players = Object.keys(lotteryData.bets).sort();
   let startAngle = 0;
-  
-  const stringToColor = (str) => {
-    let hash = 0; for(let i=0; i<str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    let c = '#'; for(let i=0; i<3; i++) { let val = (hash >> (i*8)) & 0xFF; c += ('00' + val.toString(16)).substr(-2); }
-    return c;
-  }
 
   players.forEach(p => {
     const amt = lotteryData.bets[p];
     const sliceAngle = (amt / lotteryData.total) * 2 * Math.PI;
     
-    ctx.beginPath(); ctx.moveTo(0, 0);
-    ctx.arc(0, 0, r, startAngle, startAngle + sliceAngle); ctx.closePath();
+    // Tortenstück zeichnen
+    ctx.beginPath(); 
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, r, startAngle, startAngle + sliceAngle); 
+    ctx.closePath();
     
-    ctx.fillStyle = stringToColor(p); ctx.fill();
-    ctx.strokeStyle = "#111"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = stringToColor(p); 
+    ctx.fill();
+    ctx.strokeStyle = "#111"; 
+    ctx.lineWidth = 2; 
+    ctx.stroke();
+    
+    // --- TEXT RENDERN (NAME) ---
+    // Nur zeichnen, wenn das Stück groß genug ist (> 5 Grad)
+    if (sliceAngle > 0.08) { 
+        ctx.save();
+        // Zum Mittelpunkt des Tortenstücks drehen
+        ctx.rotate(startAngle + sliceAngle / 2);
+        
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 14px Arial";
+        
+        // Text-Schatten für bessere Lesbarkeit
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.shadowBlur = 4;
+        
+        // Name schreiben (Max 12 Zeichen)
+        let displayName = p.length > 12 ? p.substring(0, 10) + ".." : p;
+        ctx.fillText(displayName, r - 10, 0);
+        
+        ctx.restore();
+    }
     
     startAngle += sliceAngle;
   });
@@ -7118,7 +7136,7 @@ function startLotteryAnimation(winnerName) {
     }
     
     const targetInSlice = winnerStartAngle + (Math.random() * (winnerEndAngle - winnerStartAngle));
-    const spins = 8 * 2 * Math.PI; // 8 Umdrehungen
+    const spins = 8 * 2 * Math.PI; 
     const targetRotation = -targetInSlice - (Math.PI / 2) + spins;
 
     let startTime = null;
@@ -7140,11 +7158,9 @@ function startLotteryAnimation(winnerName) {
     lotteryAnimFrame = requestAnimationFrame(animate);
 }
 
-// 8. Abschluss & Reset
+// 8. Abschluss
 function finishLottery(winnerName) {
     const winAmt = lotteryData.total;
-    
-    // Nachricht im Modal
     const msgBox = document.getElementById('lottery-winner-msg');
     msgBox.style.display = 'block';
     document.getElementById('last-winner-name').textContent = winnerName;
@@ -7155,19 +7171,15 @@ function finishLottery(winnerName) {
         alert(`🎉 JACKPOT! DU HAST GEWONNEN! 🎉\n+${formatNum(winAmt)} Bierchen`);
     }
 
-    // Nur EINER (zufällig) stößt den Datenbank-Reset an, um Konflikte zu vermeiden
     if (Math.random() > 0.5) { 
-        setTimeout(() => {
-            forceLotteryReset(winnerName, winAmt);
-        }, 3000); // 3 Sekunden warten, damit alle die Animation sehen
+        setTimeout(() => forceLotteryReset(winnerName, winAmt), 3000);
     }
 }
 
-// 9. NEU: Erzwingt den Reset (wird auch beim "Not-Aus" genutzt)
+// 9. Reset
 function forceLotteryReset(winnerName, winAmt) {
     const ref = db.ref('lottery');
     ref.transaction((data) => {
-        // Wir setzen zurück, egal ob Status spinning ist oder nicht (für den Not-Aus Fall)
         return {
             bets: {},
             total: 0,
@@ -7181,7 +7193,7 @@ function forceLotteryReset(winnerName, winAmt) {
     });
 }
 
-// 10. Gewinn gutschreiben (läuft bei Start)
+// 10. Gewinn prüfen
 function checkLotteryWins() {
   if(!db || !game.playerName) return;
   const ref = db.ref('lottery/pendingPayout');
@@ -7192,7 +7204,7 @@ function checkLotteryWins() {
             game.beers += pay.amount;
             saveGame();
             updateCasinoUI();
-            alert(`💰 NACHTRÄGLICHER GEWINN!\nDu hast den Jackpot gewonnen: +${formatNum(pay.amount)} Bierchen`);
+            alert(`💰 GEWONNEN!\nJackpot: +${formatNum(pay.amount)} Bierchen`);
         });
     }
   });
