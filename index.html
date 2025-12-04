@@ -5471,7 +5471,7 @@ function getMinesMultiplier(minesCount, revealedCount) {
       // Gewinn berechnen und anzeigen
       if(winMult > 0) {
         const winAmount = Math.floor(bjState.bet * winMult);
-        addScore(winAmount); 
+        triggerWin(winAmount); 
         
         // HIER IST DER NEUE TEIL: Betrag unter den Text schreiben
         // Wir nutzen innerHTML += um eine neue Zeile anzuhängen
