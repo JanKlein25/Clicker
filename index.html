@@ -6841,26 +6841,26 @@ function updateBeerTimer() {
   }
 }
   
- /* --- JACKPOT / LOTTERY SYSTEM (NEU & ANIMIERT) --- */
+/* --- JACKPOT / LOTTERY SYSTEM (FIXED & ROBUST) --- */
 
 let lotteryData = {
   bets: {},
   total: 0,
   status: 'waiting', // waiting, countdown, spinning
-  drawTime: 0,       // Zeitstempel wann der Countdown endet
-  winner: null       // Name des Gewinners für die Animation
+  drawTime: 0,       
+  winner: null,
+  spinStart: 0       // NEU: Zeitstempel wann die Drehung begann
 };
 
 let lotteryTimerInterval;
 let lotteryAnimFrame;
-let wheelRotation = 0; // Aktuelle Rotation des Rades
 
 function openLottery() {
   document.getElementById('lotteryModal').style.display = 'flex';
-  syncLottery(); // Daten laden
+  syncLottery(); 
   
   if(lotteryTimerInterval) clearInterval(lotteryTimerInterval);
-  lotteryTimerInterval = setInterval(updateLotteryLoop, 100); // Schnellerer Loop für flüssige UI
+  lotteryTimerInterval = setInterval(updateLotteryLoop, 100); 
   updateLotteryLoop();
 }
 
@@ -6876,9 +6876,22 @@ function syncLottery() {
   
   ref.on('value', (snapshot) => {
     const val = snapshot.val();
+    
+    // --- SICHERHEITS-CHECK: Hängt das Rad? ---
+    if (val && val.status === 'spinning' && val.spinStart) {
+        const now = Date.now();
+        // Wenn die Drehung vor mehr als 15 Sekunden begann, ist es abgestürzt.
+        if (now - val.spinStart > 15000) {
+            console.log("Jackpot hängt! Erzwinge Reset...");
+            forceLotteryReset(val.winner, val.total);
+            return; // Wir brechen hier ab, damit keine Animation startet
+        }
+    }
+    // -----------------------------------------
+
+    const oldStatus = lotteryData.status;
+    
     if(val) {
-      // Wenn sich der Status ändert, z.B. auf Spinning
-      const oldStatus = lotteryData.status;
       lotteryData = val;
       if(!lotteryData.bets) lotteryData.bets = {};
       
@@ -6886,30 +6899,28 @@ function syncLottery() {
       document.getElementById('lottery-pot-display').textContent = formatNum(lotteryData.total || 0);
       renderLotteryList();
       
-      // Wenn Status "waiting" oder "countdown" ist, zeichnen wir das statische Rad
+      // Statisches Rad zeichnen, wenn nicht gedreht wird
       if (lotteryData.status !== 'spinning') {
           drawLotteryWheel(0); 
       }
 
-      // Wenn der Status frisch auf "spinning" gewechselt ist -> Animation starten
+      // Animation starten, wenn Status frisch auf "spinning" wechselt
       if (oldStatus !== 'spinning' && lotteryData.status === 'spinning') {
           startLotteryAnimation(lotteryData.winner);
       }
     } else {
-      // Initiale Datenstruktur falls leer
-      lotteryData = { bets: {}, total: 0, status: 'waiting', drawTime: 0 };
+      lotteryData = { bets: {}, total: 0, status: 'waiting', drawTime: 0, spinStart: 0 };
     }
   });
 }
 
-// 2. Einsatz tätigen (Startet Countdown bei 2. Spieler)
+// 2. Einsatz tätigen
 function enterLottery() {
   const input = document.getElementById('lotteryInput');
   const amount = parseInt(input.value);
   
   if(isNaN(amount) || amount <= 0) return;
   
-  // Status Check: Niemand darf wetten, wenn es schon dreht
   if (lotteryData.status === 'spinning') {
       alert("Zu spät! Das Rad dreht sich bereits.");
       return;
@@ -6920,29 +6931,25 @@ function enterLottery() {
     return;
   }
 
-  // Bezahlen
   game.beers -= amount;
   updateCasinoUI(); 
   saveGame();
 
-  // Firebase Update
   const ref = db.ref('lottery');
   ref.transaction((current) => {
-    if (!current) current = { bets: {}, total: 0, status: 'waiting', drawTime: 0 };
+    if (!current) current = { bets: {}, total: 0, status: 'waiting', drawTime: 0, spinStart: 0 };
     if (!current.bets) current.bets = {};
     
-    // Geld hinzufügen
     const oldBet = current.bets[game.playerName] || 0;
     current.bets[game.playerName] = oldBet + amount;
     current.total = (current.total || 0) + amount;
     
-    // PRÜFUNG: Starten wir den Countdown?
     const uniquePlayers = Object.keys(current.bets).length;
     
-    // Wenn min. 2 Spieler und Status noch "waiting" -> Countdown Start (60 Sekunden)
+    // Countdown Start bei 2 Spielern
     if (uniquePlayers >= 2 && current.status === 'waiting') {
         current.status = 'countdown';
-        current.drawTime = Date.now() + 60000; // 60 Sekunden ab jetzt
+        current.drawTime = Date.now() + 60000; // 60 Sekunden
     }
     
     return current;
@@ -6986,7 +6993,7 @@ function renderLotteryList() {
   });
 }
 
-// 4. Timer Loop & Logik
+// 4. Timer Loop
 function updateLotteryLoop() {
   const timerEl = document.getElementById('lottery-timer');
   const uniquePlayers = lotteryData.bets ? Object.keys(lotteryData.bets).length : 0;
@@ -7000,13 +7007,11 @@ function updateLotteryLoop() {
       const left = lotteryData.drawTime - now;
       
       if (left <= 0) {
-          timerEl.textContent = "ZIEHUNG STARTET...";
-          // Trigger Draw (Nur einer muss es tun, wir nehmen einfach Zufall > 0.9 um Last zu verteilen oder jeder versucht es, Transaction regelt)
-          if (left < -2000) { // 2 Sekunden Puffer
+          timerEl.textContent = "ZIEHUNG LÄUFT...";
+          if (left < -2000) { 
               performLotteryDraw(); 
           }
       } else {
-          // Sekunden formatieren
           const secs = (left / 1000).toFixed(1);
           timerEl.textContent = `START IN: ${secs}s`;
           timerEl.style.color = "#f1c40f";
@@ -7018,21 +7023,18 @@ function updateLotteryLoop() {
   }
 }
 
-// 5. Ziehung durchführen (Wird aufgerufen wenn Timer abläuft)
+// 5. Ziehung triggern
 function performLotteryDraw() {
-  // Wahrscheinlichkeit reduzieren, dass alle Clients gleichzeitig feuern
-  if (Math.random() > 0.1) return; 
+  if (Math.random() > 0.1) return; // Lastverteilung
 
   const ref = db.ref('lottery');
   ref.transaction((data) => {
-    if (!data || data.status !== 'countdown') return; // Schon erledigt oder falsch
+    if (!data || data.status !== 'countdown') return; 
 
-    // Gewinner ermitteln (Gewichtet)
     let r = Math.random() * data.total;
     let winner = null;
     let accum = 0;
     
-    // Sortieren für Konsistenz
     const players = Object.keys(data.bets).sort();
     
     for (let p of players) {
@@ -7044,16 +7046,15 @@ function performLotteryDraw() {
     }
     if(!winner) winner = players[0];
 
-    // Status auf Spinning setzen, Gewinner eintragen
-    // WICHTIG: Wetten noch NICHT löschen, wir brauchen sie für die Grafik!
     data.status = 'spinning';
     data.winner = winner;
+    data.spinStart = Date.now(); // WICHTIG: Zeitstempel für den Not-Aus
     
     return data;
   });
 }
 
-// 6. Das Rad zeichnen
+// 6. Rad zeichnen
 function drawLotteryWheel(rotationOffset) {
   const canvas = document.getElementById('lotteryCanvas');
   const ctx = canvas.getContext('2d');
@@ -7062,26 +7063,20 @@ function drawLotteryWheel(rotationOffset) {
   const cx = w/2; const cy = h/2; const r = w/2 - 5;
   
   ctx.clearRect(0,0,w,h);
-  
-  // Rahmen
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.rotate(rotationOffset); // Das ganze Rad drehen
+  ctx.rotate(rotationOffset); 
   
   if(!lotteryData.bets || lotteryData.total === 0) {
-    // Leeres Rad
     ctx.beginPath(); ctx.arc(0, 0, r, 0, 2*Math.PI);
     ctx.fillStyle = "#222"; ctx.fill(); ctx.stroke();
     ctx.restore();
     return;
   }
 
-  // Alphabetisch sortieren für konsistente Farben/Positionen auf allen Clients
   const players = Object.keys(lotteryData.bets).sort();
-  
   let startAngle = 0;
   
-  // Helper für Farben
   const stringToColor = (str) => {
     let hash = 0; for(let i=0; i<str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
     let c = '#'; for(let i=0; i<3; i++) { let val = (hash >> (i*8)) & 0xFF; c += ('00' + val.toString(16)).substr(-2); }
@@ -7092,36 +7087,26 @@ function drawLotteryWheel(rotationOffset) {
     const amt = lotteryData.bets[p];
     const sliceAngle = (amt / lotteryData.total) * 2 * Math.PI;
     
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.arc(0, 0, r, startAngle, startAngle + sliceAngle);
-    ctx.closePath();
+    ctx.beginPath(); ctx.moveTo(0, 0);
+    ctx.arc(0, 0, r, startAngle, startAngle + sliceAngle); ctx.closePath();
     
-    ctx.fillStyle = stringToColor(p);
-    ctx.fill();
-    ctx.strokeStyle = "#111";
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.fillStyle = stringToColor(p); ctx.fill();
+    ctx.strokeStyle = "#111"; ctx.lineWidth = 2; ctx.stroke();
     
     startAngle += sliceAngle;
   });
-  
   ctx.restore();
 }
 
-// 7. Animations-Logik
+// 7. Animation
 function startLotteryAnimation(winnerName) {
     if(lotteryAnimFrame) cancelAnimationFrame(lotteryAnimFrame);
 
-    // Wir müssen berechnen, wo der Gewinner auf dem Rad liegt.
-    // Der Zeiger ist OBEN (-PI/2 oder 270 Grad).
-    
     const players = Object.keys(lotteryData.bets).sort();
     let winnerStartAngle = 0;
     let winnerEndAngle = 0;
     let currentAngle = 0;
     
-    // Winkel des Gewinners finden
     for(let p of players) {
         const slice = (lotteryData.bets[p] / lotteryData.total) * 2 * Math.PI;
         if(p === winnerName) {
@@ -7132,49 +7117,31 @@ function startLotteryAnimation(winnerName) {
         currentAngle += slice;
     }
     
-    // Zufälliger Punkt im Gewinner-Segment
     const targetInSlice = winnerStartAngle + (Math.random() * (winnerEndAngle - winnerStartAngle));
-    
-    // Ziel: Dieser Punkt soll OBEN sein (-PI/2).
-    // Canvas dreht im Uhrzeigersinn.
-    // Wir addieren viele Umdrehungen (z.B. 10)
-    const spins = 10 * 2 * Math.PI;
-    
-    // Ziel-Rotation berechnen:
-    // Wir wollen, dass (targetInSlice + finalRotation) % 2PI = -PI/2 (oder 3PI/2)
-    // Einfacher: finalRotation = -targetInSlice - PI/2 + spins
+    const spins = 8 * 2 * Math.PI; // 8 Umdrehungen
     const targetRotation = -targetInSlice - (Math.PI / 2) + spins;
 
     let startTime = null;
-    const duration = 8000; // 8 Sekunden drehen
+    const duration = 8000; 
 
     function animate(timestamp) {
         if (!startTime) startTime = timestamp;
         const progress = Math.min((timestamp - startTime) / duration, 1);
-        
-        // Easing (cubic-out)
         const ease = 1 - Math.pow(1 - progress, 3);
         
-        const currentRot = targetRotation * ease;
-        drawLotteryWheel(currentRot);
+        drawLotteryWheel(targetRotation * ease);
         
         if (progress < 1) {
             lotteryAnimFrame = requestAnimationFrame(animate);
         } else {
-            // Fertig!
             finishLottery(winnerName);
         }
     }
-    
     lotteryAnimFrame = requestAnimationFrame(animate);
 }
 
-// 8. Abschluss & Auszahlung
+// 8. Abschluss & Reset
 function finishLottery(winnerName) {
-    // Nur der Client des Gewinners löst die Auszahlung aus (oder wer auch immer zuerst ist)
-    // Wir nutzen pendingPayout Logic wie beim alten System
-    
-    // Alert anzeigen
     const winAmt = lotteryData.total;
     
     // Nachricht im Modal
@@ -7188,43 +7155,44 @@ function finishLottery(winnerName) {
         alert(`🎉 JACKPOT! DU HAST GEWONNEN! 🎉\n+${formatNum(winAmt)} Bierchen`);
     }
 
-    // Nach kurzer Pause Reset durchführen
-    if (Math.random() > 0.5) { // Nur ein paar Clients versuchen den Reset
+    // Nur EINER (zufällig) stößt den Datenbank-Reset an, um Konflikte zu vermeiden
+    if (Math.random() > 0.5) { 
         setTimeout(() => {
-            const ref = db.ref('lottery');
-            ref.transaction((data) => {
-                // Wenn Status immer noch spinning ist, resetten wir
-                if (data && data.status === 'spinning') {
-                    // Auszahlung vormerken
-                    return {
-                        bets: {},
-                        total: 0,
-                        status: 'waiting',
-                        drawTime: 0,
-                        lastWinnerName: winnerName,
-                        lastWinnerAmt: winAmt,
-                        pendingPayout: { user: winnerName, amount: winAmt }
-                    };
-                }
-                return data;
-            });
-        }, 3000);
+            forceLotteryReset(winnerName, winAmt);
+        }, 3000); // 3 Sekunden warten, damit alle die Animation sehen
     }
 }
 
-// 9. Gewinn-Check (läuft beim Start in init())
+// 9. NEU: Erzwingt den Reset (wird auch beim "Not-Aus" genutzt)
+function forceLotteryReset(winnerName, winAmt) {
+    const ref = db.ref('lottery');
+    ref.transaction((data) => {
+        // Wir setzen zurück, egal ob Status spinning ist oder nicht (für den Not-Aus Fall)
+        return {
+            bets: {},
+            total: 0,
+            status: 'waiting',
+            drawTime: 0,
+            spinStart: 0,
+            lastWinnerName: winnerName,
+            lastWinnerAmt: winAmt,
+            pendingPayout: { user: winnerName, amount: winAmt }
+        };
+    });
+}
+
+// 10. Gewinn gutschreiben (läuft bei Start)
 function checkLotteryWins() {
   if(!db || !game.playerName) return;
   const ref = db.ref('lottery/pendingPayout');
   ref.once('value', (snapshot) => {
     const pay = snapshot.val();
     if(pay && pay.user === game.playerName) {
-        // ICH HABE GEWONNEN!
         ref.remove().then(() => {
             game.beers += pay.amount;
             saveGame();
             updateCasinoUI();
-            // Optional: Alert hier, falls er offline war
+            alert(`💰 NACHTRÄGLICHER GEWINN!\nDu hast den Jackpot gewonnen: +${formatNum(pay.amount)} Bierchen`);
         });
     }
   });
