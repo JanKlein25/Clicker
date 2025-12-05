@@ -3659,6 +3659,8 @@
     <div class="jackpot-wrapper">
   
   <!-- Dein existierender Button (unverändert, nur margin-top entfernt, da der Wrapper das jetzt macht) -->
+  <div class="jackpot-wrapper">
+  
   <button id="lotteryBtn" onclick="openLottery()" style="
       background: linear-gradient(45deg, #d35400, #e67e22);
       border: 2px solid rgba(255, 255, 255, 0.2);
@@ -3670,16 +3672,14 @@
       cursor: pointer;
       box-shadow: 0 0 20px rgba(211, 84, 0, 0.4);
       z-index: 25;
-      /* Animation für den Button selbst */
-      animation: buttonPulse 2s infinite;
+      /* Animation jetzt im CSS gesteuert */
     ">🎰 JACKPOT</button>
 
-  <!-- Der schwebende Hinweis -->
   <div class="jackpot-hint">
     <div class="hint-arrow">⬅</div>
     <div class="hint-text">
-      <span style="color:#f1c40f; font-weight:900;">NEU!</span><br>
-      Hol deine Freunde ran<br>und zockt um die Wette!
+      <span style="color:#e67e22; font-weight:bold;">NEU!</span>
+      Zockt um die Wette
     </div>
   </div>
 
