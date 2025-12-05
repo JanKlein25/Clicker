@@ -7131,7 +7131,7 @@ function updateLotteryLoop() {
   const uniquePlayers = lotteryData.bets ? Object.keys(lotteryData.bets).length : 0;
 
   if (lotteryData.status === 'waiting') {
-      timerEl.textContent = `Warte auf Spieler (${uniquePlayers}/2)`;
+      timerEl.textContent = `Warte auf Spieler (${uniquePlayers}/mind. 2)`;
       timerEl.style.color = "#aaa";
   } 
   else if (lotteryData.status === 'countdown') {
