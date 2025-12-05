@@ -2975,6 +2975,86 @@
       .b-count { font-size: 1.1rem !important; }
     }
   
+  /* --- JACKPOT HINWEIS STYLES --- */
+
+/* Der Container hält Button und Pfeil zusammen */
+.jackpot-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-top: 15px; /* Abstand nach oben */
+  z-index: 30;
+}
+
+/* Pulsieren des Buttons selbst */
+@keyframes buttonPulse {
+  0% { transform: scale(1); box-shadow: 0 0 20px rgba(211, 84, 0, 0.4); }
+  50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(211, 84, 0, 0.8); }
+  100% { transform: scale(1); box-shadow: 0 0 20px rgba(211, 84, 0, 0.4); }
+}
+
+/* Der gesamte Hinweis-Block (Pfeil + Text) */
+.jackpot-hint {
+  position: absolute;
+  left: 105%; /* Rechts neben dem Button */
+  top: 50%;
+  transform: translateY(-50%); /* Vertikal mittig */
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none; /* Klicks gehen durch */
+  animation: hintBounce 1s infinite alternate ease-in-out;
+  width: max-content;
+}
+
+/* Der Pfeil */
+.hint-arrow {
+  font-size: 2rem;
+  color: #e67e22;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+}
+
+/* Die Textbox */
+.hint-text {
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #e67e22;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  text-align: left;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Die Animation (Hüpfen nach rechts/links) */
+@keyframes hintBounce {
+  0% { transform: translate(0, -50%); }
+  100% { transform: translate(10px, -50%); }
+}
+
+/* RESPONSIVE: Auf Handys verschieben wir den Hinweis nach OBEN */
+@media (max-width: 850px) {
+  .jackpot-hint {
+    left: 50%;
+    transform: translateX(-50%); /* Horizontal mittig */
+    top: -65px; /* Über dem Button */
+    flex-direction: column-reverse; /* Pfeil nach unten, Text oben */
+    animation: hintBounceMobile 1s infinite alternate ease-in-out;
+  }
+  
+  .hint-arrow {
+    transform: rotate(-90deg); /* Pfeil drehen, damit er nach unten zeigt */
+    margin-top: -5px;
+    font-size: 1.5rem;
+  }
+  
+  @keyframes hintBounceMobile {
+    0% { transform: translate(-50%, 0); }
+    100% { transform: translate(-50%, -10px); } /* Hüpfen nach oben/unten */
+  }
+}
+  
   </style>
 
 </head>
@@ -3575,8 +3655,11 @@
       <button id="skinsBtn" onclick="openSkins()">🎒 SKINS</button>
     </div>
     <button id="leaderboardBtn" onclick="openLeaderboard()">🏆 LEADERBOARD</button>
-    <button id="lotteryBtn" onclick="openLottery()" style="
-      margin-top: 10px;
+    
+    <div class="jackpot-wrapper">
+  
+  <!-- Dein existierender Button (unverändert, nur margin-top entfernt, da der Wrapper das jetzt macht) -->
+  <button id="lotteryBtn" onclick="openLottery()" style="
       background: linear-gradient(45deg, #d35400, #e67e22);
       border: 2px solid rgba(255, 255, 255, 0.2);
       color: #fff;
@@ -3587,7 +3670,20 @@
       cursor: pointer;
       box-shadow: 0 0 20px rgba(211, 84, 0, 0.4);
       z-index: 25;
+      /* Animation für den Button selbst */
+      animation: buttonPulse 2s infinite;
     ">🎰 JACKPOT</button>
+
+  <!-- Der schwebende Hinweis -->
+  <div class="jackpot-hint">
+    <div class="hint-arrow">⬅</div>
+    <div class="hint-text">
+      <span style="color:#f1c40f; font-weight:900;">NEU!</span><br>
+      Hol deine Freunde ran<br>und zockt um die Wette!
+    </div>
+  </div>
+
+</div>
     <!-- PRESTIGE BUTTON (NEU) -->
     <button id="prestigeBtn" onclick="openPrestige()" style="display:none;">
       🚀 AUFSTEIGEN
