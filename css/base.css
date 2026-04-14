@@ -1,0 +1,65 @@
+/* ===========================
+   BASE.CSS – Variablen, Reset, Layout
+   =========================== */
+
+:root {
+  --bg-dark: #0f0f12;
+  --panel-left: #1a1a20;
+  --panel-right: #121216;
+  --gold: #f1c40f;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --text-main: #ecf0f1;
+  --tooltip-bg: rgba(10, 10, 15, 0.98);
+  --purple: #9b59b6;
+  --blue: #3498db;
+  /* Rarity Colors */
+  --rarity-common: #b0c3d9;
+  --rarity-rare: #4b69ff;
+  --rarity-epic: #8847ff;
+  --rarity-legendary: #d32ce6;
+  --rarity-blackmarket: #8a0303;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+}
+
+/* --- LAYOUT --- */
+.left-panel {
+  flex: 1;
+  background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+  transition: background 2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-right: 2px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+.right-panel {
+  width: 420px;
+  background: var(--panel-right);
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #222;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  z-index: 50;
+}

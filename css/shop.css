@@ -1,0 +1,186 @@
+/* ===========================
+   SHOP.CSS – Right Panel Shop
+   =========================== */
+
+/* --- CLICK BOOSTER --- */
+.click-booster {
+  padding: 15px;
+  background: linear-gradient(135deg, #18181b, #0f0f12);
+  border-bottom: 2px solid #000;
+}
+
+.cb-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+}
+
+.cb-info { flex: 1; }
+
+.cb-title {
+  color: var(--gold);
+  font-family: 'Merriweather', serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.cb-stat {
+  color: #ccc;
+  font-size: 0.8rem;
+}
+
+.cb-btn {
+  background: linear-gradient(to bottom, #2ecc71, #27ae60);
+  border: 1px solid #2ecc71;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: right;
+  box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+  transition: transform 0.1s;
+  min-width: 100px;
+}
+
+.cb-btn:hover { filter: brightness(1.1); }
+.cb-btn:active { transform: scale(0.95); }
+
+.cb-btn.locked {
+  background: #333;
+  border-color: #444;
+  color: #777;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.cb-cost {
+  font-size: 0.8rem;
+  display: block;
+  opacity: 0.9;
+}
+
+/* --- STORE HEADER --- */
+.store-header {
+  background: #0a0a0d;
+  padding: 18px;
+  text-align: center;
+  font-family: 'Merriweather', serif;
+  font-weight: 900;
+  color: #57606f;
+  border-bottom: 1px solid #222;
+  font-size: 0.9rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* --- UPGRADES GRID --- */
+.upgrades-container {
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 80px;
+  max-height: 220px;
+  overflow-y: auto;
+  border-bottom: 2px solid #000;
+}
+
+.upgrade-crate {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #2d3436, #1e272e);
+  border: 1px solid #444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.upgrade-crate:hover {
+  border-color: var(--text-main);
+  background: #333;
+  z-index: 5;
+}
+
+/* --- BUILDINGS LIST --- */
+.buildings-list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #444 #0a0a0d;
+}
+
+.building-row {
+  height: 80px;
+  background: linear-gradient(to right, #1a1a20, #141418);
+  border-bottom: 1px solid #000;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  cursor: pointer;
+  position: relative;
+  opacity: 0.5;
+  transition: all 0.2s;
+}
+
+.building-row:hover {
+  opacity: 1;
+  background: #222;
+}
+
+.building-row.can-afford { opacity: 1; }
+
+.b-icon {
+  font-size: 2.2rem;
+  width: 50px;
+  text-align: center;
+  margin-right: 15px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+.b-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.b-name {
+  font-weight: 700;
+  font-family: 'Merriweather', serif;
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.b-cps {
+  font-size: 0.75rem;
+  color: #636e72;
+}
+
+.b-cost {
+  color: var(--red);
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.b-cost.affordable { color: var(--green); }
+
+.b-count {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.05);
+  margin-left: auto;
+}
