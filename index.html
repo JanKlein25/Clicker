@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>KleinClicker - Casino </title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700;900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <!-- FIREBASE SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -102,13 +102,13 @@
 
   <!-- PRESTIGE MODAL -->
   <div id="prestigeModal">
-    <div class="lb-window" style="border-color: #3498db; box-shadow: 0 0 80px rgba(52, 152, 219, 0.4);">
+    <div class="lb-window" style="border-color: rgba(0, 240, 255, 0.2); box-shadow: 0 0 80px rgba(0, 240, 255, 0.15);">
       <button class="close-btn" onclick="closePrestige()">×</button>
-      <div class="lb-header" style="background: linear-gradient(to bottom, #2980b9, #2c3e50);">
-        <div class="lb-title" style="color:#fff;">🚀 ZEITREISE</div>
+      <div class="lb-header" style="background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(191, 0, 255, 0.08));">
+        <div class="lb-title" style="color:var(--neon-cyan);">🚀 ZEITREISE</div>
       </div>
       <div class="lb-list" style="text-align:center; padding:30px;">
-        <div style="color:#e74c3c; font-weight:bold; font-size:1.2rem; margin-bottom:20px;">
+        <div style="color:var(--red); font-weight:bold; font-size:1.2rem; margin-bottom:20px; font-family:'Orbitron',monospace; letter-spacing:2px;">
           WARNUNG: HARD RESET
         </div>
         <div style="color:#ccc; margin-bottom:20px;">
@@ -116,31 +116,32 @@
           Du behältst deine Statistiken, Skins, Erfolge und Leaderboard-Platzierung.
         </div>
 
-        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; margin-bottom:20px;">
+        <div style="background:rgba(0,240,255,0.03); padding:15px; border-radius:10px; margin-bottom:20px; border:1px solid rgba(0,240,255,0.06);">
           <div>Aktueller Prestige-Level: <span id="modal-current-prestige"
-              style="color:#3498db; font-weight:bold;">0</span></div>
+              style="color:var(--neon-cyan); font-weight:bold; font-family:'Orbitron',monospace;">0</span></div>
           <div style="font-size:1.5rem; margin:10px 0;">⬇️</div>
           <div>Mögliches Neues Level: <span id="modal-new-prestige"
-              style="color:#2ecc71; font-weight:bold; font-size:1.3rem;">0</span></div>
+              style="color:var(--green); font-weight:bold; font-size:1.3rem; font-family:'Orbitron',monospace; text-shadow:0 0 10px rgba(57,255,20,0.3);">0</span></div>
           <div style="color:#2ecc71; font-size:0.9rem; margin-top:5px;">
             (+<span id="modal-gain-prestige">0</span> Level dazu)
           </div>
-          <div style="color:var(--gold); font-weight:bold; margin-top:10px;">
+          <div style="color:var(--neon-cyan); font-weight:bold; margin-top:10px; text-shadow:0 0 8px rgba(0,240,255,0.3);">
             🎁 +<span id="modal-gain-cases">0</span> Kisten
           </div>
         </div>
 
         <button onclick="doPrestige()" id="confirmPrestigeBtn" style="
-        background: linear-gradient(45deg, #e74c3c, #c0392b);
-        border: 2px solid rgba(255,255,255,0.2);
+        background: linear-gradient(135deg, rgba(255, 23, 68, 0.4), rgba(200, 0, 50, 0.3));
+        border: 1px solid rgba(255, 23, 68, 0.3);
         color: white;
         padding: 15px 30px;
-        border-radius: 50px;
+        border-radius: 10px;
         font-weight: 900;
-        font-size: 1.1rem;
+        font-size: 1rem;
         cursor: pointer;
         width: 100%;
-        box-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
+        box-shadow: 0 0 25px rgba(255, 23, 68, 0.2);
+        font-family: 'Orbitron', monospace; letter-spacing: 2px;
         ">
           RESET DURCHFÜHREN
         </button>
@@ -154,17 +155,17 @@
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.92);
+    background: rgba(5, 5, 15, 0.92);
     z-index: 15000;
     display: none;
     align-items: center; justify-content: center;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
 ">
-  <div class="lb-window" style="border-color: #f1c40f; box-shadow: 0 0 80px rgba(241, 196, 15, 0.4);">
+  <div class="lb-window" style="border-color: rgba(0, 240, 255, 0.2); box-shadow: 0 0 80px rgba(0, 240, 255, 0.15);">
     <button class="close-btn" onclick="closeBeerModal()">×</button>
     
-    <div class="lb-header" style="background: linear-gradient(to right, #d35400, #f1c40f);">
-      <div class="lb-title" style="color:#fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">🍺 BIERCHEN DEPOT</div>
+    <div class="lb-header" style="background: linear-gradient(135deg, rgba(255, 107, 0, 0.15), rgba(0, 240, 255, 0.08));">
+      <div class="lb-title" style="color:var(--neon-cyan); text-shadow: 0 0 15px rgba(0,240,255,0.5);">🍺 BIERCHEN DEPOT</div>
     </div>
 
     <div class="lb-list" style="text-align:center; padding:30px; display:flex; flex-direction:column; align-items:center; gap:15px;">
@@ -584,23 +585,24 @@
     <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:5px;">
       <button id="leaderboardBtn" onclick="openLeaderboard()">🏆 LEADERBOARD</button>
       <button id="achievementBtn" onclick="openTrophies()">🏆 <span id="achievement-count">0/40</span> <span id="achievement-bonus-display" style="color:#2ecc71; font-size:0.75rem;">+0%</span></button>
-      <button id="statsBtn" onclick="openStats()" style="background:linear-gradient(45deg,#2c3e50,#34495e); border:2px solid rgba(255,255,255,0.1); color:#fff; padding:8px 16px; border-radius:50px; font-weight:900; cursor:pointer; font-size:0.85rem;">📊 STATS</button>
+      <button id="statsBtn" onclick="openStats()" style="background:linear-gradient(135deg, rgba(0,240,255,0.15), rgba(191,0,255,0.1)); border:1px solid rgba(0,240,255,0.2); color:#fff; padding:8px 16px; border-radius:8px; font-weight:800; cursor:pointer; font-size:0.85rem; font-family:'Orbitron',monospace; letter-spacing:1px; backdrop-filter:blur(5px);">📊 STATS</button>
     </div>
     
     <div class="jackpot-wrapper">
   
   <button id="lotteryBtn" onclick="openLottery()" style="
-      background: linear-gradient(45deg, #d35400, #e67e22);
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(191, 0, 255, 0.3), rgba(0, 240, 255, 0.2));
+      border: 1px solid rgba(191, 0, 255, 0.3);
       color: #fff;
       padding: 10px 25px;
-      border-radius: 50px;
+      border-radius: 8px;
       font-weight: 900;
       font-size: 1rem;
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(211, 84, 0, 0.4);
+      box-shadow: 0 0 25px rgba(191, 0, 255, 0.2);
       z-index: 25;
       animation: buttonPulse 2s infinite;
+      font-family: 'Orbitron', monospace; letter-spacing: 2px;
     ">🎰 JACKPOT</button>
 
   <div class="jackpot-hint">
@@ -629,21 +631,21 @@
 
     <!-- PRESTIGE BADGE -->
     <div id="prestige-badge"
-      style="display:none; margin-top:25px; width: 80%; max-width:300px; color:#3498db; background:rgba(0,0,0,0.6); padding:10px; border-radius:12px; border:1px solid #3498db; text-align:center; z-index: 20;">
+      style="display:none; margin-top:25px; width: 80%; max-width:300px; color:var(--neon-cyan); background:rgba(5,5,15,0.8); padding:10px; border-radius:12px; border:1px solid rgba(0,240,255,0.15); text-align:center; z-index: 20; backdrop-filter:blur(10px);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-        <span style="font-weight:bold;">⭐ Rang <span id="prestige-level-display">0</span></span>
-        <span style="font-size:0.8rem; color:#2ecc71;">+<span id="prestige-bonus-display">0</span>% Bonus</span>
+        <span style="font-weight:bold; font-family:'Orbitron',monospace; font-size:0.85rem;">⭐ Rang <span id="prestige-level-display">0</span></span>
+        <span style="font-size:0.8rem; color:var(--green); text-shadow:0 0 8px rgba(57,255,20,0.3);">+<span id="prestige-bonus-display">0</span>% Bonus</span>
       </div>
 
       <div
-        style="width:100%; height:8px; background:#222; border-radius:4px; overflow:hidden; border:1px solid rgba(52, 152, 219, 0.3);">
+        style="width:100%; height:6px; background:rgba(0,240,255,0.05); border-radius:3px; overflow:hidden; border:1px solid rgba(0,240,255,0.1);">
         <div id="prestige-progress-bar"
-          style="width:0%; height:100%; background:linear-gradient(90deg, #3498db, #2980b9); transition: width 0.5s;">
+          style="width:0%; height:100%; background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); transition: width 0.5s;">
         </div>
       </div>
 
-      <div style="font-size:0.7rem; color:#ccc; margin-top:5px;">
-        Nächster Rang in: <span id="prestige-next-req" style="color:#fff; font-weight:bold;">0</span>
+      <div style="font-size:0.7rem; color:rgba(0,240,255,0.4); margin-top:5px; font-family:'Rajdhani',sans-serif;">
+        Nächster Rang in: <span id="prestige-next-req" style="color:#fff; font-weight:bold; font-family:'Orbitron',monospace;">0</span>
       </div>
     </div>
 
@@ -677,37 +679,37 @@
   </div>
 
   <!-- LOTTERY MODAL -->
-<div id="lotteryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:17000; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
-  <div class="lb-window" style="width:95%; max-width:500px; border-color:#e67e22; display:flex; flex-direction:column;">
+<div id="lotteryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5,5,15,0.95); z-index:17000; align-items:center; justify-content:center; backdrop-filter:blur(12px);">
+  <div class="lb-window" style="width:95%; max-width:500px; border-color:rgba(191,0,255,0.2); display:flex; flex-direction:column;">
     <button class="close-btn" onclick="closeLottery()">×</button>
     
-    <div class="lb-header" style="background:linear-gradient(to right, #d35400, #e67e22);">
+    <div class="lb-header" style="background:linear-gradient(135deg, rgba(191,0,255,0.12), rgba(0,240,255,0.08));">
       <div class="lb-title">🎰 TÄGLICHER BIER-POT</div>
     </div>
 
-    <div style="padding:20px; text-align:center; background:#111; display:flex; flex-direction:column; align-items:center;">
+    <div style="padding:20px; text-align:center; background:rgba(0,0,0,0.3); display:flex; flex-direction:column; align-items:center;">
       
-      <div style="font-size:0.9rem; color:#aaa; margin-bottom:5px;">LASS UNS PRÜGELN!</div>
-      <div id="lottery-timer" style="font-size:1.5rem; font-weight:bold; color:#fff; font-family:monospace;">--:--:--</div>
+      <div style="font-size:0.85rem; color:rgba(0,240,255,0.4); margin-bottom:5px; font-family:'Orbitron',monospace; letter-spacing:2px;">LASS UNS PRÜGELN!</div>
+      <div id="lottery-timer" style="font-size:1.5rem; font-weight:bold; color:var(--neon-cyan); font-family:'Orbitron',monospace; text-shadow:0 0 15px rgba(0,240,255,0.4);">--:--:--</div>
 
       <div style="position:relative; margin:20px 0; width:250px; height:250px;">
-        <canvas id="lotteryCanvas" width="250" height="250" style="border-radius:50%; box-shadow:0 0 20px rgba(230, 126, 34, 0.2);"></canvas>
-        <div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:2rem; color:#fff; text-shadow:0 2px 2px #000;">⬇</div>
+        <canvas id="lotteryCanvas" width="250" height="250" style="border-radius:50%; box-shadow:0 0 30px rgba(0,240,255,0.1);"></canvas>
+        <div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:2rem; color:var(--neon-cyan); text-shadow:0 0 10px var(--neon-cyan);">⬇</div>
       </div>
 
-      <div style="background:rgba(255,255,255,0.05); padding:10px 20px; border-radius:10px; margin-bottom:15px; width:100%;">
-        <div style="font-size:0.8rem; color:#aaa;">IM POT</div>
-        <div style="font-size:2rem; color:#f1c40f; font-weight:900;">🍺 <span id="lottery-pot-display">0</span></div>
+      <div style="background:rgba(0,240,255,0.03); padding:10px 20px; border-radius:10px; margin-bottom:15px; width:100%; border:1px solid rgba(0,240,255,0.06);">
+        <div style="font-size:0.75rem; color:rgba(0,240,255,0.4); font-family:'Orbitron',monospace; letter-spacing:2px;">IM POT</div>
+        <div style="font-size:2rem; color:var(--neon-cyan); font-weight:900; font-family:'Orbitron',monospace; text-shadow:0 0 20px rgba(0,240,255,0.4);">🍺 <span id="lottery-pot-display">0</span></div>
       </div>
 
-      <div id="lottery-list" style="width:100%; max-height:100px; overflow-y:auto; background:#1a1a1a; border:1px solid #333; border-radius:6px; margin-bottom:15px; padding:5px;"></div>
+      <div id="lottery-list" style="width:100%; max-height:100px; overflow-y:auto; background:rgba(0,0,0,0.3); border:1px solid rgba(0,240,255,0.06); border-radius:8px; margin-bottom:15px; padding:5px;"></div>
 
       <div id="lottery-controls" style="display:flex; gap:10px; width:100%;">
-        <input type="number" id="lotteryInput" placeholder="Menge" style="flex:1; padding:10px; background:#222; border:1px solid #444; color:#fff; border-radius:6px; font-weight:bold;">
-        <button onclick="enterLottery()" style="background:#e67e22; border:none; padding:10px 20px; color:#fff; font-weight:bold; border-radius:6px; cursor:pointer;">REINSETZEN</button>
+        <input type="number" id="lotteryInput" placeholder="Menge" style="flex:1; padding:10px; background:rgba(0,0,0,0.4); border:1px solid rgba(0,240,255,0.15); color:var(--neon-cyan); border-radius:8px; font-weight:bold; font-family:'Orbitron',monospace;">
+        <button onclick="enterLottery()" style="background:linear-gradient(135deg, rgba(191,0,255,0.3), rgba(0,240,255,0.2)); border:1px solid rgba(191,0,255,0.3); padding:10px 20px; color:#fff; font-weight:bold; border-radius:8px; cursor:pointer; font-family:'Orbitron',monospace; letter-spacing:1px;">REINSETZEN</button>
       </div>
 
-      <div id="lottery-winner-msg" style="display:none; margin-top:15px; color:#2ecc71; font-weight:bold; border:1px solid #2ecc71; padding:10px; border-radius:6px; background:rgba(46, 204, 113, 0.1);">
+      <div id="lottery-winner-msg" style="display:none; margin-top:15px; color:var(--green); font-weight:bold; border:1px solid rgba(57,255,20,0.2); padding:10px; border-radius:8px; background:rgba(57,255,20,0.03);">
         Letzter Gewinner:<br><span id="last-winner-name" style="color:#fff;">Niemand</span> (+<span id="last-winner-amt">0</span>)
       </div>
 
@@ -803,9 +805,9 @@
 
   <!-- TROPHY MODAL -->
   <div id="trophyModal">
-    <div class="lb-window" style="border-color: #f1c40f; box-shadow: 0 0 80px rgba(241, 196, 15, 0.3); max-width: 650px;">
+    <div class="lb-window" style="border-color: rgba(0, 240, 255, 0.2); box-shadow: 0 0 80px rgba(0, 240, 255, 0.15); max-width: 650px;">
       <button class="close-btn" onclick="closeTrophies()">×</button>
-      <div class="lb-header" style="background: linear-gradient(to right, #f39c12, #e67e22);">
+      <div class="lb-header" style="background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(191, 0, 255, 0.08));">
         <div class="lb-title">🏆 ACHIEVEMENTS</div>
       </div>
       <div class="trophy-grid" id="trophy-grid"></div>
@@ -814,9 +816,9 @@
 
   <!-- STATS MODAL -->
   <div id="statsModal">
-    <div class="lb-window" style="border-color: #3498db; box-shadow: 0 0 80px rgba(52, 152, 219, 0.3); max-width: 500px;">
+    <div class="lb-window" style="border-color: rgba(0, 240, 255, 0.2); box-shadow: 0 0 80px rgba(0, 240, 255, 0.15); max-width: 500px;">
       <button class="close-btn" onclick="closeStats()">×</button>
-      <div class="lb-header" style="background: linear-gradient(to right, #2c3e50, #3498db);">
+      <div class="lb-header" style="background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(191, 0, 255, 0.08));">
         <div class="lb-title">📊 STATISTIKEN</div>
       </div>
       <div class="lb-list" id="stats-content" style="padding: 15px; max-height: 65vh; overflow-y: auto;"></div>

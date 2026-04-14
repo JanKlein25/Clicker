@@ -1,5 +1,6 @@
 /* ===========================
    MODALS.CSS – Leaderboard, Prestige, Bierchen, Lottery, Tooltip
+   CYBERPUNK NEON REDESIGN
    =========================== */
 
 /* --- GLOBAL TOOLTIP --- */
@@ -8,44 +9,49 @@
   top: 0;
   left: 0;
   width: 320px;
-  background: var(--tooltip-bg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  background: rgba(8, 8, 25, 0.98);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 12px;
   pointer-events: none;
   z-index: 10000;
   padding: 0;
   display: none;
-  box-shadow: 0 10px 50px rgba(0, 0, 0, 1);
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.08);
+  backdrop-filter: blur(15px);
+  overflow: hidden;
 }
 
 .tt-header {
-  background: rgba(255, 255, 255, 0.03);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.06), rgba(191, 0, 255, 0.04));
   padding: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
 }
 
 .tt-title {
-  font-family: 'Merriweather', serif;
-  font-weight: 900;
-  font-size: 1.1rem;
-  color: var(--gold);
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--neon-cyan);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
 .tt-price {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: bold;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: #000;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  font-family: 'Rajdhani', sans-serif;
 }
 
-.tt-price.affordable { color: var(--green); border: 1px solid rgba(46, 204, 113, 0.3); }
-.tt-price.expensive { color: var(--red); opacity: 0.8; }
+.tt-price.affordable { color: var(--green); border: 1px solid rgba(57, 255, 20, 0.2); text-shadow: 0 0 8px rgba(57, 255, 20, 0.3); }
+.tt-price.expensive { color: var(--red); opacity: 0.8; text-shadow: 0 0 8px rgba(255, 23, 68, 0.3); }
 
-.tt-body { padding: 12px; font-size: 0.85rem; color: #ccc; line-height: 1.4; }
+.tt-body { padding: 12px; font-size: 0.85rem; color: #8899bb; line-height: 1.4; font-family: 'Rajdhani', sans-serif; }
 
 .tt-effect {
   color: #fff;
@@ -53,17 +59,18 @@
   margin-bottom: 8px;
   display: block;
   font-size: 0.95rem;
-  border-left: 3px solid var(--gold);
+  border-left: 2px solid var(--neon-cyan);
   padding-left: 10px;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
 }
 
 .tt-stats {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.3);
   padding: 10px;
   margin-top: 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 240, 255, 0.05);
 }
 
 .stat-highlight {
@@ -72,7 +79,8 @@
   font-size: 0.95rem;
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(0, 240, 255, 0.1);
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
 }
 
 /* --- LEADERBOARD MODAL --- */
@@ -82,44 +90,58 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.92);
+  background: rgba(5, 5, 15, 0.92);
   z-index: 12000;
   display: none;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
 }
 
 .lb-window {
-  background: #18181b;
+  background: rgba(10, 10, 30, 0.95);
   width: 95%;
   max-width: 500px;
-  border: 1px solid #333;
+  border: 1px solid rgba(0, 240, 255, 0.15);
   border-radius: 16px;
   padding: 0;
-  box-shadow: 0 0 80px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 240, 255, 0.08);
   display: flex;
   flex-direction: column;
   max-height: 80vh;
   position: relative;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
 }
 
 .lb-header {
-  background: linear-gradient(to bottom, #2d3436, #1e272e);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(191, 0, 255, 0.08));
   padding: 20px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-radius: 16px 16px 0 0;
+  position: relative;
+}
+
+.lb-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.4), transparent);
 }
 
 .lb-title {
-  font-family: 'Merriweather', serif;
-  font-size: 1.5rem;
-  color: var(--gold);
-  font-weight: 900;
-  letter-spacing: 1px;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.3rem;
+  color: var(--neon-cyan);
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
 }
 
 .lb-list { padding: 10px; overflow-y: auto; flex: 1; }
@@ -129,21 +151,26 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-family: 'Roboto', sans-serif;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.04);
+  font-family: 'Rajdhani', sans-serif;
+  transition: background 0.2s;
+}
+
+.lb-entry:hover {
+  background: rgba(0, 240, 255, 0.03);
 }
 
 .lb-entry:last-child { border-bottom: none; }
 
-.lb-rank { width: 30px; font-weight: bold; color: #666; }
-.lb-rank.top-1 { color: var(--gold); font-size: 1.2rem; }
-.lb-rank.top-2 { color: #bdc3c7; font-size: 1.1rem; }
-.lb-rank.top-3 { color: #cd7f32; font-size: 1.1rem; }
+.lb-rank { width: 30px; font-weight: bold; color: #445; font-family: 'Orbitron', monospace; }
+.lb-rank.top-1 { color: var(--neon-cyan); font-size: 1.2rem; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+.lb-rank.top-2 { color: rgba(191, 0, 255, 0.7); font-size: 1.1rem; text-shadow: 0 0 8px rgba(191, 0, 255, 0.3); }
+.lb-rank.top-3 { color: rgba(255, 107, 0, 0.7); font-size: 1.1rem; text-shadow: 0 0 8px rgba(255, 107, 0, 0.3); }
 
-.lb-name { flex: 1; font-weight: bold; color: #fff; }
-.lb-score { color: var(--green); font-weight: bold; }
+.lb-name { flex: 1; font-weight: bold; color: #dde4ff; }
+.lb-score { color: var(--green); font-weight: bold; text-shadow: 0 0 8px rgba(57, 255, 20, 0.3); }
 
-.lb-footer { padding: 15px; border-top: 1px solid #333; text-align: center; color: #666; font-size: 0.8rem; }
+.lb-footer { padding: 15px; border-top: 1px solid rgba(0, 240, 255, 0.08); text-align: center; color: #445; font-size: 0.8rem; }
 
 /* --- PRESTIGE MODAL --- */
 #prestigeModal {
@@ -152,10 +179,37 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(5, 5, 15, 0.95);
   z-index: 13000;
   display: none;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
+}
+
+/* --- CLOSE BUTTON --- */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(0, 240, 255, 0.5);
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: rgba(255, 23, 68, 0.2);
+  border-color: rgba(255, 23, 68, 0.4);
+  color: var(--red);
+  box-shadow: 0 0 15px rgba(255, 23, 68, 0.2);
 }

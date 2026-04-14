@@ -1,5 +1,6 @@
 /* ===========================
    EFFECTS.CSS – Animationen & Partikel
+   CYBERPUNK NEON REDESIGN
    =========================== */
 
 @keyframes floatAround {
@@ -18,6 +19,8 @@
   pointer-events: none;
   animation: confetti 1s ease-out forwards;
   z-index: 1000;
+  border-radius: 2px;
+  box-shadow: 0 0 6px currentColor;
 }
 
 @keyframes confetti {
@@ -28,7 +31,7 @@
 .win-pulse { animation: screenFlash 0.5s; }
 
 @keyframes screenFlash {
-  0% { background-color: rgba(255, 255, 255, 0.2); }
+  0% { background-color: rgba(0, 240, 255, 0.15); }
   100% { background-color: transparent; }
 }
 
@@ -40,6 +43,7 @@
   pointer-events: none;
   z-index: 15;
   animation: physicsFall 1.2s cubic-bezier(0.5, 0, 0.8, 0.8) forwards;
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.3));
 }
 
 @keyframes physicsFall {
@@ -50,18 +54,19 @@
 /* --- CLICK TEXT --- */
 .click-text {
   position: absolute;
-  color: #fff;
+  color: var(--neon-cyan);
   font-weight: 900;
   font-size: 1.4rem;
+  font-family: 'Orbitron', monospace;
   pointer-events: none;
   animation: floatUp 0.8s ease-out forwards;
   z-index: 100;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.8), 0 0 30px rgba(0, 240, 255, 0.3);
 }
 
 @keyframes floatUp {
   0% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-80px) scale(1); }
+  100% { opacity: 0; transform: translateY(-80px) scale(1.2); }
 }
 
 /* --- GOLDEN KLEIN --- */
@@ -72,14 +77,15 @@
   z-index: 9999;
   cursor: pointer;
   display: none;
-  filter: drop-shadow(0 0 20px gold);
-  animation: wobble 2s infinite;
+  filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.8)) hue-rotate(0deg);
+  animation: wobbleNeon 2s infinite;
 }
 
-@keyframes wobble {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-5deg); }
-  75% { transform: rotate(5deg); }
+@keyframes wobbleNeon {
+  0%, 100% { transform: rotate(0deg); filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.8)) hue-rotate(0deg); }
+  25% { transform: rotate(-5deg); filter: drop-shadow(0 0 30px rgba(191, 0, 255, 0.8)) hue-rotate(90deg); }
+  50% { transform: rotate(0deg); filter: drop-shadow(0 0 25px rgba(255, 0, 255, 0.8)) hue-rotate(180deg); }
+  75% { transform: rotate(5deg); filter: drop-shadow(0 0 30px rgba(57, 255, 20, 0.8)) hue-rotate(270deg); }
 }
 
 /* --- BUFF ICONS --- */
@@ -95,18 +101,19 @@
 .buff-icon {
   width: 50px;
   height: 50px;
-  background: rgba(0, 0, 0, 0.8);
-  border: 2px solid var(--gold);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 240, 255, 0.3);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
-  animation: pulse 1s infinite alternate;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+  animation: buffPulse 1.5s infinite alternate;
+  backdrop-filter: blur(5px);
 }
 
-@keyframes pulse {
-  from { opacity: 0.8; }
-  to { opacity: 1; }
+@keyframes buffPulse {
+  from { opacity: 0.7; box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+  to { opacity: 1; box-shadow: 0 0 25px rgba(0, 240, 255, 0.4); }
 }

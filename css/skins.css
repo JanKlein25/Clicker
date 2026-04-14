@@ -1,5 +1,6 @@
 /* ===========================
    SKINS.CSS – Skin Modal, Inventar, Cases
+   CYBERPUNK NEON REDESIGN
    =========================== */
 
 #skinModal {
@@ -8,31 +9,32 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(5, 5, 15, 0.95);
   z-index: 14000;
   display: none;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(12px);
 }
 
 .skin-window {
-  background: #18181b;
+  background: rgba(10, 10, 30, 0.95);
   width: 95%;
   max-width: 700px;
-  border: 1px solid #444;
-  border-radius: 12px;
+  border: 1px solid rgba(0, 240, 255, 0.12);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   max-height: 90vh;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 240, 255, 0.08);
+  backdrop-filter: blur(20px);
 }
 
 .skin-header {
-  background: linear-gradient(to right, #2c3e50, #000);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(191, 0, 255, 0.06));
   padding: 15px 20px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,20 +42,20 @@
 
 .case-area {
   padding: 20px;
-  background: #111;
-  border-bottom: 2px solid #222;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.06);
   text-align: center;
 }
 
 .case-spinner {
   height: 120px;
-  background: #000;
-  border: 4px solid #333;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(0, 240, 255, 0.15);
   margin: 20px auto;
-  border-radius: 8px;
+  border-radius: 10px;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 20px #000;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.05);
   width: 100%;
 }
 
@@ -69,56 +71,83 @@
   width: 90px;
   height: 90px;
   margin-right: 4px;
-  border-radius: 6px;
-  background: #222;
-  border-bottom: 3px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  background: rgba(20, 20, 40, 0.6);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
   position: relative;
+  backdrop-filter: blur(3px);
 }
 
 .case-item img {
   width: 70px;
   height: 70px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.3));
 }
 
-/* Rarity Borders */
-.rarity-common { border: 2px solid var(--rarity-common); box-shadow: 0 0 5px var(--rarity-common); }
-.rarity-rare { border: 2px solid var(--rarity-rare); box-shadow: 0 0 10px var(--rarity-rare); }
-.rarity-epic { border: 2px solid var(--rarity-epic); box-shadow: 0 0 15px var(--rarity-epic); }
-.rarity-legendary { border: 2px solid var(--rarity-legendary); box-shadow: 0 0 20px var(--rarity-legendary); }
+/* Rarity Borders - Neon Style */
+.rarity-common {
+  border: 1px solid var(--rarity-common);
+  box-shadow: 0 0 8px rgba(138, 180, 217, 0.2);
+}
+.rarity-rare {
+  border: 1px solid var(--rarity-rare);
+  box-shadow: 0 0 12px rgba(77, 124, 255, 0.3);
+}
+.rarity-epic {
+  border: 1px solid var(--rarity-epic);
+  box-shadow: 0 0 18px rgba(191, 0, 255, 0.3);
+}
+.rarity-legendary {
+  border: 1px solid var(--rarity-legendary);
+  box-shadow: 0 0 25px rgba(255, 0, 255, 0.3);
+  animation: legendaryPulse 2s infinite;
+}
+
+@keyframes legendaryPulse {
+  0% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.4); }
+  100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.2); }
+}
 
 .rarity-blackmarket {
-  border: 2px solid var(--rarity-blackmarket);
-  box-shadow: 0 0 25px var(--rarity-blackmarket);
+  border: 1px solid var(--rarity-blackmarket);
+  box-shadow: 0 0 25px rgba(255, 23, 68, 0.3);
   animation: pulseRed 2s infinite;
 }
 
 @keyframes pulseRed {
-  0% { box-shadow: 0 0 10px var(--rarity-blackmarket); }
-  50% { box-shadow: 0 0 30px var(--rarity-blackmarket); }
-  100% { box-shadow: 0 0 10px var(--rarity-blackmarket); }
+  0% { box-shadow: 0 0 10px rgba(255, 23, 68, 0.2); }
+  50% { box-shadow: 0 0 35px rgba(255, 23, 68, 0.5); }
+  100% { box-shadow: 0 0 10px rgba(255, 23, 68, 0.2); }
 }
 
 .open-case-btn {
-  background: linear-gradient(45deg, #f1c40f, #d35400);
-  border: none;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.4), rgba(191, 0, 255, 0.3));
+  border: 1px solid rgba(0, 240, 255, 0.3);
   padding: 12px 30px;
   font-weight: 900;
   color: #fff;
-  border-radius: 4px;
-  font-size: 1.1rem;
+  border-radius: 8px;
+  font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0 4px 0 #b33900;
-  transition: transform 0.1s;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  transition: all 0.3s;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
 }
 
-.open-case-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #b33900; }
-.open-case-btn:disabled { filter: grayscale(1); cursor: not-allowed; }
+.open-case-btn:hover {
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.4);
+  border-color: rgba(0, 240, 255, 0.5);
+}
+.open-case-btn:active { transform: translateY(3px) scale(0.98); box-shadow: none; }
+.open-case-btn:disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.3; }
 
 /* --- INVENTORY --- */
 .inventory-grid {
@@ -127,65 +156,85 @@
   flex-wrap: wrap;
   gap: 10px;
   overflow-y: auto;
-  background: #18181b;
+  background: rgba(10, 10, 30, 0.5);
 }
 
 .inv-slot {
   width: 80px;
   height: 80px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #333;
-  border-radius: 6px;
+  background: rgba(0, 240, 255, 0.03);
+  border: 1px solid rgba(0, 240, 255, 0.08);
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: all 0.2s;
+  transition: all 0.3s;
+  backdrop-filter: blur(3px);
 }
 
-.inv-slot:hover { background: rgba(255, 255, 255, 0.1); border-color: #666; }
-.inv-slot.equipped { border: 2px solid var(--green); background: rgba(46, 204, 113, 0.1); }
-.inv-slot img { width: 60px; height: 60px; object-fit: contain; }
+.inv-slot:hover {
+  background: rgba(0, 240, 255, 0.06);
+  border-color: rgba(0, 240, 255, 0.2);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+}
+.inv-slot.equipped {
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  background: rgba(57, 255, 20, 0.05);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.15);
+}
+.inv-slot img { width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.2)); }
 
 .count-badge {
   position: absolute;
   bottom: 2px;
   right: 4px;
   font-size: 0.7rem;
-  color: #aaa;
+  color: rgba(0, 240, 255, 0.5);
+  font-family: 'Orbitron', monospace;
 }
 
 /* --- CASE INFO --- */
 .case-info-box {
   margin-top: 15px;
   background: rgba(0, 0, 0, 0.3);
-  border: 1px solid #333;
-  border-radius: 6px;
+  border: 1px solid rgba(0, 240, 255, 0.06);
+  border-radius: 8px;
   padding: 10px;
   width: 90%;
   max-width: 100%;
   margin-left: auto;
   margin-right: auto;
+  backdrop-filter: blur(5px);
 }
 
-.ci-title { color: #aaa; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+.ci-title {
+  color: rgba(0, 240, 255, 0.5);
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 2px;
+}
 .ci-list { display: flex; flex-direction: column; gap: 4px; }
 
 .ci-row {
   display: flex;
   justify-content: space-between;
   font-size: 0.8rem;
-  padding: 3px 6px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
+  padding: 3px 8px;
+  background: rgba(0, 240, 255, 0.02);
+  border-radius: 6px;
+  font-family: 'Rajdhani', sans-serif;
 }
 
 .rarity-text-common { color: var(--rarity-common); }
-.rarity-text-rare { color: var(--rarity-rare); }
-.rarity-text-epic { color: var(--rarity-epic); }
-.rarity-text-legendary { color: var(--rarity-legendary); }
-.rarity-text-blackmarket { color: var(--rarity-blackmarket); }
+.rarity-text-rare { color: var(--rarity-rare); text-shadow: 0 0 5px rgba(77, 124, 255, 0.3); }
+.rarity-text-epic { color: var(--rarity-epic); text-shadow: 0 0 5px rgba(191, 0, 255, 0.3); }
+.rarity-text-legendary { color: var(--rarity-legendary); text-shadow: 0 0 5px rgba(255, 0, 255, 0.3); }
+.rarity-text-blackmarket { color: var(--rarity-blackmarket); text-shadow: 0 0 5px rgba(255, 23, 68, 0.3); }
 
 /* --- CASE CONTENTS PREVIEW --- */
 .case-contents-grid {
@@ -199,17 +248,22 @@
 .cc-icon {
   width: 80px;
   height: 80px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  background: rgba(0, 240, 255, 0.03);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   cursor: help;
-  transition: transform 0.1s;
+  transition: all 0.2s;
+  border: 1px solid rgba(0, 240, 255, 0.05);
 }
 
-.cc-icon:hover { transform: scale(1.1); z-index: 10; }
+.cc-icon:hover {
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
 .cc-icon img { width: 70px; height: 70px; object-fit: contain; }
 
 .cc-icon:hover::after {
@@ -218,13 +272,14 @@
   bottom: 110%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.9);
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: rgba(5, 5, 15, 0.95);
+  color: var(--neon-cyan);
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 0.7rem;
   white-space: nowrap;
-  border: 1px solid #444;
+  border: 1px solid rgba(0, 240, 255, 0.2);
   pointer-events: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 240, 255, 0.1);
+  font-family: 'Rajdhani', sans-serif;
 }

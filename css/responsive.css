@@ -1,5 +1,6 @@
 /* ===========================
-   RESPONSIVE.CSS – Alle Media Queries (dedupliziert)
+   RESPONSIVE.CSS – Alle Media Queries
+   CYBERPUNK NEON REDESIGN
    =========================== */
 
 /* --- MOBILE LAYOUT (unter 850px) --- */
@@ -13,7 +14,7 @@
   .left-panel {
     min-height: 50vh;
     border-right: none;
-    border-bottom: 2px solid #333;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.1);
   }
 
   .right-panel {
@@ -48,11 +49,12 @@
   .bakery-name {
     font-size: 1.2rem;
     top: 5px;
+    letter-spacing: 4px;
   }
 
   #top-player-display {
     top: 35px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .score-container {
@@ -63,7 +65,7 @@
   #score { font-size: 2rem; }
 
   .currency-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin-top: 0;
   }
 
@@ -89,17 +91,19 @@
 
   #casinoBtn, #skinsBtn, #leaderboardBtn, #lotteryBtn, #prestigeBtn, .nav-btn {
     padding: 5px 12px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     margin-top: 4px;
     min-height: 0;
+    letter-spacing: 1px;
   }
 
   .right-panel { width: 340px; }
 
   .store-header {
     padding: 5px;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     min-height: 0;
+    letter-spacing: 3px;
   }
 
   .click-booster { padding: 5px; }
@@ -123,7 +127,7 @@
   }
 
   .b-icon { font-size: 1.4rem; width: 30px; margin-right: 5px; }
-  .b-name { font-size: 0.8rem; margin-bottom: 0; }
+  .b-name { font-size: 0.75rem; margin-bottom: 0; }
   .b-cps { font-size: 0.6rem; }
   .b-cost { font-size: 0.7rem; }
   .b-count { font-size: 1.1rem; }
